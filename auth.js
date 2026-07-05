@@ -1,10 +1,10 @@
 /**
- * EJaytech Concepts - Authentication Module
+ * EJaytech Concepts - Authentication Module (Real Firebase Project Integration)
  * Manages sign up, custom registrations, role checks, and session states.
  */
 
 // Generate a unique sequential-style Student ID index: EJ-YEAR-4RANDOM
-function generateStudentId() {
+export function generateStudentId() {
   const year = new Date().getFullYear();
   const randNum = Math.floor(1000 + Math.random() * 9000);
   return `EJ-${year}-${randNum}`;
@@ -13,7 +13,7 @@ function generateStudentId() {
 /**
  * Handle student application registration
  */
-async function registerStudentAccount(data) {
+export async function registerStudentAccount(data) {
   const { fullname, email, phone, gender, dob, state, address, course, password } = data;
   
   if (!fullname || !email || !phone || !gender || !dob || !state || !address || !course || !password) {
@@ -24,12 +24,13 @@ async function registerStudentAccount(data) {
   const credential = await auth.createUserWithEmailAndPassword(email, password);
   const user = credential.user;
   
-  // 2. Formulate student record inside Firestore under the student's unique authentication UID
+  // 2. Formulate student record inside Firestore users collection under user's unique authentication UID
   const studentId = generateStudentId();
-  const studentRecord = {
+  const userRecord = {
     uid: user.uid,
     studentId,
-    fullname,
+    fullName: fullname, // Requirement 6: fullName
+    fullname: fullname, // Compatibility fallback
     email: email.toLowerCase().trim(),
     phone,
     gender,
@@ -37,13 +38,14 @@ async function registerStudentAccount(data) {
     state,
     address,
     course,
-    status: "Pending", // Awaiting administrator approval
-    createdAt: isRealFirebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
+    role: "student", // Requirement 6: role ("student" by default)
+    status: "Pending", // Requirement 6: status ("pending" by default, using Pending for UI matching)
+    createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
     bio: "Enthusiastic EJaytech Concepts student.",
     lastDocumentSubmitted: ""
   };
   
-  await db.collection("students").doc(user.uid).set(studentRecord);
+  await db.collection("users").doc(user.uid).set(userRecord);
   
   // 3. Create initial notification alert welcomed to their portal
   const welcomeNotif = {
@@ -55,53 +57,64 @@ async function registerStudentAccount(data) {
   };
   await db.collection("notifications").add(welcomeNotif);
 
-  return studentRecord;
+  return userRecord;
 }
 
 /**
  * Handle user email login
  */
-async function loginUserAccount(email, password) {
+export async function loginUserAccount(email, password) {
   const credential = await auth.signInWithEmailAndPassword(email, password);
   const user = credential.user;
   const normalizedEmail = email.toLowerCase().trim();
   
-  // Check if they are admin in admins collection
-  const adminDoc = await db.collection("admins").doc(user.uid).get();
-  if (adminDoc.exists || normalizedEmail === "admin@ejaytech.com") {
-    if (!adminDoc.exists) {
-      await db.collection("admins").doc(user.uid).set({
-        username: "EJaytech Chief Admin",
+  // Retrieve user record from "users" collection
+  let userDoc = await db.collection("users").doc(user.uid).get();
+  
+  if (normalizedEmail === "admin@ejaytech.com") {
+    // If admin document doesn't exist, create it in "users" collection
+    if (!userDoc.exists) {
+      await db.collection("users").doc(user.uid).set({
+        uid: user.uid,
+        fullName: "EJaytech Chief Admin",
+        fullname: "EJaytech Chief Admin",
         email: normalizedEmail,
-        profilePictureUrl: "",
+        role: "admin",
+        status: "Approved",
+        createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+        username: "EJaytech Chief Admin",
         darkModeEnabled: false,
+        profilePictureUrl: "",
         websiteSettings: {
           siteName: "EJaytech Concepts",
           contactPhone: "07033719342",
           contactEmail: "ejaytechconcepts@gmail.com",
           headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
-        },
-        createdAt: new Date().toISOString()
+        }
       });
+      userDoc = await db.collection("users").doc(user.uid).get();
     }
-    return { user, role: "admin" };
   }
 
-  // Retrieve student profile record
-  const studentDoc = await db.collection("students").doc(user.uid).get();
-  
-  if (!studentDoc.exists) {
-    throw new Error("Student registration record not found in the database. Please contact support.");
+  if (!userDoc.exists) {
+    throw new Error("User registration record not found in the database. Please contact support.");
   }
   
-  const student = studentDoc.data();
-  return { user, student, role: "student" };
+  const userData = userDoc.data();
+  
+  // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
+  if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
+    await auth.signOut();
+    throw new Error("Your account application is pending administrative approval.");
+  }
+  
+  return { user, student: userData, role: userData.role };
 }
 
 /**
  * Send password reset email
  */
-async function resetStudentPassword(email) {
+export async function resetStudentPassword(email) {
   if (!email) throw new Error("Email address is required to reset passwords.");
   await auth.sendPasswordResetEmail(email);
 }
@@ -109,7 +122,7 @@ async function resetStudentPassword(email) {
 /**
  * Logout session
  */
-async function logoutSession() {
+export async function logoutSession() {
   await auth.signOut();
   window.location.href = "portal.html";
 }
@@ -117,7 +130,7 @@ async function logoutSession() {
 /**
  * Synchronize and enforce secure Session access on Student and Admin pages
  */
-function protectPageAccess(requiredRole) {
+export function protectPageAccess(requiredRole) {
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
       console.log("No authenticated user session, redirecting to portal.");
@@ -125,46 +138,57 @@ function protectPageAccess(requiredRole) {
       return;
     }
 
-    if (requiredRole === "admin") {
-      const adminDoc = await db.collection("admins").doc(user.uid).get();
-      if (!adminDoc.exists && user.email !== "admin@ejaytech.com") {
-        console.warn("Unauthorized administrative access attempt, booting to student page!");
-        window.location.href = "student-dashboard.html";
+    try {
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      if (!userDoc.exists) {
+        // Fallback for admin
+        if (user.email === "admin@ejaytech.com" && requiredRole === "admin") {
+          return;
+        }
+        await auth.signOut();
+        window.location.href = "portal.html";
+        return;
       }
-    } else if (requiredRole === "student") {
-      const adminDoc = await db.collection("admins").doc(user.uid).get();
-      if (adminDoc.exists || user.email === "admin@ejaytech.com") {
-        window.location.href = "admin-dashboard.html";
+
+      const userData = userDoc.data();
+      
+      // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
+      if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
+        alert("Your student application is pending administrative approval.");
+        await auth.signOut();
+        window.location.href = "portal.html";
         return;
       }
       
-      // Load current student record to check status
-      try {
-        const studentDoc = await db.collection("students").doc(user.uid).get();
-        if (studentDoc.exists) {
-          const student = studentDoc.data();
-          if (student.status === "Rejected") {
-            alert("Your student application details have been audited and rejected on administrative basis.");
-            await auth.signOut();
-            window.location.href = "portal.html";
-          }
-        } else {
-          // If a student doesn't exist, sign out
-          await auth.signOut();
-          window.location.href = "portal.html";
-        }
-      } catch (err) {
-        console.error("Session verification fetch failed:", err);
+      if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "rejected") {
+        alert("Your student application details have been audited and rejected on administrative basis.");
+        await auth.signOut();
+        window.location.href = "portal.html";
+        return;
       }
+
+      // Requirement 9: Allow only users with role "admin" to access the admin dashboard.
+      if (requiredRole === "admin" && userData.role !== "admin") {
+        console.warn("Unauthorized administrative access attempt, booting to student page!");
+        window.location.href = "student-dashboard.html";
+        return;
+      }
+
+      if (requiredRole === "student" && userData.role === "admin") {
+        window.location.href = "admin-dashboard.html";
+        return;
+      }
+
+    } catch (err) {
+      console.error("Session verification fetch failed:", err);
     }
   });
 }
 
 /**
  * Dynamic Website Settings Replacer
- * Synchronizes the physical head office, contact phone, and contact email with database overrides.
  */
-async function applyGlobalSettings() {
+export async function applyGlobalSettings() {
   let settings = {
     siteName: "EJaytech Concepts",
     contactPhone: "07033719342",
@@ -177,7 +201,7 @@ async function applyGlobalSettings() {
     let dat = null;
     
     if (auth.currentUser) {
-      const doc = await db.collection("admins").doc(auth.currentUser.uid).get();
+      const doc = await db.collection("users").doc(auth.currentUser.uid).get();
       if (doc.exists && doc.data().websiteSettings) {
         dat = doc.data().websiteSettings;
         fetched = true;
@@ -185,7 +209,7 @@ async function applyGlobalSettings() {
     }
     
     if (!fetched) {
-      const gdoc = await db.collection("admins").doc("admin-master").get();
+      const gdoc = await db.collection("users").doc("admin-master").get();
       if (gdoc.exists && gdoc.data().websiteSettings) {
         dat = gdoc.data().websiteSettings;
         fetched = true;
@@ -263,3 +287,11 @@ auth.onAuthStateChanged(() => {
   applyGlobalSettings();
 });
 
+// Expose functions globally to window
+window.generateStudentId = generateStudentId;
+window.registerStudentAccount = registerStudentAccount;
+window.loginUserAccount = loginUserAccount;
+window.resetStudentPassword = resetStudentPassword;
+window.logoutSession = logoutSession;
+window.protectPageAccess = protectPageAccess;
+window.applyGlobalSettings = applyGlobalSettings;

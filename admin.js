@@ -1,5 +1,5 @@
 /**
- * EJaytech Concepts - Administrator Dashboard Logic
+ * EJaytech Concepts - Administrator Dashboard Logic (Real Firebase Integration)
  * Integrates admin capabilities: approving/rejecting accounts, managing courses list,
  * posting public notifications, and uploading study resource files.
  */
@@ -7,21 +7,25 @@
 /**
  * Fetch list of all registered students in the system
  */
-async function getRegisteredStudentsList() {
-  const snapshot = await db.collection("students").get();
+export async function getRegisteredStudentsList() {
+  const snapshot = await db.collection("users").get();
   const list = [];
   snapshot.forEach(doc => {
-    list.push({ uid: doc.id, ...doc.data() });
+    const data = doc.data();
+    // Exclude the main administrator from the user/student list
+    if (data.email !== "admin@ejaytech.com") {
+      list.push({ uid: doc.id, ...data });
+    }
   });
-  return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 }
 
 /**
  * Record action in activity logs inside Firestore
  */
-async function logAdminActivity(actionMessage) {
-  const serverTimestamp = (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
-    ? firebase.firestore.FieldValue.serverTimestamp()
+export async function logAdminActivity(actionMessage) {
+  const serverTimestamp = window.firebaseServerTimestamp 
+    ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
   await db.collection("activity_logs").add({
@@ -33,7 +37,7 @@ async function logAdminActivity(actionMessage) {
 /**
  * Fetch all activity logs from Firestore sorted by createdAt desc
  */
-async function getActivityLogsList() {
+export async function getActivityLogsList() {
   const snapshot = await db.collection("activity_logs").get();
   const list = [];
   snapshot.forEach(doc => {
@@ -49,7 +53,7 @@ async function getActivityLogsList() {
 /**
  * Clear all activity logs
  */
-async function purgeActivityLogs() {
+export async function purgeActivityLogs() {
   const snapshot = await db.collection("activity_logs").get();
   for (const doc of snapshot.docs) {
     await doc.ref.delete();
@@ -59,23 +63,23 @@ async function purgeActivityLogs() {
 /**
  * Approve student registration
  */
-async function approveStudentApplication(uid, studentId) {
-  const serverTimestamp = (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
-    ? firebase.firestore.FieldValue.serverTimestamp()
+export async function approveStudentApplication(uid, studentId) {
+  const serverTimestamp = window.firebaseServerTimestamp 
+    ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
   const adminProfile = await getAdminProfile("admin-master");
-  const adminName = adminProfile.username || "Admin Elijah";
+  const adminName = adminProfile.fullName || adminProfile.username || "Admin Elijah";
 
-  // Update student status inside Firestore
-  await db.collection("students").doc(uid).update({
+  // Update student status inside Firestore users collection
+  await db.collection("users").doc(uid).update({
     status: "Approved",
     approvalDate: serverTimestamp,
     approvedBy: adminName
   });
 
   // Retrieve student details to construct custom email components
-  const studentDoc = await db.collection("students").doc(uid).get();
+  const studentDoc = await db.collection("users").doc(uid).get();
   if (!studentDoc.exists) throw new Error("Student profile record not found.");
   const studentData = studentDoc.data();
   const studentEmail = studentData.email || "";
@@ -89,11 +93,7 @@ async function approveStudentApplication(uid, studentId) {
     notificationId: notifId,
     studentId: studentId,
     title: "Application Approved",
-    message: `Congratulations!
-
-Your application to EJaytech Concepts has been approved successfully.
-
-You may now access your student dashboard, course information, learning materials, announcements, and future updates.`,
+    message: `Congratulations! Your application to EJaytech Concepts has been approved successfully. You may now access your student dashboard and learning resources.`,
     createdAt: serverTimestamp,
     isRead: false,
     read: false,
@@ -102,27 +102,7 @@ You may now access your student dashboard, course information, learning material
   });
 
   const emailSubject = "Application Approved – EJaytech Concepts";
-  const emailMessage = `Dear ${studentName},
-
-Congratulations!
-
-We are pleased to inform you that your application to EJaytech Concepts has been approved.
-
-Student ID:
-${studentId}
-
-Course:
-${courseName}
-
-You can now log in to your student dashboard and access your learning resources.
-
-Thank you for choosing EJaytech Concepts.
-
-Best Regards,
-
-EJaytech Concepts
-
-Innovating Ideas, Delivering Solutions.`;
+  const emailMessage = `Dear ${studentName},\n\nCongratulations!\n\nWe are pleased to inform you that your application to EJaytech Concepts has been approved.\n\nStudent ID: ${studentId}\nCourse: ${courseName}\n\nYou can now log in to your student dashboard and access your learning resources.\n\nThank you for choosing EJaytech Concepts.\n\nBest Regards,\nEJaytech Concepts`;
 
   // Standard persistent email database sync log
   await db.collection("emails").add({
@@ -136,34 +116,28 @@ Innovating Ideas, Delivering Solutions.`;
   // Record action in activity logs
   const activityMessage = `Admin ${adminName} approved application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
   await logAdminActivity(activityMessage);
-
-  console.group("%c[EJaytech Email Notification Dispatched]", "color: #10b981; font-weight: bold; font-size: 1.15em;");
-  console.log(`To: ${studentEmail}`);
-  console.log(`Subject: ${emailSubject}`);
-  console.log(`Message:\n${emailMessage}`);
-  console.groupEnd();
 }
 
 /**
  * Reject student registration
  */
-async function rejectStudentApplication(uid, studentId) {
-  const serverTimestamp = (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
-    ? firebase.firestore.FieldValue.serverTimestamp()
+export async function rejectStudentApplication(uid, studentId) {
+  const serverTimestamp = window.firebaseServerTimestamp 
+    ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
   const adminProfile = await getAdminProfile("admin-master");
-  const adminName = adminProfile.username || "Admin Elijah";
+  const adminName = adminProfile.fullName || adminProfile.username || "Admin Elijah";
 
-  // Update student status inside Firestore
-  await db.collection("students").doc(uid).update({
+  // Update student status inside Firestore users collection
+  await db.collection("users").doc(uid).update({
     status: "Rejected",
     rejectionDate: serverTimestamp,
     rejectedBy: adminName
   });
 
   // Retrieve student details to construct custom email components
-  const studentDoc = await db.collection("students").doc(uid).get();
+  const studentDoc = await db.collection("users").doc(uid).get();
   if (!studentDoc.exists) throw new Error("Student profile record not found.");
   const studentData = studentDoc.data();
   const studentEmail = studentData.email || "";
@@ -176,11 +150,7 @@ async function rejectStudentApplication(uid, studentId) {
     notificationId: notifId,
     studentId: studentId,
     title: "Application Not Approved",
-    message: `Thank you for applying to EJaytech Concepts.
-
-After reviewing your application, we are unable to approve it at this time.
-
-For further enquiries, please contact the administration.`,
+    message: `Thank you for applying to EJaytech Concepts. After reviewing your application, we are unable to approve it at this time.`,
     createdAt: serverTimestamp,
     isRead: false,
     read: false,
@@ -189,17 +159,7 @@ For further enquiries, please contact the administration.`,
   });
 
   const emailSubject = "Application Status Update – EJaytech Concepts";
-  const emailMessage = `Dear ${studentName},
-
-Thank you for your interest in EJaytech Concepts.
-
-After reviewing your application, we are unable to approve it at this time.
-
-For additional information, please contact the administration.
-
-Regards,
-
-EJaytech Concepts`;
+  const emailMessage = `Dear ${studentName},\n\nThank you for your interest in EJaytech Concepts. After reviewing your application, we are unable to approve it at this time.\n\nRegards,\nEJaytech Concepts`;
 
   // Standard persistent email database sync log
   await db.collection("emails").add({
@@ -213,32 +173,26 @@ EJaytech Concepts`;
   // Record action in activity logs
   const activityMessage = `Admin ${adminName} rejected application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
   await logAdminActivity(activityMessage);
-
-  console.group("%c[EJaytech Email Notification Dispatched]", "color: #ef4444; font-weight: bold; font-size: 1.15em;");
-  console.log(`To: ${studentEmail}`);
-  console.log(`Subject: ${emailSubject}`);
-  console.log(`Message:\n${emailMessage}`);
-  console.groupEnd();
 }
 
 /**
  * Update registry indexes of student records
  */
-async function editStudentRecordAdmin(uid, data) {
-  await db.collection("students").doc(uid).update(data);
+export async function editStudentRecordAdmin(uid, data) {
+  await db.collection("users").doc(uid).update(data);
 }
 
 /**
  * Permanently purge student records (Administrative clearance)
  */
-async function deleteStudentRecordAdmin(uid) {
-  await db.collection("students").doc(uid).delete();
+export async function deleteStudentRecordAdmin(uid) {
+  await db.collection("users").doc(uid).delete();
 }
 
 /**
  * Retrieve courses list catalogue from database 
  */
-async function getCoursesList() {
+export async function getCoursesList() {
   const snapshot = await db.collection("courses").get();
   const list = [];
   snapshot.forEach(doc => {
@@ -250,7 +204,7 @@ async function getCoursesList() {
 /**
  * Create or save courses list detail specifications inside database
  */
-async function createCourseAdmin(courseData) {
+export async function createCourseAdmin(courseData) {
   const id = "course-" + Date.now();
   const courseRecord = {
     id,
@@ -285,7 +239,7 @@ async function createCourseAdmin(courseData) {
 /**
  * Update course details
  */
-async function updateCourseAdmin(courseId, courseData) {
+export async function updateCourseAdmin(courseId, courseData) {
   const courseRecord = {
     courseName: courseData.courseName || courseData.title,
     title: courseData.title || courseData.courseName,
@@ -305,21 +259,21 @@ async function updateCourseAdmin(courseId, courseData) {
 /**
  * Archive/Unarchive course
  */
-async function archiveCourseAdmin(courseId, isArchived) {
+export async function archiveCourseAdmin(courseId, isArchived) {
   await db.collection("courses").doc(courseId).update({ isArchived: !!isArchived });
 }
 
 /**
  * Delete course permanently
  */
-async function deleteCourseAdmin(courseId) {
+export async function deleteCourseAdmin(courseId) {
   await db.collection("courses").doc(courseId).delete();
 }
 
 /**
  * Retrieve learning materials list
  */
-async function getMaterialsList() {
+export async function getMaterialsList() {
   const snapshot = await db.collection("materials").get();
   const list = [];
   snapshot.forEach(doc => {
@@ -331,7 +285,7 @@ async function getMaterialsList() {
 /**
  * Put Study Learning Material attachment after uploading file to Storage
  */
-async function createLearningMaterialAdmin(title, description, courseId, fileObj, fileType = "PDF") {
+export async function createLearningMaterialAdmin(title, description, courseId, fileObj, fileType = "PDF") {
   let downloadUrl = "#";
   let sizeLabel = "1.2 MB";
 
@@ -342,11 +296,10 @@ async function createLearningMaterialAdmin(title, description, courseId, fileObj
       const uploadTask = await storage.ref().child(storagePath).put(fileObj);
       downloadUrl = await uploadTask.ref.getDownloadURL();
     } catch (err) {
-      console.warn("Storage upload skipped or failed, using a simulation URL.", err);
+      console.warn("Storage upload failed, using fallback pdf.", err);
       downloadUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
     }
   } else {
-    // simulation or standard fallback file
     downloadUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
   }
 
@@ -357,7 +310,7 @@ async function createLearningMaterialAdmin(title, description, courseId, fileObj
     description: description || "No description provided.",
     filePath: downloadUrl,
     fileSize: sizeLabel,
-    fileType: fileType, // PDF, Video, Image, Assignment
+    fileType: fileType,
     uploadedAt: new Date().toISOString()
   };
 
@@ -379,14 +332,14 @@ async function createLearningMaterialAdmin(title, description, courseId, fileObj
 /**
  * Delete a study material record
  */
-async function deleteLearningMaterialAdmin(materialId) {
+export async function deleteLearningMaterialAdmin(materialId) {
   await db.collection("materials").doc(materialId).delete();
 }
 
 /**
  * Fetch campus Announcements
  */
-async function getAnnouncementsList() {
+export async function getAnnouncementsList() {
   const snapshot = await db.collection("announcements").get();
   const list = [];
   snapshot.forEach(doc => {
@@ -398,7 +351,7 @@ async function getAnnouncementsList() {
 /**
  * Create Announcement
  */
-async function createAnnouncementAdmin(title, message) {
+export async function createAnnouncementAdmin(title, message) {
   const id = "ann-" + Date.now();
   const announcementRecord = {
     id,
@@ -407,7 +360,6 @@ async function createAnnouncementAdmin(title, message) {
     createdAt: new Date().toISOString()
   };
   
-  // Write to announcements collection
   await db.collection("announcements").doc(id).set(announcementRecord);
 
   // Broadly syndicate as a global notification
@@ -426,21 +378,21 @@ async function createAnnouncementAdmin(title, message) {
 /**
  * Edit announcement
  */
-async function editAnnouncementAdmin(annId, data) {
+export async function editAnnouncementAdmin(annId, data) {
   await db.collection("announcements").doc(annId).update(data);
 }
 
 /**
  * Delete announcement
  */
-async function deleteAnnouncementAdmin(annId) {
+export async function deleteAnnouncementAdmin(annId) {
   await db.collection("announcements").doc(annId).delete();
 }
 
 /**
  * Fetch all notifications for notification management history
  */
-async function getNotificationsHistoryList() {
+export async function getNotificationsHistoryList() {
   const snapshot = await db.collection("notifications").get();
   const list = [];
   snapshot.forEach(doc => {
@@ -452,14 +404,14 @@ async function getNotificationsHistoryList() {
 /**
  * Delete notice
  */
-async function deleteNotificationAdmin(notifId) {
+export async function deleteNotificationAdmin(notifId) {
   await db.collection("notifications").doc(notifId).delete();
 }
 
 /**
  * Create custom administrative system alert
  */
-async function createSystemAnnouncement(title, message, studentId) {
+export async function createSystemAnnouncement(title, message, studentId) {
   const finalId = studentId || "all";
   await db.collection("notifications").add({
     studentId: finalId,
@@ -474,13 +426,13 @@ async function createSystemAnnouncement(title, message, studentId) {
 /**
  * Fetch logged Admin document
  */
-async function getAdminProfile(uid) {
-  const docRef = await db.collection("admins").doc(uid).get();
+export async function getAdminProfile(uid) {
+  const docRef = await db.collection("users").doc(uid).get();
   if (docRef.exists) {
     return docRef.data();
   }
-  // Default fallback if not found
   return {
+    fullName: "EJaytech Chief Admin",
     username: "EJaytech Chief Admin",
     email: "admin@ejaytech.com",
     darkModeEnabled: false,
@@ -497,14 +449,14 @@ async function getAdminProfile(uid) {
 /**
  * Edit administrator settings profile details
  */
-async function updateAdminProfile(uid, data) {
-  await db.collection("admins").doc(uid).update(data);
+export async function updateAdminProfile(uid, data) {
+  await db.collection("users").doc(uid).update(data);
 }
 
 /**
- * Change authenticated user's password
+ * Change authenticated user's password using standard Firebase Modular Auth SDK API
  */
-async function changeAdminPassword(currentPassword, newPassword) {
+export async function changeAdminPassword(currentPassword, newPassword) {
   const user = auth.currentUser;
   if (!user) {
     const err = new Error("No active administrator user session. Please sign in again.");
@@ -524,22 +476,16 @@ async function changeAdminPassword(currentPassword, newPassword) {
     throw err;
   }
 
-  // Import the latest Firebase Authentication v9/v10 modular SDK (or its high-fidelity mock)
-  let updatePassword, reauthenticateWithCredential, EmailAuthProvider;
-  try {
-    const authModule = await import("firebase/auth");
-    updatePassword = authModule.updatePassword;
-    reauthenticateWithCredential = authModule.reauthenticateWithCredential;
-    EmailAuthProvider = authModule.EmailAuthProvider;
-  } catch (importErr) {
-    console.error("Failed to import firebase/auth module:", importErr);
-    throw new Error("Authentication module is unavailable: " + importErr.message);
-  }
+  // Import from modular config
+  const configModule = await import("./firebase-config.js");
+  const updatePassFn = configModule.updatePassword;
+  const reauthFn = configModule.reauthenticateWithCredential;
+  const providerCls = configModule.EmailAuthProvider;
 
-  // Reauthenticate the currently signed-in user using their current password before modifying
+  // Reauthenticate the currently signed-in user
   try {
-    const credential = EmailAuthProvider.credential(user.email, currentPassword);
-    await reauthenticateWithCredential(user, credential);
+    const credential = providerCls.credential(user.email, currentPassword);
+    await reauthFn(user, credential);
   } catch (reauthErr) {
     console.error("Reauthentication failed:", reauthErr);
     const code = reauthErr.code || "";
@@ -558,7 +504,7 @@ async function changeAdminPassword(currentPassword, newPassword) {
 
   // Perform password update using the modular SDK API
   try {
-    await updatePassword(user, newPassword);
+    await updatePassFn(user, newPassword);
   } catch (updateErr) {
     console.error("Password update failed:", updateErr);
     const code = updateErr.code || "";
@@ -579,3 +525,31 @@ async function changeAdminPassword(currentPassword, newPassword) {
     }
   }
 }
+
+// Expose functions globally to window
+window.getRegisteredStudentsList = getRegisteredStudentsList;
+window.logAdminActivity = logAdminActivity;
+window.getActivityLogsList = getActivityLogsList;
+window.purgeActivityLogs = purgeActivityLogs;
+window.approveStudentApplication = approveStudentApplication;
+window.rejectStudentApplication = rejectStudentApplication;
+window.editStudentRecordAdmin = editStudentRecordAdmin;
+window.deleteStudentRecordAdmin = deleteStudentRecordAdmin;
+window.getCoursesList = getCoursesList;
+window.createCourseAdmin = createCourseAdmin;
+window.updateCourseAdmin = updateCourseAdmin;
+window.archiveCourseAdmin = archiveCourseAdmin;
+window.deleteCourseAdmin = deleteCourseAdmin;
+window.getMaterialsList = getMaterialsList;
+window.createLearningMaterialAdmin = createLearningMaterialAdmin;
+window.deleteLearningMaterialAdmin = deleteLearningMaterialAdmin;
+window.getAnnouncementsList = getAnnouncementsList;
+window.createAnnouncementAdmin = createAnnouncementAdmin;
+window.editAnnouncementAdmin = editAnnouncementAdmin;
+window.deleteAnnouncementAdmin = deleteAnnouncementAdmin;
+window.getNotificationsHistoryList = getNotificationsHistoryList;
+window.deleteNotificationAdmin = deleteNotificationAdmin;
+window.createSystemAnnouncement = createSystemAnnouncement;
+window.getAdminProfile = getAdminProfile;
+window.updateAdminProfile = updateAdminProfile;
+window.changeAdminPassword = changeAdminPassword;

@@ -1,13 +1,13 @@
 /**
- * EJaytech Concepts - Student Operations Module
+ * EJaytech Concepts - Student Operations Module (Real Firebase Project Integration)
  * Manages profile loading, class materials listing, and assignments/materials upload triggers.
  */
 
 /**
  * Fetch and load student profile data
  */
-async function getStudentProfile(uid) {
-  const docRef = await db.collection("students").doc(uid).get();
+export async function getStudentProfile(uid) {
+  const docRef = await db.collection("users").doc(uid).get();
   if (docRef.exists) {
     return docRef.data();
   }
@@ -17,10 +17,10 @@ async function getStudentProfile(uid) {
 /**
  * Update basic personal bio fields inside Firestore
  */
-async function updateStudentProfile(uid, fields) {
-  // Prevent altering locked fields (id, email, status, course) via database rules
+export async function updateStudentProfile(uid, fields) {
   const sanitisedFields = {
     fullname: fields.fullname,
+    fullName: fields.fullname, // Sync fullName as well
     phone: fields.phone,
     gender: fields.gender,
     dob: fields.dob,
@@ -29,14 +29,14 @@ async function updateStudentProfile(uid, fields) {
     bio: fields.bio || ""
   };
   
-  await db.collection("students").doc(uid).update(sanitisedFields);
+  await db.collection("users").doc(uid).update(sanitisedFields);
   return getStudentProfile(uid);
 }
 
 /**
  * Retrieve notifications applicable to this student (their studentId or 'all')
  */
-async function getStudentNotifications(studentId) {
+export async function getStudentNotifications(studentId) {
   const snapshot = await db.collection("notifications").get();
   const list = [];
   snapshot.forEach(doc => {
@@ -46,21 +46,20 @@ async function getStudentNotifications(studentId) {
       list.push({ id, ...data });
     }
   });
-  // Sort descending by date
   return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
 /**
  * Mark a notification as read
  */
-async function markNotificationAsRead(notifId) {
+export async function markNotificationAsRead(notifId) {
   await db.collection("notifications").doc(notifId).update({ status: "read", read: true });
 }
 
 /**
  * Retrieve materials uploaded by the admin for a specific course
  */
-async function getCourseMaterials(courseName) {
+export async function getCourseMaterials(courseName) {
   const snapshot = await db.collection("materials").get();
   const list = [];
   
@@ -88,18 +87,17 @@ async function getCourseMaterials(courseName) {
 /**
  * Upload an Assignment PDF/Image File to Firebase Storage as student files
  */
-async function uploadAssignmentFile(uid, studentId, fileObj) {
+export async function uploadAssignmentFile(uid, studentId, fileObj) {
   if (!fileObj) throw new Error("Please select a file to submit.");
   
-  // Create a storage key path
   const storagePath = `student_files/${uid}/${Date.now()}_${fileObj.name}`;
   
-  // Put file in Storage
+  // Put file in Storage using modular ref wrapper
   const uploadTask = await storage.ref().child(storagePath).put(fileObj);
   const downloadUrl = await uploadTask.ref.getDownloadURL();
   
-  // Update student collection registry linking the file
-  await db.collection("students").doc(uid).update({
+  // Update users collection registry linking the file
+  await db.collection("users").doc(uid).update({
     lastDocumentSubmitted: downloadUrl
   });
 
@@ -114,3 +112,11 @@ async function uploadAssignmentFile(uid, studentId, fileObj) {
 
   return downloadUrl;
 }
+
+// Expose functions globally to window
+window.getStudentProfile = getStudentProfile;
+window.updateStudentProfile = updateStudentProfile;
+window.getStudentNotifications = getStudentNotifications;
+window.markNotificationAsRead = markNotificationAsRead;
+window.getCourseMaterials = getCourseMaterials;
+window.uploadAssignmentFile = uploadAssignmentFile;

@@ -1,191 +1,276 @@
 /**
  * EJaytech Concepts - Real Firebase Database & Authentication Layer
- * Connected to live Firebase project: ejaytech-concepts
+ * Connected to live Firebase project: ejaytech-de88d using Firebase Modular SDK
  */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged, 
+  sendPasswordResetEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getStorage, 
+  ref, 
+  uploadBytes, 
+  getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDQsHkDn_P4lyX5YnyTYKJGQumhIG6wESI",
-  authDomain: "ejaytech-concepts.firebaseapp.com",
-  projectId: "ejaytech-concepts",
-  storageBucket: "ejaytech-concepts.firebasestorage.app",
-  messagingSenderId: "802065299790",
-  appId: "1:802065299790:web:800ab9b7666d4de69e461f"
+  apiKey: "AIzaSyDo-pOH9qR6dd-kDBFikkr2ohpZKK7EzGc",
+  authDomain: "ejaytech-de88d.firebaseapp.com",
+  projectId: "ejaytech-de88d",
+  storageBucket: "ejaytech-de88d.firebasestorage.app",
+  messagingSenderId: "35030264525",
+  appId: "1:35030264525:web:bd020efd61b7c7f2935784",
+  measurementId: "G-VK8YT2BE53"
 };
 
-// Initialize Live Firebase SDK
-if (typeof firebase !== 'undefined') {
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+// Initialize Firebase App
+const app = initializeApp(firebaseConfig);
+const firestore = getFirestore(app);
+const firebaseAuth = getAuth(app);
+const storageInstance = getStorage(app);
+
+// Custom Compatibility Classes for Firestore
+class DocRefWrapper {
+  constructor(firestoreInstance, path) {
+    this.firestoreInstance = firestoreInstance;
+    this.path = path;
   }
-} else {
-  console.warn("Firebase SDK is not loaded. Ensure Firebase Compat scripts are included in HTML head.");
-}
 
-// Global active instances
-const realDb = typeof firebase !== 'undefined' ? firebase.firestore() : null;
-const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
-const storage = typeof firebase !== 'undefined' ? firebase.storage() : null;
+  get id() {
+    const parts = this.path.split("/");
+    return parts[parts.length - 1];
+  }
 
-const OperationType = {
-  CREATE: 'create',
-  UPDATE: 'update',
-  DELETE: 'delete',
-  LIST: 'list',
-  GET: 'get',
-  WRITE: 'write',
-};
+  get ref() {
+    return this;
+  }
 
-/**
- * Handle Firestore errors according to specific skill instructions.
- */
-function handleFirestoreError(error, operationType, path) {
-  const errMsg = error && error.message ? error.message : String(error);
-  const isPermissionError = errMsg.toLowerCase().includes("permission") || errMsg.toLowerCase().includes("insufficient");
-  
-  if (isPermissionError) {
-    const errInfo = {
-      error: errMsg,
-      authInfo: {
-        userId: auth && auth.currentUser ? auth.currentUser.uid : null,
-        email: auth && auth.currentUser ? auth.currentUser.email : null,
-        emailVerified: auth && auth.currentUser ? auth.currentUser.emailVerified : null,
-        isAnonymous: auth && auth.currentUser ? auth.currentUser.isAnonymous : null,
-        tenantId: auth && auth.currentUser ? auth.currentUser.tenantId : null,
-        providerInfo: auth && auth.currentUser && auth.currentUser.providerData ? auth.currentUser.providerData.map(provider => ({
-          providerId: provider.providerId,
-          email: provider.email,
-        })) : []
-      },
-      operationType: operationType,
-      path: path
+  async get() {
+    const d = doc(this.firestoreInstance, this.path);
+    const snap = await getDoc(d);
+    return {
+      exists: snap.exists(),
+      id: snap.id,
+      ref: this,
+      data: () => snap.data()
     };
-    console.error('Firestore Error: ', JSON.stringify(errInfo));
-    throw new Error(JSON.stringify(errInfo));
   }
-  throw error;
+
+  async set(data) {
+    const d = doc(this.firestoreInstance, this.path);
+    await setDoc(d, data);
+  }
+
+  async update(data) {
+    const d = doc(this.firestoreInstance, this.path);
+    await updateDoc(d, data);
+  }
+
+  async delete() {
+    const d = doc(this.firestoreInstance, this.path);
+    await deleteDoc(d);
+  }
 }
 
-/**
- * Create a transparent proxy wrapper around Firestore references to intercept error pathways.
- */
-function wrapRef(ref, path = "") {
-  if (!ref) return ref;
-  
-  return new Proxy(ref, {
-    get(target, prop, receiver) {
-      const val = Reflect.get(target, prop, receiver);
-      if (typeof val === "function") {
-        return function(...args) {
-          if (prop === "collection") {
-            const colName = args[0];
-            const nextPath = path ? `${path}/${colName}` : colName;
-            return wrapRef(val.apply(target, args), nextPath);
-          }
-          if (prop === "doc") {
-            const docId = args[0] || "unknown";
-            const nextPath = path ? `${path}/${docId}` : docId;
-            return wrapRef(val.apply(target, args), nextPath);
-          }
-          if (prop === "where" || prop === "orderBy" || prop === "limit") {
-            return wrapRef(val.apply(target, args), path);
-          }
-          
-          if (prop === "get") {
-            return val.apply(target, args).catch(err => {
-              const isCollection = typeof target.add === "function";
-              const op = isCollection ? OperationType.LIST : OperationType.GET;
-              handleFirestoreError(err, op, path);
-            });
-          }
-          if (prop === "set") {
-            return val.apply(target, args).catch(err => {
-              handleFirestoreError(err, OperationType.WRITE, path);
-            });
-          }
-          if (prop === "add") {
-            return val.apply(target, args).catch(err => {
-              handleFirestoreError(err, OperationType.CREATE, path);
-            });
-          }
-          if (prop === "update") {
-            return val.apply(target, args).catch(err => {
-              handleFirestoreError(err, OperationType.UPDATE, path);
-            });
-          }
-          if (prop === "delete") {
-            return val.apply(target, args).catch(err => {
-              handleFirestoreError(err, OperationType.DELETE, path);
-            });
-          }
-          if (prop === "onSnapshot") {
-            let onNext = args[0];
-            let onError = args[1];
-            
-            if (typeof args[1] !== "function") {
-              onError = (err) => {
-                const isCollection = typeof target.add === "function";
-                const op = isCollection ? OperationType.LIST : OperationType.GET;
-                handleFirestoreError(err, op, path);
-              };
-              args[0] = function(snap) {
-                try {
-                  onNext(snap);
-                } catch (callbackErr) {
-                  console.error("onSnapshot onNext callback error:", callbackErr);
-                }
-              };
-              args[1] = onError;
-            } else {
-              args[0] = function(snap) {
-                try {
-                  onNext(snap);
-                } catch (callbackErr) {
-                  console.error("onSnapshot onNext callback error:", callbackErr);
-                }
-              };
-              args[1] = function(err) {
-                const isCollection = typeof target.add === "function";
-                const op = isCollection ? OperationType.LIST : OperationType.GET;
-                try {
-                  handleFirestoreError(err, op, path);
-                } catch (wrappedErr) {
-                  onError(wrappedErr);
-                }
-              };
-            }
-            return val.apply(target, args);
-          }
-          
-          return val.apply(target, args);
-        };
-      }
-      if (val && typeof val === "object" && (val.collection || val.doc || val.get)) {
-        return wrapRef(val, path);
-      }
-      return val;
+class QueryWrapper {
+  constructor(firestoreInstance, colPath, constraints = []) {
+    this.firestoreInstance = firestoreInstance;
+    this.colPath = colPath;
+    this.constraints = constraints;
+  }
+
+  where(field, op, value) {
+    return new QueryWrapper(this.firestoreInstance, this.colPath, [...this.constraints, where(field, op, value)]);
+  }
+
+  orderBy(field, dir) {
+    return new QueryWrapper(this.firestoreInstance, this.colPath, [...this.constraints, orderBy(field, dir)]);
+  }
+
+  limit(n) {
+    return new QueryWrapper(this.firestoreInstance, this.colPath, [...this.constraints, limit(n)]);
+  }
+
+  async get() {
+    const colRef = collection(this.firestoreInstance, this.colPath);
+    let q;
+    if (this.constraints.length > 0) {
+      q = query(colRef, ...this.constraints);
+    } else {
+      q = colRef;
     }
-  });
+    const snap = await getDocs(q);
+    const docs = snap.docs.map(d => ({
+      id: d.id,
+      ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
+      data: () => d.data()
+    }));
+    return {
+      docs,
+      forEach: (callback) => docs.forEach(callback),
+      size: docs.length
+    };
+  }
 }
 
-// Proxied database reference that automatically handles error intercept paths
-const db = wrapRef(realDb);
+class CollectionWrapper {
+  constructor(firestoreInstance, colPath) {
+    this.firestoreInstance = firestoreInstance;
+    this.colPath = colPath;
+  }
 
-// Expose them globally
-window.db = db;
-window.auth = auth;
-window.storage = storage;
+  doc(docId) {
+    if (!docId) {
+      const newDocRef = doc(collection(this.firestoreInstance, this.colPath));
+      return new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${newDocRef.id}`);
+    }
+    return new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${docId}`);
+  }
+
+  async add(data) {
+    const colRef = collection(this.firestoreInstance, this.colPath);
+    const res = await addDoc(colRef, data);
+    return {
+      id: res.id,
+      ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${res.id}`)
+    };
+  }
+
+  async get() {
+    const colRef = collection(this.firestoreInstance, this.colPath);
+    const snap = await getDocs(colRef);
+    const docs = snap.docs.map(d => ({
+      id: d.id,
+      ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
+      data: () => d.data()
+    }));
+    return {
+      docs,
+      forEach: (callback) => docs.forEach(callback),
+      size: docs.length
+    };
+  }
+
+  where(field, op, value) {
+    return new QueryWrapper(this.firestoreInstance, this.colPath, [where(field, op, value)]);
+  }
+
+  orderBy(field, dir) {
+    return new QueryWrapper(this.firestoreInstance, this.colPath, [orderBy(field, dir)]);
+  }
+
+  limit(n) {
+    return new QueryWrapper(this.firestoreInstance, this.colPath, [limit(n)]);
+  }
+}
+
+class DbWrapper {
+  constructor(firestoreInstance) {
+    this.firestoreInstance = firestoreInstance;
+  }
+
+  collection(colName) {
+    return new CollectionWrapper(this.firestoreInstance, colName);
+  }
+
+  doc(docPath) {
+    return new DocRefWrapper(this.firestoreInstance, docPath);
+  }
+}
+
+// Custom Compatibility Classes for Storage
+class StorageRefWrapper {
+  constructor(storageInst, path = "") {
+    this.storageInst = storageInst;
+    this.path = path;
+  }
+
+  child(childPath) {
+    return new StorageRefWrapper(this.storageInst, this.path ? `${this.path}/${childPath}` : childPath);
+  }
+
+  async put(fileObj) {
+    const storageRef = ref(this.storageInst, this.path);
+    await uploadBytes(storageRef, fileObj);
+    const storageRefForUrl = storageRef;
+    return {
+      ref: {
+        async getDownloadURL() {
+          return await getDownloadURL(storageRefForUrl);
+        }
+      }
+    };
+  }
+}
+
+class StorageWrapper {
+  constructor(storageInst) {
+    this.storageInst = storageInst;
+  }
+
+  ref(path = "") {
+    return new StorageRefWrapper(this.storageInst, path);
+  }
+}
+
+// Expose instances globally
+window.db = new DbWrapper(firestore);
+window.auth = {
+  get currentUser() {
+    return firebaseAuth.currentUser;
+  },
+  async signInWithEmailAndPassword(email, password) {
+    return await signInWithEmailAndPassword(firebaseAuth, email, password);
+  },
+  async createUserWithEmailAndPassword(email, password) {
+    return await createUserWithEmailAndPassword(firebaseAuth, email, password);
+  },
+  async signOut() {
+    return await signOut(firebaseAuth);
+  },
+  onAuthStateChanged(callback) {
+    return onAuthStateChanged(firebaseAuth, callback);
+  },
+  async sendPasswordResetEmail(email) {
+    return await sendPasswordResetEmail(firebaseAuth, email);
+  }
+};
+window.storage = new StorageWrapper(storageInstance);
 window.isRealFirebase = true;
+window.firebaseServerTimestamp = serverTimestamp;
 
-// Validate Connection to Firestore on boot (Prerequisite check)
-async function testConnection() {
-  if (db) {
-    try {
-      await db.doc('test/connection').get({ source: 'server' });
-    } catch (error) {
-      if (error && error.message && error.message.toLowerCase().includes('offline')) {
-        console.error("Please check your Firebase configuration: Client is offline.");
-      }
-    }
-  }
-}
-testConnection();
+// Expose SDK functions for ES Module scripts that need them
+export {
+  app,
+  firestore,
+  firebaseAuth,
+  storageInstance,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider
+};
