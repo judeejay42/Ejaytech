@@ -1,0 +1,52 @@
+/**
+ * Custom Style Adjustments for Bootstrap 5 Templates
+ * Year: 2026
+ */
+
+/* Transition utilities */
+.transition {
+    transition: all 0.25s ease-in-out;
+}
+
+.hover-translate:hover {
+    transform: translateY(-5px);
+}
+
+/* Floating custom details */
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+.tracking-tight {
+    letter-spacing: -0.025em;
+}
+
+.font-monospace {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbars aesthetics */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+/* Dynamic bouncy or ripple effects */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}

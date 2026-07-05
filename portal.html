@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal Entry - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet" id="bootstrap-icons">
+  <!-- Custom Core CSS -->
+  <link href="assets/css/style.css" rel="stylesheet" id="custom-style">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
+        <div class="me-2 text-primary" style="font-size: 1.8rem;"><i class="bi bi-cpu-fill"></i></div>
+        <div>
+          <span class="brand-logo">EJaytech Concepts</span>
+          <span class="brand-tagline">Innovating Ideas, Delivering Solutions</span>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
+          <li class="nav-item"><a class="nav-link" href="index.html" id="link-home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html" id="link-about">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html" id="link-services">Our Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="courses.html" id="link-courses">Courses</a></li>
+          <li class="nav-item">
+            <a class="btn btn-primary-custom ms-lg-2 active" href="portal.html" id="nav-portal-btn"><i class="bi bi-door-open-fill me-1"></i> Student Portal</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Portal Grid Center -->
+  <main class="container py-5" style="min-height: 75vh;" id="portal-frame">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+        
+        <!-- Welcome Card Wrapper -->
+        <div class="bg-white border rounded-4 p-4 p-md-5 shadow-sm text-start" id="portal-card">
+          <div class="text-center mb-4">
+            <div class="text-primary fs-1 mb-2"><i class="bi bi-person-badge-fill"></i></div>
+            <h2 class="fw-bold font-display text-dark">EJaytech Concepts Portal Gateway</h2>
+            <p class="text-muted small">Login to access study materials or submit official course enrollment forms.</p>
+          </div>
+
+          <!-- Tabs Pills Controls -->
+          <ul class="nav nav-pills nav-pills-custom justify-content-center mb-4" id="portalTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="login-tab-btn" data-bs-toggle="pill" data-bs-target="#login-panel" type="button" role="tab" aria-selected="true"><i class="bi bi-shield-lock-fill me-1"></i> Account Login</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="register-tab-btn" data-bs-toggle="pill" data-bs-target="#register-panel" type="button" role="tab" aria-selected="false"><i class="bi bi-pencil-square me-1"></i> Register Student</button>
+            </li>
+          </ul>
+
+          <!-- Global Dynamic Helpers Alerts -->
+          <div class="alert alert-danger d-none" id="portal-error-alert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="portal-err-msg">An error occurred. Please try again.</span>
+          </div>
+          <div class="alert alert-success d-none" id="portal-success-alert" role="alert">
+            <i class="bi bi-patch-check-fill me-2"></i> <span id="portal-success-msg">Action processed successfully.</span>
+          </div>
+
+          <!-- Content Panels -->
+          <div class="tab-content" id="portalTabsContent">
+            
+            <!-- 1. ACCOUNT LOGIN PANEL -->
+            <div class="tab-pane fade show active" id="login-panel" role="tabpanel" aria-labelledby="login-tab-btn">
+              <form id="login-form">
+                <div class="mb-3">
+                  <label for="login-email" class="form-label">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white text-muted"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" id="login-email" required placeholder="student@example.com">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="login-password" class="form-label">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white text-muted"><i class="bi bi-key"></i></span>
+                    <input type="password" class="form-control" id="login-password" required placeholder="Enter password (e.g., student123)">
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4 small">
+                  <span class="text-muted">Admin User: <code class="text-dark bg-light px-1">admin@ejaytech.com / admin12345</code></span>
+                  <a href="#" class="text-primary text-decoration-none" id="forgot-password-link">Forgot Password?</a>
+                </div>
+
+                <div class="text-end">
+                  <button type="submit" class="btn btn-primary-custom w-100" id="login-submit-btn"><i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- 2. STUDENT REGISTRATION PANEL -->
+            <div class="tab-pane fade" id="register-panel" role="tabpanel" aria-labelledby="register-tab-btn">
+              <form id="register-form">
+                <div class="row g-3">
+                  <!-- Name -->
+                  <div class="col-md-6">
+                    <label for="reg-fullname" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="reg-fullname" required placeholder="John Chukwudi Bello">
+                  </div>
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label for="reg-email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="reg-email" required placeholder="john@example.com">
+                  </div>
+                  <!-- Phone -->
+                  <div class="col-md-6">
+                    <label for="reg-phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="reg-phone" required placeholder="e.g. +234 80 1234 5678">
+                  </div>
+                  <!-- Gender -->
+                  <div class="col-md-6">
+                    <label for="reg-gender" class="form-label">Gender Selection</label>
+                    <select class="form-select" id="reg-gender" required>
+                      <option value="" disabled selected>Choose gender...</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other / Private</option>
+                    </select>
+                  </div>
+                  <!-- Dob -->
+                  <div class="col-md-6">
+                    <label for="reg-dob" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="reg-dob" required>
+                  </div>
+                  <!-- State of origin -->
+                  <div class="col-md-6">
+                    <label for="reg-state" class="form-label">State of Origin</label>
+                    <input type="text" class="form-control" id="reg-state" required placeholder="e.g. FCT Abuja, Oyo, Kano">
+                  </div>
+                  <!-- Course Selecting Dynamic -->
+                  <div class="col-md-12">
+                    <label for="reg-course" class="form-label">Select Learning Course Track</label>
+                    <select class="form-select text-dark font-display fw-semibold" id="reg-course" required>
+                      <option value="" disabled selected>Choose the vocational track...</option>
+                      <option value="Frontend Web Development">Frontend Web Development (₦120,000 / 12 Weeks)</option>
+                      <option value="Graphic Design">Graphic Design (Canva Pro + Photoshop) (₦80,000 / 8 Weeks)</option>
+                      <option value="UI/UX Design">UI/UX Figma Design Prototyping (₦100,000 / 10 Weeks)</option>
+                      <option value="Digital Skills & Freelancing">Digital Skills &amp; Gigs Freelancing (₦60,000 / 6 Weeks)</option>
+                    </select>
+                  </div>
+                  <!-- Address -->
+                  <div class="col-md-12">
+                    <label for="reg-address" class="form-label">Residential Address</label>
+                    <textarea class="form-control" id="reg-address" rows="2" required placeholder="Enter primary contact or residential home details..."></textarea>
+                  </div>
+                  <!-- Choice of Password -->
+                  <div class="col-md-12">
+                    <label for="reg-password" class="form-label">Create Login Password</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white text-muted"><i class="bi bi-key-fill"></i></span>
+                      <input type="password" class="form-control" id="reg-password" required minlength="6" placeholder="Choose secure password (min 6 characters)">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex gap-2 flex-wrap align-items-center justify-content-between">
+                  <span class="small text-muted mb-0">Initial status is cataloged as <code class="text-warning">Pending</code> approval.</span>
+                  <button type="submit" class="btn btn-primary-custom" id="reg-submit-btn"><i class="bi bi-person-fill-add me-1"></i> Register Student Account</button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Complete Premium Footer -->
+  <footer class="footer-custom" id="main-footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-5 col-md-12 text-start">
+          <div class="d-flex align-items-center mb-4">
+            <div class="me-2 text-primary" style="font-size: 2rem;"><i class="bi bi-cpu-fill"></i></div>
+            <div>
+              <h5 class="mb-0 fw-bold text-white font-display">EJaytech Concepts</h5>
+              <span class="small text-muted font-mono" style="font-size: 0.75rem;">INNOVATING IDEAS, DELIVERING SOLUTIONS</span>
+            </div>
+          </div>
+          <p class="mb-4" style="font-size: 0.93rem; max-width: 400px;">
+            At EJaytech Concepts, we fuse professional technology configurations with world-class curriculum skills transfers to launch the next digital creators.
+          </p>
+          <div class="d-flex gap-3 text-white fs-5" id="social-handles">
+            <a href="https://facebook.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="https://x.com/ejaytech_c" target="_blank" class="text-muted hover-whiteLink" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://linkedin.com/company/ejaytech-concepts" target="_blank" class="text-muted hover-whiteLink" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="https://instagram.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold font-display text-white mb-4">Functional Pages</h5>
+          <ul class="list-unstyled d-grid gap-2 text-start p-0">
+            <li><a href="index.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Home Entry</a></li>
+            <li><a href="about.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Who We Are (Contact)</a></li>
+            <li><a href="services.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Core Services</a></li>
+            <li><a href="courses.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Vocational Schedules</a></li>
+            <li><a href="portal.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Student Portal</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6 text-start">
+          <h5 class="fw-bold font-display text-white mb-4">Physical Head Office</h5>
+          <ul class="list-unstyled d-grid gap-3 text-start p-0">
+            <li class="d-flex gap-3">
+              <i class="bi bi-geo-alt-fill text-primary mt-1"></i>
+              <span>04 Akande Oke Street, Eleweran, Abeokuta, Nigeria.</span>
+            </li>
+            <li class="d-flex gap-3">
+              <i class="bi bi-telephone-fill text-primary mt-1"></i>
+              <span>+234 (0) 703 371 9342</span>
+            </li>
+            <li class="d-flex gap-3">
+              <i class="bi bi-envelope-fill text-primary mt-1"></i>
+              <span>ejaytechconcepts@gmail.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-top border-secondary mt-5 pt-4 text-center">
+        <p class="mb-0 small" style="opacity: 0.7;">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved. Designed for Static &amp; GitHub Pages Deployments.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase Compat CDNs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+  <!-- App Custom Logic Modules -->
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Form Controllers & Routing Logic -->
+  <script>
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // Check if user has ?apply= in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const applyCourse = urlParams.get('apply');
+    if (applyCourse) {
+      console.log(`Auto focusing registration form for selected course: ${applyCourse}`);
+      
+      // Toggle tab pane to register and activate nav pillow
+      const registerTab = new bootstrap.Tab(document.getElementById('register-tab-btn'));
+      registerTab.show();
+      
+      // Select the value corresponding in dropdown
+      const courseDropdown = document.getElementById('reg-course');
+      for (let i = 0; i < courseDropdown.options.length; i++) {
+        if (courseDropdown.options[i].value === applyCourse || courseDropdown.options[i].text.includes(applyCourse)) {
+          courseDropdown.selectedIndex = i;
+          break;
+        }
+      }
+    }
+
+    // Auto router if user is active already
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        if (user.email === "admin@ejaytech.com") {
+          window.location.href = "admin-dashboard.html";
+        } else {
+          window.location.href = "student-dashboard.html";
+        }
+      }
+    });
+
+    const errorAlert = document.getElementById("portal-error-alert");
+    const successAlert = document.getElementById("portal-success-alert");
+    const errMsg = document.getElementById("portal-err-msg");
+    const successMsg = document.getElementById("portal-success-msg");
+
+    function displayError(txt) {
+      successAlert.classList.add("d-none");
+      errorAlert.classList.remove("d-none");
+      errMsg.textContent = txt;
+      window.scrollTo(0, 0);
+    }
+
+    function displaySuccess(txt) {
+      errorAlert.classList.add("d-none");
+      successAlert.classList.remove("d-none");
+      successMsg.textContent = txt;
+      window.scrollTo(0, 0);
+    }
+
+    // Login Submission
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const pass = document.getElementById("login-password").value;
+      const btn = document.getElementById("login-submit-btn");
+
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating credentials...';
+        
+        const result = await loginUserAccount(email, pass);
+        displaySuccess("Access granted! Entering classroom dashboard...");
+        
+        setTimeout(() => {
+          if (result.role === "admin") {
+            window.location.href = "admin-dashboard.html";
+          } else {
+            window.location.href = "student-dashboard.html";
+          }
+        }, 1200);
+
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway';
+        displayError(err.message || "Invalid authentication credentials. Check spelling and try again.");
+      }
+    });
+
+    // Registration Submission
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fullname = document.getElementById("reg-fullname").value;
+      const email = document.getElementById("reg-email").value;
+      const phone = document.getElementById("reg-phone").value;
+      const gender = document.getElementById("reg-gender").value;
+      const dob = document.getElementById("reg-dob").value;
+      const state = document.getElementById("reg-state").value;
+      const course = document.getElementById("reg-course").value;
+      const address = document.getElementById("reg-address").value;
+      const password = document.getElementById("reg-password").value;
+      const btn = document.getElementById("reg-submit-btn");
+
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating student profile...';
+
+        const record = await registerStudentAccount({
+          fullname, email, phone, gender, dob, state, address, course, password
+        });
+
+        displaySuccess(`Registration complete under student code ID: ${record.studentId}! Your profile is pending administrative approval. Redirecting...`);
+        document.getElementById("register-form").reset();
+
+        setTimeout(() => {
+          window.location.href = "student-dashboard.html";
+        }, 2500);
+
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-person-fill-add me-1"></i> Register Student Account';
+        displayError(err.message || "Registration encountered an issue. Ensure password length is 6+ or email is unique.");
+      }
+    });
+
+    // Forgot password simulation
+    document.getElementById("forgot-password-link").addEventListener("click", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      if (!email) {
+        alert("Please enters your email address in the input field above first.");
+        return;
+      }
+      try {
+        await resetStudentPassword(email);
+        alert(`A password recovery reset instructions links has been dispatched to: ${email}`);
+      } catch (err) {
+        alert("Encounters problem: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

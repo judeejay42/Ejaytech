@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Classroom - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet" id="bootstrap-icons">
+  <!-- Custom Core CSS -->
+  <link href="assets/css/style.css" rel="stylesheet" id="custom-style">
+</head>
+<body class="bg-light">
+
+  <!-- Dash Navigation Header -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-3" id="dash-nav">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <div class="me-2 text-primary fs-3"><i class="bi bi-cpu-fill"></i></div>
+        <div>
+          <span class="fw-bold text-white font-display">Student Workspace</span>
+          <span class="small d-block text-muted" style="font-size: 0.7rem;">EJaytech Concepts Abuja Hub</span>
+        </div>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-light small d-none d-sm-inline" id="user-display-email">student@example.com</span>
+        <button onclick="logoutSession()" class="btn btn-outline-danger btn-sm" id="logout-btn"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Workspace Frame -->
+  <div class="container-fluid py-4 fade-in-section" id="workspace-container">
+    
+    <!-- Loading Screen Overlay -->
+    <div class="text-center py-5" id="dash-loading-screen">
+      <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem;">
+        <span class="visually-hidden">Syncing session...</span>
+      </div>
+      <p class="text-muted mt-3 font-display">Synchronizing secure student credentials...</p>
+    </div>
+
+    <!-- Error/Notice Screen Overlay (Hidden by default) -->
+    <div class="text-center py-5 d-none mx-auto" id="dash-error-screen" style="max-width: 500px;">
+      <div class="rounded-circle p-3 mb-3 d-inline-flex justify-content-center align-items-center bg-danger-subtle text-danger" style="width: 70px; height: 70px;">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 2.2rem;"></i>
+      </div>
+      <h4 class="fw-bold text-dark font-display mb-3" id="dash-error-title">Unable to Load Profile</h4>
+      <p class="text-secondary mb-4 leading-relaxed id-error-msg" id="dash-error-message"></p>
+      <div class="d-flex flex-column gap-2 justify-content-center align-items-center" id="dash-error-actions">
+        <!-- Buttons injected dynamically -->
+      </div>
+    </div>
+
+    <!-- Active Grid Workspace (Visible once loaded) -->
+    <div class="row g-4 d-none" id="active-dashboard-grid">
+      
+      <!-- LEFT FIXED SIDEBAR: PROFILE & ENROLLMENT METRICS -->
+      <aside class="col-lg-4 col-xl-3 text-start">
+        <div class="card border rounded-3 p-4 bg-white shadow-sm mb-4" id="profile-summary-card">
+          <div class="text-center mb-3">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 font-display" style="width: 72px; height: 72px; font-size: 1.8rem;" id="student-avatar">ST</div>
+            <h4 class="fw-bold font-display text-dark mb-1" id="student-fullname-display">Student Name</h4>
+            <span class="badge border badge-status" id="student-status-badge">Pending</span>
+          </div>
+
+          <div class="border-top pt-3">
+            <ul class="list-unstyled d-flex flex-column gap-3 small p-0 mb-0">
+              <li class="d-flex justify-content-between">
+                <span class="text-muted">Student ID ID:</span>
+                <strong class="text-dark font-mono" id="student-id-display">EJ-2026-XXXX</strong>
+              </li>
+              <li class="d-flex justify-content-between">
+                <span class="text-muted">Course Enrolled:</span>
+                <strong class="text-dark small text-end" id="student-course-display">Frontend Pro</strong>
+              </li>
+              <li class="d-flex justify-content-between">
+                <span class="text-muted">Registered Email:</span>
+                <strong class="text-dark text-truncate" style="max-width: 170px;" id="student-email-display">email@ex.com</strong>
+              </li>
+              <li class="d-flex justify-content-between">
+                <span class="text-muted">Active Phone:</span>
+                <strong class="text-dark" id="student-phone-display">+234806...</strong>
+              </li>
+              <li class="d-flex justify-content-between">
+                <span class="text-muted">Date of Birth:</span>
+                <strong class="text-dark" id="student-dob-display">2026-06-18</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card border rounded-3 p-4 bg-white shadow-sm" id="bio-display-card">
+          <h5 class="fw-bold font-display text-dark mb-2"><i class="bi bi-chat-quote me-1"></i> Personal Statement</h5>
+          <p class="text-muted small mb-0" id="student-bio-display">Tell classmates more about your goals...</p>
+        </div>
+      </aside>
+
+      <!-- RIGHT PRIMARY WORKSPACE: STATUS OVERLAYS & CLASSROOM PANES -->
+      <main class="col-lg-8 col-xl-9 text-start">
+        
+        <!-- PENDING OVERLAY STATE (Shown ONLY if status is 'Pending') -->
+        <div class="p-4 rounded-3 border bg-warning-subtle text-warning-dark border-warning mb-4 d-none" id="pending-status-overlay">
+          <div class="d-flex align-items-start gap-3">
+            <span class="fs-1 text-warning"><i class="bi bi-person-fill-exclamation"></i></span>
+            <div>
+              <h4 class="fw-bold font-display mb-2 text-dark">Enrollment Review Notice</h4>
+              <p class="mb-3 text-dark" style="opacity: 0.95;">
+                Welcome! Your vocational training enrollment is currently listed as <span class="badge bg-warning text-dark fw-bold">PENDING REGISTRATION CHECKS</span>.
+              </p>
+              <p class="mb-0 text-muted small">
+                While our registrar conducts document checks and verifies tuition logs at our Garki Abuja central hub (Suite B18 Garki Plaza), you are welcome to pre-read class manuals, view syllabi, and keep your contact details updated below.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPROVED CONTENT (Syllabus, Materials, Inbox, and Forms) -->
+        <div id="classroom-approved-workspace" class="d-grid gap-4">
+          
+          <!-- Tabbed Controls for classroom sections -->
+          <div class="card border rounded-3 p-3 bg-white shadow-sm">
+            <ul class="nav nav-tabs border-0 font-display fw-semibold" id="classroomTabs" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials-pane" type="button" role="tab" aria-selected="true"><i class="bi bi-journal-text me-1"></i> Study Materials</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="assignments-tab" data-bs-toggle="tab" data-bs-target="#assignments-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-cloud-upload-fill me-1"></i> Submit Homework</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="inbox-tab" data-bs-toggle="tab" data-bs-target="#inbox-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-envelope-open-fill me-1"></i> Notice Board <span class="badge bg-danger ms-1" id="notif-badge-count">0</span></button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-person-gear-fill me-1"></i> Edit Profile</button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Classroom Contents Pane Container -->
+          <div class="tab-content" id="classroomTabsContent">
+            
+            <!-- PANE 1: STUDY RESOURCE DOWNLOADS -->
+            <div class="tab-pane fade show active" id="materials-pane" role="tabpanel" aria-labelledby="materials-tab">
+              <div class="card border rounded-3 p-4 bg-white shadow-sm">
+                <h4 class="fw-bold font-display text-dark mb-3"><i class="bi bi-folder-symlink-fill me-2 text-primary"></i> Class Lecture Chapters & Manuals</h4>
+                <p class="text-muted small">Download curriculum sheets and textbook guides assigned by instructors to support practical workstations exercises.</p>
+                
+                <div class="row g-3 mt-1" id="materials-list-container">
+                  <!-- Materials dynamically cataloged -->
+                  <div class="text-center py-4 col-12">
+                    <p class="text-muted">No materials uploaded for this program yet.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 2: ASSIGNMENT FILE UPLINK -->
+            <div class="tab-pane fade" id="assignments-pane" role="tabpanel" aria-labelledby="assignments-tab">
+              <div class="card border rounded-3 p-4 bg-white shadow-sm">
+                <h4 class="fw-bold font-display text-dark mb-3"><i class="bi bi-cloud-arrow-up-fill me-2 text-primary"></i> Upload Assignment & Projects Work</h4>
+                <p class="text-muted small">Uplink completed wireframe exercises, photoshop graphic exports, or zip code folder directly to Firebase Storage for trainer evaluations.</p>
+                
+                <form id="assignment-upload-form" class="mt-3">
+                  <div class="p-4 border border-dashed rounded-3 bg-light text-center mb-3 d-grid gap-3" style="border-style: dashed !important; border-width: 2px !important; border-color: var(--color-border) !important;">
+                    <div class="fs-1 text-primary"><i class="bi bi-file-earmark-zip"></i></div>
+                    <div>
+                      <h6 class="fw-bold mb-1 text-dark font-display">Drag and drop file here, or browse</h6>
+                      <p class="text-muted small mb-0">Supported formats: PDF, JPEG, PNG, ZIP (Max size: 6MB)</p>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-sm-8 col-md-6">
+                        <input type="file" class="form-control" id="homework-file-ref" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Upload Progress Spinner alerts -->
+                  <div class="alert alert-info d-none" id="upload-progress-alert">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Executing secure file storage encryption, please hold...
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="small text-muted" id="last-submission-badge">Last upload link: None submitted yet.</span>
+                    <button type="submit" class="btn btn-primary-custom" id="upload-sub-btn"><i class="bi bi-cloud-upload-fill me-1"></i> Upload Material File</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- PANE 3: ALERTS NOTIFICATION INBOX -->
+            <div class="tab-pane fade" id="inbox-pane" role="tabpanel" aria-labelledby="inbox-tab">
+              <div class="card border rounded-3 p-4 bg-white shadow-sm col-12">
+                <h4 class="fw-bold font-display text-dark mb-3"><i class="bi bi-bell-fill me-2 text-primary"></i> Announcement Notice Board</h4>
+                <p class="text-muted small">Read messages, holidays, course schedules and updates targeted to your cohort.</p>
+                
+                <div class="d-grid gap-3 mt-3 col-12" id="alerts-inbox-container">
+                  <!-- Alerts loaded dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 4: PROFILE EDITING CONTROLS -->
+            <div class="tab-pane fade" id="settings-pane" role="tabpanel" aria-labelledby="settings-tab">
+              <div class="card border rounded-3 p-4 bg-white shadow-sm">
+                <h4 class="fw-bold font-display text-dark mb-3"><i class="bi bi-person-bounding-box me-2 text-primary"></i> Edit Bio & Contact Profile</h4>
+                <p class="text-muted small">Keep your records, names, birthdate, and bio coordinates current in Garki registry database.</p>
+                
+                <form id="edit-profile-form" class="mt-3">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="edit-fullname" class="form-label">Full Name</label>
+                      <input type="text" class="form-control" id="edit-fullname" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="edit-phone" class="form-label">Phone Number</label>
+                      <input type="tel" class="form-control" id="edit-phone" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="edit-gender" class="form-label">Gender</label>
+                      <select class="form-select" id="edit-gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="edit-dob" class="form-label">Date of Birth</label>
+                      <input type="date" class="form-control" id="edit-dob" required>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="edit-state" class="form-label">State of Origin</label>
+                      <input type="text" class="form-control" id="edit-state" required>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="edit-address" class="form-label">Physical Address</label>
+                      <textarea class="form-control" id="edit-address" rows="2" required></textarea>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="edit-bio" class="form-label">Short Personal Bio Statement</label>
+                      <textarea class="form-control" id="edit-bio" rows="2" placeholder="Tell our Abuja mentors about your future tech, UI/UX, or graphics design goals..."></textarea>
+                    </div>
+                  </div>
+
+                  <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary-custom" id="edit-profile-sub-btn"><i class="bi bi-save-fill me-2"></i> Save Profile Details</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Student Approval Notification Popup Modal -->
+  <div class="modal fade" id="studentApprovalModal" tabindex="-1" aria-labelledby="studentApprovalModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-start" style="background-color: #ffffff; color: #1e293b;">
+        <div class="modal-header border-0 p-4 pb-0 position-relative text-center d-flex flex-column align-items-center">
+          <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" id="approval-modal-close-btn"></button>
+          <div class="rounded-circle p-3 mb-2 d-inline-flex justify-content-center align-items-center bg-success-subtle text-success" style="width: 70px; height: 70px; border: 2px solid rgba(16, 185, 129, 0.2);">
+            <i class="bi bi-patch-check-fill text-success" style="font-size: 2.2rem;"></i>
+          </div>
+          <h4 class="modal-title fw-bold font-display text-dark mt-2" id="studentApprovalModalLabel">Application Approved!</h4>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <p class="text-secondary mb-4 leading-relaxed" id="approval-modal-message-text" style="font-size: 1.05rem;">
+            Congratulations! Your application to EJaytech Concepts has been approved. You may now access your student dashboard and learning resources.
+          </p>
+          <button type="button" class="btn btn-success w-100 py-3 fw-bold font-display text-white border-0 shadow-sm" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <i class="bi bi-rocket-takeoff-fill me-2"></i> Get Started
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Compat CDNs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+  <!-- App Custom Logic Modules -->
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="student.js"></script>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Page Dashboard Script -->
+  <script>
+    // Enforce student session protection
+    protectPageAccess("student");
+
+    let currentStudentData = null;
+    let studentUnsubscribe = null;
+    let notificationsUnsubscribe = null;
+
+    let loadTimeout = null;
+    let loadedSuccessfully = false;
+
+    function clearLoadTimeout() {
+      if (loadTimeout) {
+        clearTimeout(loadTimeout);
+        loadTimeout = null;
+      }
+    }
+
+    /**
+     * Show UI state for search failures, server errors, authentication anomalies, or connection timeouts
+     */
+    function showErrorState(title, message, includeContactButton = true) {
+      // Ensure current spinner and core layouts are hidden
+      document.getElementById("dash-loading-screen").classList.add("d-none");
+      document.getElementById("active-dashboard-grid").classList.add("d-none");
+      
+      const errorScreen = document.getElementById("dash-error-screen");
+      if (errorScreen) {
+        errorScreen.classList.remove("d-none");
+      }
+      
+      const errorTitleEl = document.getElementById("dash-error-title");
+      if (errorTitleEl) {
+        errorTitleEl.textContent = title;
+      }
+      
+      const errorMsgEl = document.getElementById("dash-error-message");
+      if (errorMsgEl) {
+        errorMsgEl.textContent = message;
+      }
+      
+      const actionsContainer = document.getElementById("dash-error-actions");
+      if (actionsContainer) {
+        let html = `<button onclick="window.location.reload()" class="btn btn-dark fw-bold px-4 py-2"><i class="bi bi-arrow-clockwise me-2"></i> Refresh Workspace</button>`;
+        if (includeContactButton) {
+          html += `<a href="mailto:elijahyahuza@gmail.com" class="btn btn-outline-danger fw-bold px-4 py-2 mt-2" id="contact-admin-btn"><i class="bi bi-envelope-fill me-2"></i> Contact Administrator</a>`;
+        }
+        actionsContainer.innerHTML = html;
+      }
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      const authEmail = user ? user.email : "none";
+      const authUid = user ? user.uid : "none";
+      console.log(`[Authentication Status] Changed. UID: ${authUid} | Email: ${authEmail}`);
+
+      if (user) {
+        document.getElementById("user-display-email").textContent = user.email;
+        
+        // Reset tracking states for this connection session
+        loadedSuccessfully = false;
+        clearLoadTimeout();
+
+        // Safety limit trigger - Never allow infinite loading. After 10s show error options.
+        loadTimeout = setTimeout(() => {
+          if (!loadedSuccessfully) {
+            console.error(`[Loading Failure] Registration profile retrieval timed out after 10 seconds for UID: ${user.uid}`);
+            showErrorState(
+              "Connection Timeout",
+              "Unable to load student profile. Please refresh or contact support."
+            );
+          }
+        }, 10000);
+
+        // Unsubscribe any legacy listener blocks to avoid dual renders
+        if (studentUnsubscribe) studentUnsubscribe();
+        if (notificationsUnsubscribe) notificationsUnsubscribe();
+
+        console.log(`[Firestore Query] Initiating student profile lookup matching UID: ${user.uid}`);
+
+        // Establish real-time observer of student doc in Firestore matching Auth UID
+        studentUnsubscribe = db.collection("students").doc(user.uid).onSnapshot(async (doc) => {
+          try {
+            console.log(`[Firestore Query Result] Status updated. Doc ID: ${doc.id} | Exists: ${doc.exists}`);
+
+            if (doc.exists) {
+              const data = doc.data();
+              currentStudentData = data;
+              loadedSuccessfully = true;
+              clearLoadTimeout();
+
+              // Clear past error wrappers if any were showing
+              const errorScreen = document.getElementById("dash-error-screen");
+              if (errorScreen) errorScreen.classList.add("d-none");
+
+              await renderStudentDashboardWithData(data, user.uid);
+            } else {
+              console.warn(`[Loading Failure] Profile lookup returned empty (no document) for UID: ${user.uid}`);
+              loadedSuccessfully = true;
+              clearLoadTimeout();
+              showErrorState("Student Profile Not Found", "Student profile not found.", true);
+            }
+          } catch (handlerErr) {
+            console.error(`[Loading Failure] Error rendering workspace layout:`, handlerErr);
+            loadedSuccessfully = true;
+            clearLoadTimeout();
+            showErrorState("Renderer Setup Error", "Could not assemble student dashboard layouts: " + handlerErr.message, true);
+          }
+        }, (err) => {
+          console.error(`[Loading Failure] Firestore event streaming triggered unauthorized or connection error:`, err);
+          loadedSuccessfully = true;
+          clearLoadTimeout();
+          showErrorState("Database Authorization Error", err.message, true);
+        });
+      } else {
+        clearLoadTimeout();
+        if (studentUnsubscribe) { studentUnsubscribe(); studentUnsubscribe = null; }
+        if (notificationsUnsubscribe) { notificationsUnsubscribe(); notificationsUnsubscribe = null; }
+      }
+    });
+
+    /**
+     * Legacy/Helper Fetch-Once function kept for Event Handlers / Forms
+     */
+    async function renderStudentDashboard(uid) {
+      try {
+        const data = await getStudentProfile(uid);
+        await renderStudentDashboardWithData(data, uid);
+      } catch (err) {
+        console.error("[Loading Failure] Direct renderStudentDashboard failed:", err);
+      }
+    }
+
+    /**
+     * Primary renderer using live/incoming document data (implements strict fallback values for all missing fields)
+     */
+    async function renderStudentDashboardWithData(data, uid) {
+      try {
+        currentStudentData = data || {};
+        
+        // Hide loader, show grid
+        document.getElementById("dash-loading-screen").classList.add("d-none");
+        document.getElementById("active-dashboard-grid").classList.remove("d-none");
+
+        // Display basic variables on profile card with robust fallback values for missing Firestore fields
+        const fullnameVal = data.fullname || "Student";
+        const studentIdVal = data.studentId || "EJ-PENDING";
+        const courseVal = data.course || "General Software Track";
+        
+        // Use authenticated email fallback if the Firestore records' email is empty
+        const emailVal = data.email || (auth.currentUser ? auth.currentUser.email : "") || "Not Specified";
+        const phoneVal = data.phone || "Not Specified";
+        const dobVal = data.dob || "Not Specified";
+        const bioVal = data.bio || "No custom bio statement specified. Edit your profile to tell us about your digital goals!";
+
+        document.getElementById("student-fullname-display").textContent = fullnameVal;
+        document.getElementById("student-id-display").textContent = studentIdVal;
+        document.getElementById("student-course-display").textContent = courseVal;
+        document.getElementById("student-email-display").textContent = emailVal;
+        document.getElementById("student-phone-display").textContent = phoneVal;
+        document.getElementById("student-dob-display").textContent = dobVal;
+        document.getElementById("student-bio-display").textContent = bioVal;
+        
+        // Set initials avatar safely
+        let initials = "ST";
+        if (fullnameVal && fullnameVal.trim()) {
+          const parts = fullnameVal.trim().split(/\s+/).map(n => n ? n[0] : "").filter(Boolean);
+          if (parts.length > 0) {
+            initials = parts.join("").substring(0, 2).toUpperCase();
+          }
+        }
+        document.getElementById("student-avatar").textContent = initials;
+
+        // Dynamic status badges
+        const badge = document.getElementById("student-status-badge");
+        badge.className = "badge border badge-status";
+        
+        const statusVal = data.status || "Pending";
+        badge.textContent = statusVal;
+
+        if (statusVal === "Pending") {
+          badge.classList.add("badge-status-pending");
+          document.getElementById("pending-status-overlay").classList.remove("d-none");
+          // Limit classroom tabs in pending state by blurring container
+          document.getElementById("classroom-approved-workspace").style.opacity = "0.75";
+        } else if (statusVal === "Approved") {
+          badge.classList.add("badge-status-approved");
+          document.getElementById("pending-status-overlay").classList.add("d-none");
+          document.getElementById("classroom-approved-workspace").style.opacity = "1";
+
+          // Check if we should display the approval popup modal (once per login session)
+          const sessionKey = "approval_modal_shown_" + uid;
+          if (sessionStorage.getItem(sessionKey) !== "true") {
+            const approvalModal = new bootstrap.Modal(document.getElementById('studentApprovalModal'));
+            
+            const msgText = document.getElementById("approval-modal-message-text");
+            if (msgText) {
+              msgText.innerHTML = `Your application has been approved successfully.<br><br>Welcome to EJaytech Concepts.`;
+            }
+
+            approvalModal.show();
+            sessionStorage.setItem(sessionKey, "true");
+
+            // Automatically check and mark any unread approval notification as read
+            setTimeout(async () => {
+              try {
+                const list = await getStudentNotifications(studentIdVal);
+                const approvalNotif = list.find(n => 
+                  (n.title.toLowerCase().includes("approved") || n.message.toLowerCase().includes("approved")) && 
+                  (n.status === "unread" || n.read === false)
+                );
+                if (approvalNotif) {
+                  await markNotificationAsRead(approvalNotif.id);
+                  // Since we are listening in real time, notifications list updates dynamically!
+                }
+              } catch (e) {
+                console.warn("Auto-dismiss approval notification failed:", e);
+              }
+            }, 1200);
+          }
+        } else {
+          badge.classList.add("badge-status-rejected");
+          document.getElementById("pending-status-overlay").classList.add("d-none");
+        }
+
+        // Fill in Profile Modification form inputs with database values
+        document.getElementById("edit-fullname").value = data.fullname || "";
+        document.getElementById("edit-phone").value = data.phone || "";
+        document.getElementById("edit-gender").value = data.gender || "";
+        document.getElementById("edit-dob").value = data.dob || "";
+        document.getElementById("edit-state").value = data.state || "";
+        document.getElementById("edit-address").value = data.address || "";
+        document.getElementById("edit-bio").value = data.bio || "";
+
+        // Homework submit log badge
+        if (data.lastDocumentSubmitted) {
+          document.getElementById("last-submission-badge").innerHTML = `
+            <a href="${data.lastDocumentSubmitted}" target="_blank" class="text-success fw-bold text-decoration-none">
+              <i class="bi bi-check-circle-fill me-1"></i> View Submitted Material File <i class="bi bi-box-arrow-up-right small"></i>
+            </a>`;
+        } else {
+          document.getElementById("last-submission-badge").innerHTML = "";
+        }
+
+        // Load specific lists
+        await loadDashboardLessonMaterials();
+
+        // Subscribe to real-time notifications for our student ID
+        if (!notificationsUnsubscribe) {
+          notificationsUnsubscribe = db.collection("notifications")
+            .onSnapshot(async (snapshot) => {
+              await loadDashboardNotifications();
+            }, (err) => {
+              console.error("Notifications socket subscription error:", err);
+            });
+        }
+
+      } catch (err) {
+        console.error("Fetch profile failed:", err);
+      }
+    }
+
+    /**
+     * Load curriculum attachments PDFs
+     */
+    async function loadDashboardLessonMaterials() {
+      const container = document.getElementById("materials-list-container");
+      try {
+        const list = await getCourseMaterials(currentStudentData.course);
+        
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="col-12 text-center py-4 text-muted border rounded-3 bg-light">
+              <i class="bi bi-journal-x fs-2 d-block mb-2 text-secondary"></i>
+              No study materials cataloged for class "${currentStudentData.course}" yet. Instructors will upload soon.
+            </div>`;
+          return;
+        }
+
+        let html = "";
+        list.forEach(mat => {
+          html += `
+            <div class="col-md-6 col-12">
+              <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between h-100">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="fs-2 text-danger"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.92rem;">${mat.title}</h6>
+                    <p class="text-muted small mb-0">${mat.description || "Lecture guide materials."} &bull; <span class="font-mono text-dark">${mat.fileSize}</span></p>
+                  </div>
+                </div>
+                <a href="${mat.filePath}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-download"></i></a>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+
+      } catch (err) {
+        console.error("Load materials error:", err);
+      }
+    }
+
+    /**
+     * Load Notice board announcements
+     */
+    async function loadDashboardNotifications() {
+      const container = document.getElementById("alerts-inbox-container");
+      const badgeCount = document.getElementById("notif-badge-count");
+
+      try {
+        const list = await getStudentNotifications(currentStudentData.studentId);
+        
+        const unreadCount = list.filter(n => n.status === "unread" || n.read === false).length;
+        badgeCount.className = unreadCount > 0 ? "badge bg-danger ms-1" : "badge bg-secondary ms-1";
+        badgeCount.textContent = unreadCount;
+
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-4 text-muted border rounded-3 bg-light text-start p-3">
+              No recent notifications on notice board logs.
+            </div>`;
+          return;
+        }
+
+        let html = "";
+        list.forEach(notif => {
+          const isUnread = notif.status === "unread" || notif.read === false;
+          html += `
+            <div class="p-3 rounded-3 border text-start ${isUnread ? 'border-primary bg-primary-subtle' : 'bg-light'}" id="notif-wrapper-${notif.id}">
+              <div class="d-flex justify-content-between align-items-start">
+                <h6 class="fw-bold text-dark mb-1 font-display">${notif.title}</h6>
+                <span class="small font-mono text-muted text-end" style="font-size: 0.75rem;">${new Date(notif.createdAt).toLocaleDateString()}</span>
+              </div>
+              <p class="text-muted mb-2 small">${notif.message}</p>
+              ${isUnread ? `
+                <button onclick="dismissNotification('${notif.id}')" class="btn btn-link p-0 text-primary fw-bold text-decoration-none small" style="font-size: 0.8rem;">
+                  <i class="bi bi-eye-fill me-1"></i> Dismiss &amp; Mark as Read
+                </button>
+              ` : `<span class="text-muted small"><i class="bi bi-eye-slash"></i> Read archive</span>`}
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+
+      } catch (err) {
+        console.error("Inbox list error:", err);
+      }
+    }
+
+    /**
+     * Dismiss notifications
+     */
+    async function dismissNotification(notifId) {
+      try {
+        await markNotificationAsRead(notifId);
+        await loadDashboardNotifications();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Homework Submit Submission
+    document.getElementById("assignment-upload-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      // In default pending state, block file transfers
+      if (currentStudentData.status === "Pending") {
+        alert("Your student account profile is listed as PENDING REVIEW. Please contact register at Suite B18 Capital Plaza Garki Abuja to approve files.");
+        return;
+      }
+
+      const fileObj = document.getElementById("homework-file-ref").files[0];
+      const btn = document.getElementById("upload-sub-btn");
+      const progressAlert = document.getElementById("upload-progress-alert");
+
+      try {
+        btn.disabled = true;
+        progressAlert.classList.remove("d-none");
+
+        const downloadUrl = await uploadAssignmentFile(auth.currentUser.uid, currentStudentData.studentId, fileObj);
+        
+        progressAlert.classList.add("d-none");
+        btn.disabled = false;
+        alert("Success! Your homework folder has been securely packaged and cataloged inside our database storage. Instructors notified.");
+        
+        document.getElementById("assignment-upload-form").reset();
+        await renderStudentDashboard(auth.currentUser.uid);
+
+      } catch (err) {
+        console.error("Upload error:", err);
+        btn.disabled = false;
+        progressAlert.classList.add("d-none");
+        alert("Upload error: " + err.message);
+      }
+    });
+
+    // Profile updates form submission
+    document.getElementById("edit-profile-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fullname = document.getElementById("edit-fullname").value;
+      const phone = document.getElementById("edit-phone").value;
+      const gender = document.getElementById("edit-gender").value;
+      const dob = document.getElementById("edit-dob").value;
+      const state = document.getElementById("edit-state").value;
+      const address = document.getElementById("edit-address").value;
+      const bio = document.getElementById("edit-bio").value;
+      const btn = document.getElementById("edit-profile-sub-btn");
+
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving database rows...';
+        
+        await updateStudentProfile(auth.currentUser.uid, {
+          fullname, phone, gender, dob, state, address, bio
+        });
+        
+        alert("Success! Garki profile records updated successfully.");
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save-fill me-2"></i> Save Profile Details';
+        
+        await renderStudentDashboard(auth.currentUser.uid);
+
+      } catch (err) {
+        console.error("Edit profile error:", err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save-fill me-2"></i> Save Profile Details';
+        alert("Failed to modify database record rows: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+/* ==========================================================================
+   EJaytech Concepts - Central Custom Stylesheet
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  /* Color Theme Variables */
+  --color-bg-light: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-text-main: #0f172a;
+  --color-text-muted: #475569;
+  --color-primary: #1e40af; /* Deep Royal Indigo */
+  --color-primary-hover: #1e3a8a;
+  --color-accent: #0284c7; /* Cyber Ocean Blue */
+  --color-accent-light: #e0f2fe;
+  --color-border: #e2e8f0;
+  --color-success: #15803d;
+  --color-success-light: #dcfce7;
+  --color-warning: #b45309;
+  --color-warning-light: #fef3c7;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-light);
+  color: var(--color-text-main);
+  line-height: 1.6;
+}
+
+/* Custom Fonts & Headings */
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-text-main);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Elegant Navbar Styling */
+.navbar-custom {
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.9rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand .brand-logo {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.brand-tagline {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  display: block;
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link {
+  font-weight: 500;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--color-primary);
+  background-color: var(--color-bg-light);
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--color-primary);
+  background-color: var(--color-accent-light);
+  font-weight: 600;
+}
+
+/* Primary buttons with modern aesthetics */
+.btn-primary-custom {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(30, 64, 175, 0.15), 0 2px 4px -2px rgba(30, 64, 175, 0.15);
+}
+
+.btn-primary-custom:hover, .btn-primary-custom:focus {
+  background-color: var(--color-primary-hover);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2), 0 4px 6px -4px rgba(30, 64, 175, 0.2);
+}
+
+.btn-secondary-custom {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  font-weight: 600;
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-custom:hover {
+  background-color: var(--color-bg-light);
+  border-color: var(--color-text-muted);
+  transform: translateY(-1px);
+}
+
+/* Hero Section */
+.hero-section {
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  padding: 6.5rem 0 5.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 45%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(224,242,254,0.3) 0%, rgba(255,255,255,0) 70%);
+  pointer-events: none;
+}
+
+/* Custom premium card layout styling */
+.card-custom {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card-custom:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary);
+}
+
+.card-custom-icon {
+  width: 52px;
+  height: 52px;
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  font-size: 1.4rem;
+}
+
+/* Bento grid custom layout blocks */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .bento-large {
+    grid-column: span 2;
+  }
+}
+
+/* Statistics Counter */
+.stat-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.2rem;
+  font-family: var(--font-display);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* Call to Action Section */
+.cta-section {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  padding: 5rem 0;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section h2, .cta-section p, .cta-section a {
+  color: #ffffff !important;
+}
+
+/* Custom tabs styling in portal registration */
+.nav-pills-custom .nav-link {
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  margin: 0 0.25rem;
+  padding: 0.6rem 1.3rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: var(--font-display);
+}
+
+.nav-pills-custom .nav-link.active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+/* Form layouts */
+form label {
+  font-weight: 500;
+  color: var(--color-text-main);
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.form-control, .form-select {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+  outline: none;
+}
+
+/* Bulletproof footer */
+.footer-custom {
+  background-color: #0f172a;
+  color: #94a3b8;
+  padding: 4.5rem 0 2rem 0;
+  border-top: 1px solid #1e293b;
+}
+
+.footer-custom h5, .footer-custom .navbar-brand {
+  color: #ffffff !important;
+}
+
+.footer-custom a {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.footer-custom a:hover {
+  color: #ffffff;
+}
+
+/* Table Design */
+.table-custom {
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-custom th {
+  background-color: var(--color-bg-light);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+/* Status Badges */
+.badge-status {
+  padding: 0.45rem 0.8rem;
+  border-radius: 50rem;
+  font-weight: 600;
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.badge-status-pending {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.badge-status-approved {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.badge-status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Layout transition animation rules */
+.fade-in-section {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

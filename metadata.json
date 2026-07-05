@@ -1,0 +1,6 @@
+{
+  "name": "EJaytech Concepts Platform",
+  "description": "A full-stack training and student management platform for EJaytech Concepts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

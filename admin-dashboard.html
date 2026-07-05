@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Command Core - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet" id="bootstrap-icons">
+  <!-- D3 Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+  <!-- Custom Core CSS -->
+  <link href="assets/css/style.css" rel="stylesheet" id="custom-style">
+
+  <style>
+    /* Premium Admin UI Custom Styles */
+    :root {
+      --sidebar-width: 280px;
+    }
+    
+    .admin-sidebar {
+      width: var(--sidebar-width);
+      min-height: calc(100vh - 72px);
+      background-color: #1e293b;
+      color: #f8fafc;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-val {
+      font-size: 1.85rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+
+    .badge-status {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      font-weight: 600;
+      border-radius: 9999px;
+    }
+
+    .badge-status-pending {
+      background-color: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a !important;
+    }
+
+    .badge-status-approved {
+      background-color: #dcfce7;
+      color: #15803d;
+      border-color: #bbf7d0 !important;
+    }
+
+    .badge-status-rejected {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border-color: #fecaca !important;
+    }
+
+    /* Core overrides for Premium Dark Mode */
+    body.dark-mode {
+      background-color: #0f172a !important;
+      color: #e2e8f0 !important;
+    }
+    body.dark-mode .bg-light {
+      background-color: #0f172a !important;
+    }
+    body.dark-mode .bg-white,
+    body.dark-mode .card,
+    body.dark-mode .modal-content,
+    body.dark-mode .stat-card {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    body.dark-mode .text-dark,
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode h3,
+    body.dark-mode h4,
+    body.dark-mode h5,
+    body.dark-mode h6,
+    body.dark-mode .table,
+    body.dark-mode .form-label,
+    body.dark-mode .card-title {
+      color: #f8fafc !important;
+    }
+    body.dark-mode .table-light {
+      background-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    body.dark-mode .table-hover tbody tr:hover {
+      background-color: #1e293b !important;
+    }
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #334155 !important;
+    }
+    body.dark-mode .form-control:focus,
+    body.dark-mode .form-select:focus {
+      border-color: #3b82f6 !important;
+    }
+    body.dark-mode .text-muted,
+    body.dark-mode span.text-muted,
+    body.dark-mode p.text-muted,
+    body.dark-mode small.text-muted {
+      color: #94a3b8 !important;
+    }
+    body.dark-mode .border {
+      border-color: #334155 !important;
+    }
+    body.dark-mode .border-top,
+    body.dark-mode .border-bottom {
+      border-color: #334155 !important;
+    }
+
+    /* Interactive tabs styles */
+    .admin-tab-btn {
+      color: #64748b;
+      padding: 10px 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+    
+    .admin-tab-btn:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #f8fafc;
+    }
+
+    .admin-tab-btn.active {
+      background-color: #3b82f6 !important;
+      color: #ffffff !important;
+    }
+
+    /* D3 charts sizing */
+    #analytics-chart-container svg {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Admin Nav Header -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-3 border-bottom border-secondary" id="admin-nav" style="background-color: #0f171c !important;">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <div class="me-2 text-primary fs-3"><i class="bi bi-shield-fill-check"></i></div>
+        <div>
+          <span class="fw-bold text-white font-display">EJAYTECH CORE OPERATIONS</span>
+          <span class="small d-block text-muted" style="font-size: 0.72rem;">Central Administrative Registry Console</span>
+        </div>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-white-50 small d-none d-md-block font-mono">AUTHORIZED CHIEF EXECUTIVE SESSION</span>
+        <button onclick="logoutSession()" class="btn btn-outline-danger btn-sm" id="logout-btn"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Loading State screen -->
+  <div class="text-center py-5 my-5" id="admin-loading-screen">
+    <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem;">
+      <span class="visually-hidden">Loading administrative keys...</span>
+    </div>
+    <p class="text-muted mt-3 font-display">Authorizing administrative privilege validation keys...</p>
+  </div>
+
+  <!-- MAIN ADMIN CONSOLE GRID -->
+  <div class="container-fluid px-0 d-none" id="active-admin-grid">
+    <div class="d-flex flex-column flex-lg-row">
+      
+      <!-- LEFT COLUMN: INTEGRATED FUNCTIONAL SIDEBAR (SETTINGS & TOGGLES) -->
+      <div class="admin-sidebar p-4 d-flex flex-column gap-4 border-end border-secondary">
+        
+        <!-- Logged Admin Identity Card -->
+        <div class="card p-3 border-0 bg-dark text-white text-center shadow-lg" style="background-color: #111827 !important;">
+          <div class="position-relative d-inline-block mx-auto mb-2">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70" id="admin-sidebar-avatar" alt="Admin Profile" class="rounded-circle border border-primary border-3" style="width: 75px; height: 75px; object-fit: cover;">
+            <button class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-1" title="Upload Avatar Photo" onclick="document.getElementById('admin-avatar-trigger').click()">
+              <i class="bi bi-camera-fill small" style="font-size: 0.7rem;"></i>
+            </button>
+            <input type="file" id="admin-avatar-trigger" class="d-none" accept="image/*" onchange="uploadAdminAvatarPhoto(this)">
+          </div>
+          <h6 class="fw-bold font-display mb-1 text-white" id="admin-sidebar-username">Chief Director Admin</h6>
+          <p class="text-primary-emphasis mb-1 small" id="admin-sidebar-email">admin@ejaytech.com</p>
+          <span class="badge bg-success-subtle text-success border border-success fw-bold mx-auto px-2 py-1" style="font-size: 0.68rem;"><i class="bi bi-check-circle-fill me-1"></i> Root Verified</span>
+        </div>
+
+        <!-- Sidebar Navigation Tabs Pill Selector -->
+        <div class="d-flex flex-column gap-1" id="admin-sidebar-tabs">
+          <button class="admin-tab-btn active" onclick="switchAdminWorkspacePane('analytics')">
+            <i class="bi bi-speedometer2"></i> Executive Overview
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('registry')">
+            <i class="bi bi-people-fill"></i> Student Registry
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('courses')">
+            <i class="bi bi-journal-album"></i> Manage Courses
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('materials')">
+            <i class="bi bi-file-earmark-arrow-up-fill"></i> Lecture Library
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('announcements')">
+            <i class="bi bi-megaphone-fill"></i> Dispatch &amp; Notice
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('settings')">
+            <i class="bi bi-sliders"></i> Brand &amp; Accounts
+          </button>
+        </div>
+
+        <hr class="border-secondary mt-3">
+
+        <!-- Theme Setting Toggle Switch -->
+        <div class="d-flex align-items-center justify-content-between px-3">
+          <span class="small font-mono text-white-50"><i class="bi bi-moon-stars-fill me-2"></i> Dark Core Console</span>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="console-theme-switch" onchange="toggleAdminConsoleTheme(this.checked)">
+          </div>
+        </div>
+
+        <div class="mt-auto px-1 pt-4 text-center">
+          <p class="text-white-50 font-mono mb-0" style="font-size: 0.65rem;">PORTAL ENGINE v2.0.4 - STATS LIVE</p>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: INTERACTIVE WORKSPACE VIEWPORTS -->
+      <div class="flex-grow-1 p-4 text-start">
+        
+        <!-- PANE 1: EXECUTIVE OVERVIEW (7 METRICS & D3 GRAPHS) -->
+        <div class="admin-workspace-pane" id="pane-analytics">
+          <h4 class="fw-bold text-dark font-display mb-1"><i class="bi bi-activity text-primary me-2"></i> Executive Command Dashboard</h4>
+          <p class="text-muted small mb-4">Live analytics tracking active registrations, curricular courses, lesson catalogs, and operational statistics.</p>
+          
+          <!-- 7 SEPARATE METRICS BADGES GRID -->
+          <div class="row g-3 mb-4">
+            <div class="col-xl-3 col-md-6 col-12">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-dark" id="stat-total-students">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Total Applicants</p>
+                </div>
+                <div class="fs-1 text-primary-emphasis opacity-50"><i class="bi bi-people"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-12">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-warning" id="stat-pending-students">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Pending Audits</p>
+                </div>
+                <div class="fs-1 text-warning opacity-50"><i class="bi bi-hourglass-split"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-12">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-success" id="stat-approved-students">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Approved Enrolled</p>
+                </div>
+                <div class="fs-1 text-success opacity-50"><i class="bi bi-check-circle"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-12">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-danger" id="stat-rejected-students">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Rejected Entries</p>
+                </div>
+                <div class="fs-1 text-danger opacity-50"><i class="bi bi-x-circle"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-md-4 col-12 mt-3">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-primary" id="stat-total-courses">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Pathways Catalogue</p>
+                </div>
+                <div class="fs-1 text-primary opacity-50"><i class="bi bi-journal-bookmark-fill"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-md-4 col-12 mt-3">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-info" id="stat-total-materials">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Lecture Manuals Lib</p>
+                </div>
+                <div class="fs-1 text-info opacity-50"><i class="bi bi-folder2-open"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-md-4 col-12 mt-3">
+              <div class="stat-card p-3 rounded-3 shadow-sm border text-start d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="stat-val text-secondary" id="stat-total-announcements">0</p>
+                  <p class="text-muted small mb-0 fw-semibold">Board Announcements</p>
+                </div>
+                <div class="fs-1 text-secondary opacity-50"><i class="bi bi-megaphone"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- D3 CHARTS ANALYTICS VIEW -->
+          <div class="row g-4 mt-2">
+            <!-- Left: Donut Chart -->
+            <div class="col-lg-5">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold font-display text-dark mb-1"><i class="bi bi-pie-chart text-primary me-1"></i> Admissions Distribution</h5>
+                <p class="text-muted small mb-3">Live validation split of physical and online vocational program applications.</p>
+                <div id="analytics-chart-container" class="text-center d-flex align-items-center justify-content-center py-2" style="min-height: 250px;"></div>
+              </div>
+            </div>
+            <!-- Right: Bar Chart -->
+            <div class="col-lg-7">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold font-display text-dark mb-1"><i class="bi bi-bar-chart-steps text-accent me-1"></i> Course Track Enrollment</h5>
+                <p class="text-muted small mb-4">Total headcount of certified students undergoing interactive classes.</p>
+                <div id="course-allocation-chart-container" class="py-1"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SYSTEM ACTIVITY LOGS -->
+          <div class="card p-4 rounded-3 border bg-white shadow-sm mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="fw-bold font-display text-dark mb-1"><i class="bi bi-clock-history text-indigo me-1"></i> System Administrative Logs</h5>
+                <p class="text-muted small mb-0">Audited activity log history of administrative approval operations and registry state changes.</p>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" onclick="clearActivityLogs()"><i class="bi bi-trash-fill me-1"></i> Clear Audited Logs</button>
+            </div>
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+              <table class="table table-sm table-hover align-middle mb-0 text-start">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col" class="small text-muted py-2">Action / Message</th>
+                    <th scope="col" class="small text-muted py-2 text-end">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="activity-logs-tbody">
+                  <tr>
+                    <td colspan="2" class="text-center text-muted py-3 small">No administrative log entries registered yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: INTERACTIVE STUDENT REGISTRY (ADVANCED SORT/FILTER & EXPORT) -->
+        <div class="admin-workspace-pane d-none" id="pane-registry">
+          <div class="card p-4 rounded-3 border bg-white shadow-sm">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+              <div>
+                <h4 class="fw-bold text-dark font-display mb-1"><i class="bi bi-table text-primary me-2"></i> Interactive Student Master Registry</h4>
+                <p class="text-muted small mb-0">Track verification indices, manage course tracks, and audit profiles in Firestore.</p>
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <button onclick="exportStudentRegistryCSV()" class="btn btn-outline-success fw-bold btn-sm d-flex align-items-center gap-1">
+                  <i class="bi bi-filetype-csv fs-5"></i> Export Registry Data
+                </button>
+              </div>
+            </div>
+
+            <!-- SEARCH, FILTERS, & SORT BAR -->
+            <div class="row g-3 mb-4 bg-light p-3 rounded-3 border">
+              <!-- Search query -->
+              <div class="col-md-4">
+                <label class="form-label small fw-bold text-muted">Search Query</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="reg-search-query" onkeyup="filterRegistryTable()" placeholder="Name, Student ID, State, Email...">
+                </div>
+              </div>
+              <!-- Status filter -->
+              <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Audent Status</label>
+                <select class="form-select form-select-sm" id="reg-status-filter" onchange="filterRegistryTable()">
+                  <option value="all">Show All Statuses</option>
+                  <option value="Pending">Pending Audit Statuses Only</option>
+                  <option value="Approved">Approved Statuses Only</option>
+                  <option value="Rejected">Rejected Statuses Only</option>
+                </select>
+              </div>
+              <!-- Sorting option -->
+              <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Sort By Parameter</label>
+                <select class="form-select form-select-sm" id="reg-sorting-selector" onchange="filterRegistryTable()">
+                  <option value="date-new">Registered Date (Newest first)</option>
+                  <option value="date-old">Registered Date (Oldest first)</option>
+                  <option value="name-az">Full Name (A - Z)</option>
+                  <option value="name-za">Full Name (Z - A)</option>
+                  <option value="code">Student Code ID</option>
+                </select>
+              </div>
+              <!-- Clear Filters -->
+              <div class="col-md-2 d-flex align-items-end">
+                <button onclick="resetRegistryFilterForms()" class="btn btn-secondary btn-sm w-100"><i class="bi bi-arrow-counterclockwise"></i> Reset Filters</button>
+              </div>
+            </div>
+
+            <!-- TABLE CONSOLE -->
+            <div class="table-responsive rounded-3 border">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light table-light">
+                  <tr class="font-display small text-uppercase">
+                    <th>Student ID</th>
+                    <th>Full Name Info</th>
+                    <th>Contact Credentials</th>
+                    <th>Course Stream</th>
+                    <th>Status Flag</th>
+                    <th>Submission Check</th>
+                    <th class="text-end">Command Options</th>
+                  </tr>
+                </thead>
+                <tbody id="student-table-rows" class="small text-dark font-sans">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 3: COURSE SCHEMATICS & CRUD TRACK BUILDER -->
+        <div class="admin-workspace-pane d-none" id="pane-courses">
+          <div class="row g-4">
+            
+            <!-- Course Creation/Edit Form (Left) -->
+            <div class="col-xl-5">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1" id="course-form-title-h5"><i class="bi bi-journal-plus text-primary me-1"></i> Add Course Pathway</h5>
+                <p class="text-muted small mb-4">Introduce custom career streams or edit current syllabus requirements.</p>
+                
+                <form id="course-editor-form" onsubmit="handleCourseFormSubmit(event)">
+                  <input type="hidden" id="course-form-id">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="c-title" class="form-label small fw-semibold text-dark">Course Official Title</label>
+                      <input type="text" class="form-control form-control-sm" id="c-title" required placeholder="e.g. Advanced Graphic Design Layouts">
+                    </div>
+                    <div class="col-sm-6 text-start">
+                      <label for="c-fee" class="form-label small fw-semibold text-dark">Tuition Fee</label>
+                      <input type="text" class="form-control form-control-sm" id="c-fee" required placeholder="e.g. ₦120,000">
+                    </div>
+                    <div class="col-sm-6 text-start">
+                      <label for="c-duration" class="form-label small fw-semibold text-dark">Schedule Duration</label>
+                      <input type="text" class="form-control form-control-sm" id="c-duration" required placeholder="e.g. 10 Weeks">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="c-reqs" class="form-label small fw-semibold text-dark">Equipment Requisites</label>
+                      <input type="text" class="form-control form-control-sm" id="c-reqs" required placeholder="e.g. Personal computer (At least 8GB RAM)">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="c-outcomes" class="form-label small fw-semibold text-dark">General Learning Outcomes</label>
+                      <input type="text" class="form-control form-control-sm" id="c-outcomes" placeholder="Become skilled with photoshop masking, vectors, graphics layouts">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="c-img" class="form-label small fw-semibold text-dark">Cover Banner Image URL (Optional)</label>
+                      <input type="url" class="form-control form-control-sm" id="c-img" placeholder="https://images.unsplash.com/photo-...">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="c-desc" class="form-label small fw-semibold text-dark">Catalog Description</label>
+                      <textarea class="form-control form-control-sm" id="c-desc" rows="2" required placeholder="Brief catalog blurb..."></textarea>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="c-syllabus" class="form-label small fw-semibold text-dark">Syllabus Chapters (Separate chapters by comma)</label>
+                      <textarea class="form-control form-control-sm" id="c-syllabus" rows="3" required placeholder="e.g. Intro to layouts, Canva Master Pro, Color wheel codes"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                    <button type="button" class="btn btn-secondary btn-sm d-none" id="course-form-cancel-btn" onclick="resetCourseEditorForm()"><i class="bi bi-x"></i> Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm ms-auto" id="course-form-submit-btn"><i class="bi bi-save"></i> Save Course Pathway</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Existing Courses Table List (Right) -->
+            <div class="col-xl-7">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-journal-check text-success me-1"></i> Course Catalog Registry</h5>
+                <p class="text-muted small mb-4">Verify current active curriculum lines, archive tracks or purge old pathways.</p>
+                
+                <div class="table-responsive border rounded-3">
+                  <table class="table table-hover align-middle mb-0 small">
+                    <thead class="bg-light table-light">
+                      <tr>
+                        <th>Title / Cost</th>
+                        <th>Duration / Reqs</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="course-list-items">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 4: CLASSROOM LECTURES MANUAL LIBRARY (PDF, VIDEO, ASSIGNMENTS) -->
+        <div class="admin-workspace-pane d-none" id="pane-materials">
+          <div class="row g-4">
+            
+            <!-- Lecture Uploader Form (Left) -->
+            <div class="col-lg-5">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-file-earmark-arrow-up text-primary me-1"></i> Upload Study Lecture PDF / Resource</h5>
+                <p class="text-muted small mb-4">Index reference guidelines and assignment sheets directly inside student classrooms.</p>
+                
+                <form id="material-uploader-form" onsubmit="handleMaterialUploadSubmit(event)">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="m-course" class="form-label small fw-semibold text-dark">Target Student Stream Path</label>
+                      <select class="form-select form-select-sm" id="m-course" required>
+                        <!-- Loaded dynamically -->
+                      </select>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="m-title" class="form-label small fw-semibold text-dark">Document / Lesson Title</label>
+                      <input type="text" class="form-control form-control-sm" id="m-title" required placeholder="e.g. Chapter 1: CSS flexbox layout guidelines">
+                    </div>
+                    <div class="col-sm-6 text-start">
+                      <label for="m-type" class="form-label small fw-semibold text-dark">Classification Type</label>
+                      <select class="form-select form-select-sm" id="m-type" required>
+                        <option value="PDF">PDF Manual</option>
+                        <option value="Video">Video Tutorial Link</option>
+                        <option value="Image">Design Frame Asset</option>
+                        <option value="Assignment">Class Exercise / Assignment</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6 text-start">
+                      <label id="m-file-label" for="m-file" class="form-label small fw-semibold text-dark">Attach Document File</label>
+                      <input type="file" class="form-control form-control-sm" id="m-file" required>
+                      <!-- Text Input option if Type is Video Link or external file URL -->
+                      <input type="url" class="form-control form-control-sm d-none mt-1" id="m-file-url" placeholder="https://youtube.com/watch?...">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="m-desc" class="form-label small fw-semibold text-dark">Brief Reading Instruction</label>
+                      <input type="text" class="form-control form-control-sm" id="m-desc" required placeholder="e.g. Study pages 5 to 12 and submit assignment 1 answers">
+                    </div>
+                  </div>
+
+                  <!-- Alert Upload progress -->
+                  <div class="alert alert-info d-none mt-3" id="m-upload-progress">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Executing document stream upload to Storage...
+                  </div>
+
+                  <div class="text-end mt-4 border-top pt-3">
+                    <button type="submit" class="btn btn-primary btn-sm" id="m-submit-btn"><i class="bi bi-cloud-arrow-up"></i> Upload Manual to Classroom</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Stored Library Materials Table (Right) -->
+            <div class="col-lg-7">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-folder-symlink text-success me-1"></i> Active Lecture Materials Ledger</h5>
+                <p class="text-muted small mb-4">Verify stored chapter notebooks or flush unwanted attachment files.</p>
+                
+                <div class="table-responsive border rounded-3">
+                  <table class="table table-hover align-middle mb-0 small">
+                    <thead class="bg-light table-light">
+                      <tr>
+                        <th>Material Title / Stream</th>
+                        <th>Classification</th>
+                        <th>Ref Size</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="materials-list-items">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 5: DISPATCH PUBLIC ANNOUNCEMENTS & SEND SECURE NOTIFICATIONS -->
+        <div class="admin-workspace-pane d-none" id="pane-announcements">
+          <div class="row g-4">
+            
+            <!-- Broadcast creator Form (Left) -->
+            <div class="col-xl-5">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1" id="ann-form-header-title"><i class="bi bi-send-check text-primary me-1"></i> Dispatch Program Announcement</h5>
+                <p class="text-muted small mb-4">Syndicate campus notices or direct secure notification notes to individual students.</p>
+                
+                <form id="announcement-composer-form" onsubmit="handleAnnouncementSubmit(event)">
+                  <input type="hidden" id="ann-form-id">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="a-target" class="form-label small fw-semibold text-dark">Target Announcement Audience</label>
+                      <select class="form-select form-select-sm" id="a-target">
+                        <option value="all">Broadcast Globally (All Students)</option>
+                        <!-- Populated on load -->
+                      </select>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="a-title" class="form-label small fw-semibold text-dark">Notice Headline</label>
+                      <input type="text" class="form-control form-control-sm" id="a-title" required placeholder="e.g. Abuja Hub Mid-Term Resumption Notice">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="a-message" class="form-label small fw-semibold text-dark">Detailed Announcement Message</label>
+                      <textarea class="form-control form-control-sm" id="a-message" rows="4" required placeholder="Write clear instructional alert steps for student dashboards ..."></textarea>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                    <button type="button" class="btn btn-secondary btn-sm d-none" id="ann-form-cancel-btn" onclick="resetAnnouncementForm()"><i class="bi bi-x"></i> Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm ms-auto" id="ann-submit-btn"><i class="bi bi-send-fill"></i> Deliver Notice Alert</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Published Notice Board List (Right) -->
+            <div class="col-xl-7">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-blockquote-left text-primary me-1 text-success"></i> Dispatched Campus Notice Board</h5>
+                <p class="text-muted small mb-4">Edit or delete active dynamic public alerts. Note: Public announcements reflect globally on student sidebars.</p>
+                
+                <div id="school-announcements-list-view">
+                  <!-- Loaded dynamically -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 6: BRANDING WEBSITE COORDINATES & SYSTEM SETTINGS -->
+        <div class="admin-workspace-pane d-none" id="pane-settings">
+          <div class="row g-4">
+            
+            <!-- Company coordinates editor (Left) -->
+            <div class="col-lg-6">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-sliders text-primary me-1"></i> Manage Website Settings</h5>
+                <p class="text-muted small mb-4">Configure the central contact coordinates displayed dynamically on footers and about pages globally.</p>
+                
+                <form id="website-central-settings-form" onsubmit="handleWebsiteSettingsSave(event)">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="s-sitename" class="form-label small fw-semibold text-dark">Business Registered Name</label>
+                      <input type="text" class="form-control form-control-sm" id="s-sitename" required>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-phone" class="form-label small fw-semibold text-dark">Click-to-Call Phone Line</label>
+                      <input type="tel" class="form-control form-control-sm" id="s-phone" required placeholder="07033719342">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-email" class="form-label small fw-semibold text-dark">Inquiry Email Address</label>
+                      <input type="email" class="form-control form-control-sm" id="s-email" required placeholder="ejaytechconcepts@gmail.com">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-address" class="form-label small fw-semibold text-dark">Physical Headquarters Address Location</label>
+                      <textarea class="form-control form-control-sm" id="s-address" rows="3" required placeholder="04 Akande Oke Street, Eleweran, Abeokuta"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="text-end mt-4 border-top pt-3">
+                    <button type="submit" class="btn btn-primary btn-sm" id="s-submit-btn"><i class="bi bi-check-circle"></i> Commit Settings Overrides</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Administrator Username & Account configs (Right) -->
+            <div class="col-lg-6">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-key text-primary me-1"></i> Secure Admin Credentials</h5>
+                <p class="text-muted small mb-4">Update executive security password keys and administrator display tags.</p>
+                
+                <form id="admin-security-profile-form" onsubmit="handleAdminProfileSubmit(event)">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="s-name" class="form-label small fw-semibold text-dark">Executive Profile Username</label>
+                      <input type="text" class="form-control form-control-sm" id="s-name" required>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-current-pass" class="form-label small fw-semibold text-dark">Current Password</label>
+                      <input type="password" class="form-control form-control-sm" id="s-current-pass" placeholder="Enter current password to verify identity">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-pass" class="form-label small fw-semibold text-dark">Choose New Password (At least 8 characters)</label>
+                      <input type="password" class="form-control form-control-sm" id="s-pass" placeholder="Enter new secret code if modifying">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-pass-confirm" class="form-label small fw-semibold text-dark">Verify Password Code</label>
+                      <input type="password" class="form-control form-control-sm" id="s-pass-confirm" placeholder="Re-type new secret code">
+                    </div>
+                  </div>
+
+                  <div class="text-end mt-4 border-top pt-3">
+                    <button type="submit" class="btn btn-primary btn-sm" id="ps-submit-btn"><i class="bi bi-lock"></i> Update Admin Account</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPREHENSIVE STUDENT DRILLDOWN VIEW MODAL DIALOG -->
+  <div class="modal fade" id="drilldownStudentModal" tabindex="-1" aria-labelledby="drilldownStudentModalLabel" aria-hidden="true" style="z-index: 1055;">
+    <div class="modal-dialog modal-md text-start">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white p-3">
+          <h5 class="modal-title fw-bold font-display" id="drilldownStudentModalLabel"><i class="bi bi-person-bounding-box text-primary me-2"></i> Student Master File Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" id="drilldown-modal-body">
+          <!-- Dynamic profile loading blurb -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT STUDENT DETAILS MODAL -->
+  <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true" style="z-index: 1055;">
+    <div class="modal-dialog modal-lg text-start">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white p-3">
+          <h5 class="modal-title fw-bold font-display" id="editStudentModalLabel"><i class="bi bi-person-lines-fill me-2 text-primary"></i> Edit Student Registry Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="modal-edit-profile-form">
+            <input type="hidden" id="modal-uid">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="modal-fullname" class="form-label small fw-semibold">Full Name</label>
+                <input type="text" class="form-control form-control-sm" id="modal-fullname" required>
+              </div>
+              <div class="col-md-6">
+                <label for="modal-phone" class="form-label small fw-semibold">Phone Number</label>
+                <input type="tel" class="form-control form-control-sm" id="modal-phone" required>
+              </div>
+              <div class="col-md-6">
+                <label for="modal-dob" class="form-label small fw-semibold">Date of Birth</label>
+                <input type="date" class="form-control form-control-sm" id="modal-dob" required>
+              </div>
+              <div class="col-md-6">
+                <label for="modal-state" class="form-label small fw-semibold">State of Origin</label>
+                <input type="text" class="form-control form-control-sm" id="modal-state" required>
+              </div>
+              <div class="col-md-12">
+                <label for="modal-address" class="form-label small fw-semibold">Residential Address</label>
+                <textarea class="form-control form-control-sm" id="modal-address" rows="2" required></textarea>
+              </div>
+              <div class="col-md-12">
+                <label for="modal-bio" class="form-label small fw-semibold">Personal Statement Bio</label>
+                <textarea class="form-control form-control-sm" id="modal-bio" rows="2"></textarea>
+              </div>
+            </div>
+            
+            <div class="text-end mt-4 border-top pt-3">
+              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm ms-2" id="modal-save-btn"><i class="bi bi-save"></i> Save Registry Edits</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Compat CDNs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+  <!-- App Custom Logic Modules -->
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/auth": "./firebase-auth-mock.js"
+    }
+  }
+  </script>
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="admin.js"></script>
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Interactive Dashboard Administration Script Logic -->
+  <script>
+    // Security restriction for page access
+    protectPageAccess("admin");
+
+    let studentsMasterList = [];
+    let coursesMasterList = [];
+    let materialsMasterList = [];
+    let announcementsMasterList = [];
+    
+    let bootstrapEditModal = null;
+    let bootstrapDrilldownModal = null;
+
+    let editingCourseId = null;
+    let editingAnnId = null;
+
+    // Monitor Auth State and Initialize
+    auth.onAuthStateChanged(async (user) => {
+      if (user && user.email === "admin@ejaytech.com") {
+        document.getElementById("admin-loading-screen").classList.add("d-none");
+        document.getElementById("active-admin-grid").classList.remove("d-none");
+        
+        bootstrapEditModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+        bootstrapDrilldownModal = new bootstrap.Modal(document.getElementById('drilldownStudentModal'));
+        
+        // Retrieve and bind console theme parameters
+        const storedTheme = localStorage.getItem("admin_dark_mode") === "true";
+        document.getElementById("console-theme-switch").checked = storedTheme;
+        toggleAdminConsoleTheme(storedTheme);
+
+        await refreshAllAdminDashboardData();
+      }
+    });
+
+    /**
+     * Complete operational refresh loader
+     */
+    async function refreshAllAdminDashboardData() {
+      try {
+        studentsMasterList = await getRegisteredStudentsList();
+        coursesMasterList = await getCoursesList();
+        materialsMasterList = await getMaterialsList();
+        announcementsMasterList = await getAnnouncementsList();
+
+        // Calculate 7-metrics panels
+        document.getElementById("stat-total-students").textContent = studentsMasterList.length;
+        document.getElementById("stat-pending-students").textContent = studentsMasterList.filter(s => s.status === "Pending").length;
+        document.getElementById("stat-approved-students").textContent = studentsMasterList.filter(s => s.status === "Approved").length;
+        document.getElementById("stat-rejected-students").textContent = studentsMasterList.filter(s => s.status === "Rejected").length;
+        document.getElementById("stat-total-courses").textContent = coursesMasterList.length;
+        document.getElementById("stat-total-materials").textContent = materialsMasterList.length;
+        document.getElementById("stat-total-announcements").textContent = announcementsMasterList.length;
+
+        // Render sections dynamically
+        await renderStudentRegistryRows(studentsMasterList);
+        await renderCourseCatalogListing(coursesMasterList);
+        await renderMaterialsCatalogListing(materialsMasterList);
+        await renderAnnouncementsCatalogListing(announcementsMasterList);
+        await renderActivityLogsListing();
+
+        // Populate course dropdown selectors in other panels
+        populateSelectorsAndFilters();
+
+        // Render D3 interactive models
+        renderD3StatusChart();
+        renderD3CourseBarChart(coursesMasterList, studentsMasterList);
+
+        // Render active settings configs on forms
+        await loadSettingsFormValues();
+
+      } catch (err) {
+        console.error("General Refresh Error: ", err);
+      }
+    }
+
+    /**
+     * Populate selectors in material & announcement sections
+     */
+    function populateSelectorsAndFilters() {
+      // Material target course selector dropdown
+      const materialDrop = document.getElementById("m-course");
+      let dropOptsSrc = "";
+      coursesMasterList.forEach(c => {
+        dropOptsSrc += `<option value="${c.title}">${c.title}</option>`;
+      });
+      materialDrop.innerHTML = dropOptsSrc || `<option value="">No Course Paths Available</option>`;
+
+      // Announcement targets selector dropdown with student names
+      const annDrop = document.getElementById("a-target");
+      let annOptsSrc = `<option value="all">Broadcast Globally (All Students)</option>`;
+      studentsMasterList.forEach(s => {
+        annOptsSrc += `<option value="${s.studentId}">${s.fullname} [${s.studentId}]</option>`;
+      });
+      annDrop.innerHTML = annOptsSrc;
+    }
+
+    /**
+     * Sidebar responsive view toggler
+     */
+    function switchAdminWorkspacePane(paneName) {
+      // Deactivate all sidebar items visually
+      document.querySelectorAll("#admin-sidebar-tabs button").forEach(b => {
+        b.classList.remove("active");
+      });
+      // Hide all workspace panes
+      document.querySelectorAll(".admin-workspace-pane").forEach(p => {
+        p.classList.add("d-none");
+      });
+
+      // Target active selector and show pane
+      const paneTarget = document.getElementById(`pane-${paneName}`);
+      if (paneTarget) {
+        paneTarget.classList.remove("d-none");
+      }
+      // Highlight click coordinate
+      event.currentTarget.classList.add("active");
+
+      // Draw responsive charts specifically on selector reload
+      if (paneName === "analytics") {
+        renderD3StatusChart();
+        renderD3CourseBarChart(coursesMasterList, studentsMasterList);
+      }
+    }
+
+    /**
+     * Premium CSS injection dark mode toggle
+     */
+    function toggleAdminConsoleTheme(enabled) {
+      if (enabled) {
+        document.body.classList.add("dark-mode");
+      } else {
+        document.body.classList.remove("dark-mode");
+      }
+      localStorage.setItem("admin_dark_mode", enabled ? "true" : "false");
+    }
+
+    /**
+     * Render main Student rows
+     */
+    async function renderStudentRegistryRows(list) {
+      const tbody = document.getElementById("student-table-rows");
+      
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No matching student logs registered in database.</td></tr>`;
+        return;
+      }
+
+      let innerSrcHtml = "";
+      list.forEach(student => {
+        let badgeClass = "badge-status-pending";
+        if (student.status === "Approved") badgeClass = "badge-status-approved";
+        if (student.status === "Rejected") badgeClass = "badge-status-rejected";
+
+        const hasSub = student.lastDocumentSubmitted ? `
+          <a href="${student.lastDocumentSubmitted}" target="_blank" class="btn btn-link text-success fw-bold p-0 text-decoration-none" style="font-size: 0.8rem;">
+            <i class="bi bi-file-earmark-check-fill me-1"></i> Open <i class="bi bi-box-arrow-up-right text-success small"></i>
+          </a>` : `<span class="text-muted text-start" style="font-size: 0.75rem;">None</span>`;
+
+        innerSrcHtml += `
+          <tr id="reg-row-${student.uid}">
+            <td class="font-mono fw-bold text-primary">${student.studentId}</td>
+            <td class="fw-bold" style="cursor: pointer;" onclick="drilldownStudentProfile('${student.uid}')" title="Click to view file">
+              <span class="text-dark">${student.fullname}</span>
+              <span class="d-block small text-muted font-sans" style="font-weight: 400;">${student.gender} &bull; ${student.state}</span>
+            </td>
+            <td>
+              <div class="text-dark">${student.email}</div>
+              <span class="text-muted small">${student.phone}</span>
+            </td>
+            <td class="small fw-semibold text-primary-emphasis">${student.course}</td>
+            <td><span class="badge badge-status ${badgeClass}">${student.status}</span></td>
+            <td>${hasSub}</td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                ${student.status === 'Pending' ? `
+                  <button onclick="approveRecord('${student.uid}', '${student.studentId}')" title="Approve" class="btn btn-outline-success btn-sm p-1 px-2"><i class="bi bi-check-lg"></i></button>
+                  <button onclick="rejectRecord('${student.uid}', '${student.studentId}')" title="Reject" class="btn btn-outline-warning btn-sm p-1 px-2"><i class="bi bi-x-circle"></i></button>
+                ` : ''}
+                <button onclick="focusEditModal('${student.uid}')" title="Edit Profile" class="btn btn-outline-secondary btn-sm p-1 px-2"><i class="bi bi-pencil-square"></i></button>
+                <button onclick="purgeStudentRecord('${student.uid}')" title="Purge Record" class="btn btn-outline-danger btn-sm p-1 px-2"><i class="bi bi-trash3-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = innerSrcHtml;
+    }
+
+    /**
+     * Full Search and Multi-filter registry row mapper
+     */
+    function filterRegistryTable() {
+      const query = document.getElementById("reg-search-query").value.toLowerCase().trim();
+      const statusFilter = document.getElementById("reg-status-filter").value;
+      const sortingValue = document.getElementById("reg-sorting-selector").value;
+
+      let workList = [...studentsMasterList];
+
+      // 1. Status Filter
+      if (statusFilter !== "all") {
+        workList = workList.filter(s => s.status === statusFilter);
+      }
+
+      // 2. Search query filter
+      if (query.length > 0) {
+        workList = workList.filter(s => {
+          return (
+            s.fullname.toLowerCase().includes(query) ||
+            s.studentId.toLowerCase().includes(query) ||
+            s.email.toLowerCase().includes(query) ||
+            s.phone.toLowerCase().includes(query) ||
+            s.state.toLowerCase().includes(query) ||
+            s.course.toLowerCase().includes(query)
+          );
+        });
+      }
+
+      // 3. Sorting mappings
+      if (sortingValue === "date-new") {
+        workList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      } else if (sortingValue === "date-old") {
+        workList.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      } else if (sortingValue === "name-az") {
+        workList.sort((a, b) => a.fullname.localeCompare(b.fullname));
+      } else if (sortingValue === "name-za") {
+        workList.sort((a, b) => b.fullname.localeCompare(a.fullname));
+      } else if (sortingValue === "code") {
+        workList.sort((a, b) => a.studentId.localeCompare(b.studentId));
+      }
+
+      renderStudentRegistryRows(workList);
+    }
+
+    /**
+     * Clear filters
+     */
+    function resetRegistryFilterForms() {
+      document.getElementById("reg-search-query").value = "";
+      document.getElementById("reg-status-filter").value = "all";
+      document.getElementById("reg-sorting-selector").value = "date-new";
+      renderStudentRegistryRows(studentsMasterList);
+    }
+
+    /**
+     * Dynamic CSV Registry Exporter
+     */
+    function exportStudentRegistryCSV() {
+      if (studentsMasterList.length === 0) {
+        alert("No student profiles exist to export.");
+        return;
+      }
+      
+      const headers = ["Student ID", "Full Name", "Email Address", "Phone Number", "Gender", "State", "DOB", "Course Stream", "Date Joined", "Application Status"];
+      const rows = studentsMasterList.map(s => [
+        s.studentId,
+        s.fullname,
+        s.email,
+        s.phone,
+        s.gender,
+        s.state,
+        s.dob,
+        s.course,
+        s.createdAt ? s.createdAt.split('T')[0] : "",
+        s.status
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," 
+        + [headers.join(","), ...rows.map(e => e.map(item => `"${String(item).replace(/"/g, '""')}"`).join(","))].join("\n");
+
+      const encoded = encodeURI(csvContent);
+      const dlLink = document.createElement("a");
+      dlLink.setAttribute("href", encoded);
+      dlLink.setAttribute("download", `EJaytech_Registry_Export_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
+    }
+
+    /**
+     * Approve Application Control
+     */
+    async function approveRecord(uid, studentId) {
+      if (!confirm(`Are you absolutely sure you want to approve student profile ${studentId}?`)) return;
+      try {
+        await approveStudentApplication(uid, studentId);
+        alert(`Application successfully approved. Notice sent to student.`);
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Action failure: " + err.message);
+      }
+    }
+
+    /**
+     * Reject Application Control
+     */
+    async function rejectRecord(uid, studentId) {
+      if (!confirm(`Are you absolutely sure you want to reject student profile ${studentId}?`)) return;
+      try {
+        await rejectStudentApplication(uid, studentId);
+        alert(`Application audited and rejected. Student dashboard references updated.`);
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Action failure: " + err.message);
+      }
+    }
+
+    /**
+     * Focus Edit Student modal Form
+     */
+    function focusEditModal(uid) {
+      const student = studentsMasterList.find(s => s.uid === uid);
+      if (!student) return;
+
+      document.getElementById("modal-uid").value = uid;
+      document.getElementById("modal-fullname").value = student.fullname;
+      document.getElementById("modal-phone").value = student.phone;
+      document.getElementById("modal-dob").value = student.dob;
+      document.getElementById("modal-state").value = student.state;
+      document.getElementById("modal-address").value = student.address;
+      document.getElementById("modal-bio").value = student.bio || "";
+
+      bootstrapEditModal.show();
+    }
+
+    // Modal Edit submit listener
+    document.getElementById("modal-edit-profile-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const uid = document.getElementById("modal-uid").value;
+      const fullname = document.getElementById("modal-fullname").value;
+      const phone = document.getElementById("modal-phone").value;
+      const dob = document.getElementById("modal-dob").value;
+      const state = document.getElementById("modal-state").value;
+      const address = document.getElementById("modal-address").value;
+      const bio = document.getElementById("modal-bio").value;
+
+      const saveBtn = document.getElementById("modal-save-btn");
+
+      try {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving edits...';
+        
+        await editStudentRecordAdmin(uid, {
+          fullname, phone, dob, state, address, bio
+        });
+
+        bootstrapEditModal.hide();
+        alert("Student profile records updated successfully!");
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="bi bi-save"></i> Save Registry Edits';
+        
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Edits save aborted: " + err.message);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="bi bi-save"></i> Save Registry Edits';
+      }
+    });
+
+    /**
+     * Student Profile Drilldown View Modal Loader
+     */
+    function drilldownStudentProfile(uid) {
+      const student = studentsMasterList.find(s => s.uid === uid);
+      if (!student) return;
+
+      const outputBody = document.getElementById("drilldown-modal-body");
+      outputBody.innerHTML = `
+        <div class="text-center mb-4">
+          <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150&auto=format&fit=crop&q=70" class="rounded-circle border p-1" style="width: 100px; height: 100px; object-fit: cover;">
+          <h5 class="fw-bold text-dark font-display mt-2 mb-0">${student.fullname}</h5>
+          <span class="text-primary font-mono fw-bold text-uppercase d-block" style="font-size: 0.82rem;">${student.studentId}</span>
+        </div>
+        <div class="row g-2 text-dark font-sans small">
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Course Assigned:</div>
+          <div class="col-sm-7 fw-bold text-primary">${student.course}</div>
+          
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Email ID:</div>
+          <div class="col-sm-7">${student.email}</div>
+          
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Phone Support:</div>
+          <div class="col-sm-7">${student.phone}</div>
+
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Gender Track:</div>
+          <div class="col-sm-7">${student.gender}</div>
+
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Birthdate DOB:</div>
+          <div class="col-sm-7">${student.dob}</div>
+
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">State of Origin:</div>
+          <div class="col-sm-7">${student.state}</div>
+
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Street Residence:</div>
+          <div class="col-sm-7">${student.address}</div>
+
+          <div class="col-sm-5 fw-bold text-muted text-uppercase">Current Status:</div>
+          <div class="col-sm-7"><span class="badge ${student.status === 'Approved' ? 'bg-success' : (student.status === 'Rejected' ? 'bg-danger' : 'bg-warning')} text-white mx-0">${student.status}</span></div>
+
+          <div class="col-12 mt-3 pt-3 border-top">
+            <h6 class="fw-bold font-display text-muted text-uppercase" style="font-size: 0.72rem;">Student Statement Bio</h6>
+            <p class="text-muted fst-italic mb-0 bg-light p-2 rounded border">${student.bio || "No biography statement supplied by student."}</p>
+          </div>
+        </div>
+      `;
+
+      bootstrapDrilldownModal.show();
+    }
+
+    /**
+     * Purge Student records permanently
+     */
+    async function purgeStudentRecord(uid) {
+      if (!confirm("WARNING!\nYou are about to permanently purge this student record from Firestore directory.\nThis is a complete clinical delete. Proceed?")) return;
+      try {
+        await deleteStudentRecordAdmin(uid);
+        alert("Student cleared successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Operation aborted: " + err.message);
+      }
+    }
+
+
+    /**
+     * =========================================
+     * PANE 3: COURSE CATALOG FUNCTIONS
+     * =========================================
+     */
+    async function renderCourseCatalogListing(courses) {
+      const container = document.getElementById("course-list-items");
+      if (courses.length === 0) {
+        container.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">No courses registered. Insert pathways.</td></tr>`;
+        return;
+      }
+
+      let courseRows = "";
+      courses.forEach(c => {
+        const isArch = c.isArchived === true;
+        courseRows += `
+          <tr class="${isArch ? 'opacity-50' : ''}">
+            <td>
+              <strong class="text-dark">${c.title}</strong>
+              <div class="text-muted small">${c.fee}</div>
+            </td>
+            <td>
+              <div>${c.duration}</div>
+              <span class="text-muted d-block" style="font-size: 0.75rem; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${c.requirements}</span>
+            </td>
+            <td>
+              <span class="badge ${isArch ? 'bg-secondary' : 'bg-success'} text-white">${isArch ? 'Archived' : 'Active'}</span>
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <button class="btn btn-outline-secondary btn-sm p-1 px-2" onclick="editCourseFormTrigger('${c.id}')" title="Edit Syllabus"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-outline-warning btn-sm p-1 px-2" onclick="toggleArchiveCourse('${c.id}', ${!isArch})" title="${isArch ? 'Activate' : 'Archive'}"><i class="bi ${isArch ? 'bi-check-circle-fill' : 'bi-archive-fill'}"></i></button>
+                <button class="btn btn-outline-danger btn-sm p-1 px-2" onclick="purgeCourseCatalog('${c.id}')" title="Delete Permanent"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      container.innerHTML = courseRows;
+    }
+
+    // Trigger Edit state inside course builder left panel
+    function editCourseFormTrigger(id) {
+      const course = coursesMasterList.find(c => c.id === id);
+      if (!course) return;
+
+      editingCourseId = id;
+      
+      document.getElementById("course-form-id").value = id;
+      document.getElementById("c-title").value = course.title;
+      document.getElementById("c-fee").value = course.fee;
+      document.getElementById("c-duration").value = course.duration;
+      document.getElementById("c-reqs").value = course.requirements;
+      document.getElementById("c-outcomes").value = course.learningOutcomes || "";
+      document.getElementById("c-img").value = course.courseImage || "";
+      document.getElementById("c-desc").value = course.description;
+      
+      // Syllabus array map
+      document.getElementById("c-syllabus").value = Array.isArray(course.syllabus) ? course.syllabus.join(", ") : (course.syllabus || "");
+
+      // Change labels
+      document.getElementById("course-form-title-h5").innerHTML = '<i class="bi bi-pencil-square text-warning"></i> Modify Course Pathway';
+      document.getElementById("course-form-submit-btn").innerHTML = '<i class="bi bi-check2-circle"></i> Update Course Pathway';
+      document.getElementById("course-form-cancel-btn").classList.remove("d-none");
+    }
+
+    function resetCourseEditorForm() {
+      editingCourseId = null;
+      document.getElementById("course-form-id").value = "";
+      document.getElementById("course-editor-form").reset();
+
+      document.getElementById("course-form-title-h5").innerHTML = '<i class="bi bi-journal-plus text-primary me-1"></i> Add Course Pathway';
+      document.getElementById("course-form-submit-btn").innerHTML = '<i class="bi bi-save"></i> Save Course Pathway';
+      document.getElementById("course-form-cancel-btn").classList.add("d-none");
+    }
+
+    // Submit handler Course Pathway (Create / Update)
+    async function handleCourseFormSubmit(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById("c-title").value;
+      const fee = document.getElementById("c-fee").value;
+      const duration = document.getElementById("c-duration").value;
+      const requirements = document.getElementById("c-reqs").value;
+      const learningOutcomes = document.getElementById("c-outcomes").value;
+      const courseImage = document.getElementById("c-img").value;
+      const description = document.getElementById("c-desc").value;
+      const syllabus = document.getElementById("c-syllabus").value;
+
+      const submitBtn = document.getElementById("course-form-submit-btn");
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
+
+        const updatedData = {
+          title, fee, duration, requirements, learningOutcomes, courseImage, description, syllabus
+        };
+
+        if (editingCourseId) {
+          await updateCourseAdmin(editingCourseId, updatedData);
+          alert(`Success! "${title}" updated inside catalog list.`);
+        } else {
+          await createCourseAdmin(updatedData);
+          alert(`Success! "${title}" published dynamically.`);
+        }
+
+        resetCourseEditorForm();
+        submitBtn.disabled = false;
+        await refreshAllAdminDashboardData();
+
+      } catch (err) {
+        alert("Course processing failed: " + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-save"></i> Save Course Pathway';
+      }
+    }
+
+    // Toggle Archiving
+    async function toggleArchiveCourse(courseId, shouldArchive) {
+      try {
+        await archiveCourseAdmin(courseId, shouldArchive);
+        alert(`Course catalog track status updated.`);
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Archiving update failed: " + err.message);
+      }
+    }
+
+    // Purge Course
+    async function purgeCourseCatalog(courseId) {
+      if (!confirm("Permanently delete this course path from active catalog registries?")) return;
+      try {
+        await deleteCourseAdmin(courseId);
+        alert("Course track physically cleaned.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Delete failed: " + err.message);
+      }
+    }
+
+
+    /**
+     * =========================================
+     * PANE 4: LECTURES & ATTACHMENTS SYSTEM
+     * =========================================
+     */
+    async function renderMaterialsCatalogListing(materials) {
+      const container = document.getElementById("materials-list-items");
+      if (materials.length === 0) {
+        container.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">No learning materials uploaded. Upload manual attachments.</td></tr>`;
+        return;
+      }
+
+      let rows = "";
+      materials.forEach(m => {
+        let typeIcon = "bi-file-earmark-pdf-fill text-danger";
+        if (m.fileType === "Video") typeIcon = "bi-play-btn-fill text-primary";
+        if (m.fileType === "Image") typeIcon = "bi-image text-success";
+        if (m.fileType === "Assignment") typeIcon = "bi-pencil-square text-warning";
+
+        rows += `
+          <tr>
+            <td>
+              <strong class="text-dark">${m.title}</strong>
+              <span class="d-block text-muted small" style="font-size: 0.72rem;">${m.courseId || 'General Stream'}</span>
+            </td>
+            <td>
+              <span class="fw-bold text-uppercase" style="font-size: 0.75rem;"><i class="bi ${typeIcon} me-1"></i> ${m.fileType || 'PDF'}</span>
+            </td>
+            <td class="font-mono text-muted small">${m.fileSize || '1.1 MB'}</td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <a class="btn btn-outline-secondary btn-sm p-1 px-2" href="${m.filePath}" target="_blank" title="View Document"><i class="bi bi-box-arrow-up-right"></i></a>
+                <button class="btn btn-outline-danger btn-sm p-1 px-2" onclick="purgeClassroomMaterial('${m.id}')" title="Delete Material"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      container.innerHTML = rows;
+    }
+
+    // Submit handler upload materials
+    async function handleMaterialUploadSubmit(e) {
+      e.preventDefault();
+      const courseId = document.getElementById("m-course").value;
+      const title = document.getElementById("m-title").value;
+      const fileType = document.getElementById("m-type").value;
+      const description = document.getElementById("m-desc").value;
+      
+      const fileInput = document.getElementById("m-file");
+      const urlInput = document.getElementById("m-file-url");
+
+      const submitBtn = document.getElementById("m-submit-btn");
+      const progressAlert = document.getElementById("m-upload-progress");
+
+      let fileObj = null;
+      let mockType = "PDF";
+
+      if (fileType !== "Video") {
+        fileObj = fileInput.files[0];
+        if (!fileObj && fileType !== "Video") {
+          alert("Please attach a reference manual file.");
+          return;
+        }
+      } else {
+        // Simulation details for video link
+        fileObj = { name: "Video_Reference_Tutorial_Stream", size: 1048576 * 12 }; // Custom size model for links
+      }
+
+      try {
+        submitBtn.disabled = true;
+        progressAlert.classList.remove("d-none");
+
+        // Run upload to storage & sync db
+        await createLearningMaterialAdmin(title, description, courseId, fileObj, fileType);
+        
+        progressAlert.classList.add("d-none");
+        submitBtn.disabled = false;
+        document.getElementById("material-uploader-form").reset();
+
+        alert(`Learning material successfully published! Notification alerts emitted to course subscribers.`);
+        await refreshAllAdminDashboardData();
+
+      } catch (err) {
+        alert("Manual upload failure: " + err.message);
+        submitBtn.disabled = false;
+        progressAlert.classList.add("d-none");
+      }
+    }
+
+    // Delete Classroom materials
+    async function purgeClassroomMaterial(matId) {
+      if (!confirm("Delete this learning material permanently?")) return;
+      try {
+        await deleteLearningMaterialAdmin(matId);
+        alert("Instruction material purged successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Delete failed: " + err.message);
+      }
+    }
+
+
+    /**
+     * =========================================
+     * PANE 5: ANNOUNCEMENTS FUNCTIONS
+     * =========================================
+     */
+    async function renderAnnouncementsCatalogListing(anns) {
+      const container = document.getElementById("school-announcements-list-view");
+      if (anns.length === 0) {
+        container.innerHTML = `<p class="text-muted text-center py-4">No published broadcast announcements. Compose announcements.</p>`;
+        return;
+      }
+
+      let codeBlocks = "";
+      anns.forEach(a => {
+        codeBlocks += `
+          <div class="card p-3 mb-3 border bg-light text-start shadow-sm">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="fw-bold text-primary font-display mb-0">${a.title}</h6>
+              <span class="font-mono text-muted d-block small" style="font-size: 0.72rem;">${new Date(a.createdAt).toLocaleDateString()}</span>
+            </div>
+            <p class="text-dark small mb-3 text-muted" style="white-space: pre-wrap;">${a.message}</p>
+            <div class="text-end border-top pt-2">
+              <button class="btn btn-outline-secondary btn-sm p-1 px-2 border-0" onclick="editAnnouncementFormTrigger('${a.id}')"><i class="bi bi-pencil-square me-1"></i> Edit</button>
+              <button class="btn btn-outline-danger btn-sm p-1 px-2 border-0 ms-1" onclick="purgeCampusAnnouncement('${a.id}')"><i class="bi bi-trash-fill me-1"></i> Delete</button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = codeBlocks;
+    }
+
+    function editAnnouncementFormTrigger(id) {
+      const ann = announcementsMasterList.find(a => a.id === id);
+      if (!ann) return;
+
+      editingAnnId = id;
+      document.getElementById("ann-form-id").value = id;
+      document.getElementById("a-title").value = ann.title;
+      document.getElementById("a-message").value = ann.message;
+      document.getElementById("a-target").value = "all"; // defaults back to global
+
+      document.getElementById("ann-form-header-title").innerHTML = '<i class="bi bi-pencil-square text-warning"></i> Modify Announcement Alert';
+      document.getElementById("ann-submit-btn").innerHTML = '<i class="bi bi-check2-circle"></i> Update Notice Alert';
+      document.getElementById("ann-form-cancel-btn").classList.remove("d-none");
+    }
+
+    function resetAnnouncementForm() {
+      editingAnnId = null;
+      document.getElementById("ann-form-id").value = "";
+      document.getElementById("announcement-composer-form").reset();
+
+      document.getElementById("ann-form-header-title").innerHTML = '<i class="bi bi-send-check text-primary me-1"></i> Dispatch Program Announcement';
+      document.getElementById("ann-submit-btn").innerHTML = '<i class="bi bi-send-fill"></i> Deliver Notice Alert';
+      document.getElementById("ann-form-cancel-btn").classList.add("d-none");
+    }
+
+    async function handleAnnouncementSubmit(e) {
+      e.preventDefault();
+      const target = document.getElementById("a-target").value;
+      const title = document.getElementById("a-title").value;
+      const message = document.getElementById("a-message").value;
+
+      const submitBtn = document.getElementById("ann-submit-btn");
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
+
+        if (editingAnnId) {
+          await editAnnouncementAdmin(editingAnnId, { title, message });
+          alert("Announcement modified successfully!");
+        } else {
+          // If a studentId is targeted, we create a secure system direct notice
+          if (target !== "all") {
+            await createSystemAnnouncement(title, message, target);
+            alert(`Direct secure notification successfully transmitted to student: ${target}`);
+          } else {
+            await createAnnouncementAdmin(title, message);
+            alert(`Global public campus announcement dispatched successfully!`);
+          }
+        }
+
+        resetAnnouncementForm();
+        submitBtn.disabled = false;
+        await refreshAllAdminDashboardData();
+
+      } catch (err) {
+        alert("Notice push failures: " + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-send-fill"></i> Deliver Notice Alert';
+      }
+    }
+
+    // Delete announcement
+    async function purgeCampusAnnouncement(annId) {
+      if (!confirm("Permanently delete this public campus announcement?")) return;
+      try {
+        await deleteAnnouncementAdmin(annId);
+        alert("Public notice deleted.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Delete failed: " + err.message);
+      }
+    }
+
+
+    /**
+     * Render administrative activity logs
+     */
+    async function renderActivityLogsListing() {
+      const tbody = document.getElementById("activity-logs-tbody");
+      if (!tbody) return;
+
+      try {
+        const logs = await getActivityLogsList();
+        if (logs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-3 small">No administrative log entries registered yet.</td></tr>`;
+          return;
+        }
+
+        let html = "";
+        logs.forEach(log => {
+          let dateStr = "";
+          if (log.createdAt) {
+            if (log.createdAt.seconds) {
+              dateStr = new Date(log.createdAt.seconds * 1000).toLocaleString();
+            } else {
+              dateStr = new Date(log.createdAt).toLocaleString();
+            }
+          } else {
+            dateStr = new Date().toLocaleString();
+          }
+
+          html += `
+            <tr>
+              <td class="py-2 small text-dark"><i class="bi bi-info-circle text-primary me-2"></i>${log.message}</td>
+              <td class="py-2 small text-muted text-end font-mono" style="font-size: 0.8rem;">${dateStr}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } catch (err) {
+        console.error("Error rendering activity logs:", err);
+      }
+    }
+
+    /**
+     * Clear all activity logs
+     */
+    async function clearActivityLogs() {
+      if (!confirm("Are you absolutely sure you want to clear all administrative activity logs? This operation is irreversible.")) return;
+      try {
+        await purgeActivityLogs();
+        await refreshAllAdminDashboardData();
+        alert("All administrative logs cleared successfully.");
+      } catch (err) {
+        alert("Failed to clear logs: " + err.message);
+      }
+    }
+
+
+    /**
+     * =========================================
+     * PANE 6: SETTINGS MANAGEMENT SUBMITS
+     * =========================================
+     */
+    async function loadSettingsFormValues() {
+      try {
+        const profile = await getAdminProfile("admin-master");
+        
+        // Populate profile form inputs
+        document.getElementById("s-name").value = profile.username || "Chief Executive Admin";
+        document.getElementById("admin-sidebar-username").textContent = profile.username || "Chief Executive Admin";
+        
+        // Populate custom avatar image
+        if (profile.profilePictureUrl) {
+          document.getElementById("admin-sidebar-avatar").src = profile.profilePictureUrl;
+        }
+
+        // Central site coordinates
+        if (profile.websiteSettings) {
+          const w = profile.websiteSettings;
+          document.getElementById("s-sitename").value = w.siteName || "EJaytech Concepts";
+          document.getElementById("s-phone").value = w.contactPhone || "07033719342";
+          document.getElementById("s-email").value = w.contactEmail || "ejaytechconcepts@gmail.com";
+          document.getElementById("s-address").value = w.headOfficeAddress || "04 Akande Oke Street, Eleweran, Abeokuta";
+        }
+      } catch (err) {
+        console.warn("Unable to map setting properties to forms:", err);
+      }
+    }
+
+    // Save Brand configuration override coordinates
+    async function handleWebsiteSettingsSave(e) {
+      e.preventDefault();
+      const siteName = document.getElementById("s-sitename").value;
+      const contactPhone = document.getElementById("s-phone").value;
+      const contactEmail = document.getElementById("s-email").value;
+      const headOfficeAddress = document.getElementById("s-address").value;
+
+      const subBtn = document.getElementById("s-submit-btn");
+
+      try {
+        subBtn.disabled = true;
+        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Updating coordinates...';
+
+        await updateAdminProfile("admin-master", {
+          websiteSettings: {
+            siteName,
+            contactPhone,
+            contactEmail,
+            headOfficeAddress
+          }
+        });
+
+        alert("Branding settings successfully synchronized! Footer contact blocks globally updated.");
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-check-circle"></i> Commit Settings Overrides';
+
+        await refreshAllAdminDashboardData();
+
+      } catch (err) {
+        alert("Failed synchronizing settings coordinates: " + err.message);
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-check-circle"></i> Commit Settings Overrides';
+      }
+    }
+
+    // Admin security Profile submissions
+    async function handleAdminProfileSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById("s-name").value;
+      const currentPass = document.getElementById("s-current-pass") ? document.getElementById("s-current-pass").value : "";
+      const newPass = document.getElementById("s-pass").value;
+      const confirmPass = document.getElementById("s-pass-confirm").value;
+
+      const subBtn = document.getElementById("ps-submit-btn");
+
+      // Validate credentials parameters if modifying password
+      if (newPass.length > 0) {
+        if (!currentPass) {
+          alert("Please enter your Current Password to verify identity before changing credentials.");
+          return;
+        }
+        if (newPass.length < 8) {
+          alert("The new password must be at least 8 characters long.");
+          return;
+        }
+        if (newPass !== confirmPass) {
+          alert("Verify Password Code does not match Choose New Password. Please re-enter.");
+          return;
+        }
+      }
+
+      try {
+        subBtn.disabled = true;
+        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Modifying parameters...';
+
+        await updateAdminProfile("admin-master", { username });
+
+        if (newPass.length > 0) {
+          await changeAdminPassword(currentPass, newPass);
+          alert("Admin account credentials and security keys updated successfully!");
+        } else {
+          alert("Admin account profile parameters successfully saved.");
+        }
+
+        // Clear password fields on success
+        if (document.getElementById("s-current-pass")) {
+          document.getElementById("s-current-pass").value = "";
+        }
+        document.getElementById("s-pass").value = "";
+        document.getElementById("s-pass-confirm").value = "";
+
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-lock"></i> Update Admin Account';
+
+        await refreshAllAdminDashboardData();
+
+      } catch (err) {
+        alert("Parameters update failed: " + err.message);
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-lock"></i> Update Admin Account';
+      }
+    }
+
+    // Interactive custom upload for profile pictures
+    async function uploadAdminAvatarPhoto(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const avatarImg = document.getElementById("admin-sidebar-avatar");
+      avatarImg.classList.add("opacity-50");
+
+      try {
+        let downloadUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70";
+        
+        // Upload to storage emulated or real
+        const path = `admins/admin-master/profile_picture_${Date.now()}`;
+        try {
+          const snapshot = await storage.ref().child(path).put(file);
+          downloadUrl = await snapshot.ref.getDownloadURL();
+        } catch (e) {
+          downloadUrl = "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=70";
+        }
+
+        await updateAdminProfile("admin-master", { profilePictureUrl: downloadUrl });
+        avatarImg.src = downloadUrl;
+        avatarImg.classList.remove("opacity-50");
+        alert("Admin profile image modified!");
+        
+      } catch (err) {
+        alert("Image upload aborted: " + err.message);
+        avatarImg.classList.remove("opacity-50");
+      }
+    }
+
+    /**
+     * =========================================
+     * D3 INTERACTIVE METRICS CHART IMPLEMENTATIONS
+     * =========================================
+     */
+    function renderD3StatusChart() {
+      const container = document.getElementById("analytics-chart-container");
+      if (!container) return;
+      container.innerHTML = ""; // Clean coordinate canvas
+
+      const pendingCount = studentsMasterList.filter(s => s.status === "Pending").length;
+      const approvedCount = studentsMasterList.filter(s => s.status === "Approved").length;
+      const rejectedCount = studentsMasterList.filter(s => s.status === "Rejected").length;
+
+      const docData = [
+        { label: "Pending", count: pendingCount, color: "#f59e0b" },
+        { label: "Approved", count: approvedCount, color: "#10b981" },
+        { label: "Rejected", count: rejectedCount, color: "#ef4444" }
+      ];
+
+      const sum = docData.reduce((totalCount, d) => totalCount + d.count, 0);
+      if (sum === 0) {
+        container.innerHTML = `<p class="text-muted small py-5 my-3 text-center font-sans"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> No applicant registrations available to construct D3 diagrams yet.</p>`;
+        return;
+      }
+
+      const diameter = 180;
+      const radius = diameter / 2;
+      const gap = 8;
+
+      const svgObj = d3.select("#analytics-chart-container")
+        .append("svg")
+        .attr("width", diameter + 10)
+        .attr("height", diameter + 10)
+        .append("g")
+        .attr("transform", `translate(${radius + 5}, ${radius + 5})`);
+
+      const generatorPie = d3.pie()
+        .value(d => d.count)
+        .sort(null);
+
+      const sectorArc = d3.arc()
+        .innerRadius(radius - 28)
+        .outerRadius(radius - 4);
+
+      const focalArc = d3.arc()
+        .innerRadius(radius - 28)
+        .outerRadius(radius);
+
+      const slices = svgObj.selectAll("path")
+        .data(generatorPie(docData))
+        .enter()
+        .append("path")
+        .attr("d", sectorArc)
+        .attr("fill", d => d.data.color)
+        .style("stroke", "#ffffff")
+        .style("stroke-width", "2.5px")
+        .style("cursor", "pointer")
+        .each(function(d) { this._current = d; });
+
+      // Staggered loading transition animations
+      slices.transition()
+        .duration(750)
+        .attrTween("d", function(d) {
+          const startInterp = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+          return function(progress) {
+            return sectorArc(startInterp(progress));
+          }
+        });
+
+      // Interactive hover behaviors
+      slices.on("mouseover", function(event, d) {
+        d3.select(this)
+          .transition()
+          .duration(150)
+          .attr("d", focalArc);
+
+        qtyLabel.text(`${d.data.count}`);
+        subtextLabel.text(d.data.label);
+      })
+      .on("mouseout", function(event, d) {
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr("d", sectorArc);
+
+        qtyLabel.text(`${sum}`);
+        subtextLabel.text("Applicants");
+      });
+
+      // Ring Center Label bindings
+      const qtyLabel = svgObj.append("text")
+        .attr("class", "fw-bold text-dark font-sans")
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.05em")
+        .style("font-size", "1.7rem")
+        .text(`${sum}`);
+
+      const subtextLabel = svgObj.append("text")
+        .attr("class", "text-muted small font-sans fw-semibold text-uppercase")
+        .attr("text-anchor", "middle")
+        .attr("dy", "1.52em")
+        .style("font-size", "0.62rem")
+        .text("Applicants");
+    }
+
+    /**
+     * D3 horizontal progress-bars metrics compiler
+     */
+    function renderD3CourseBarChart(courses, students) {
+      const container = document.getElementById("course-allocation-chart-container");
+      if (!container) return;
+      
+      if (courses.length === 0) {
+        container.innerHTML = `<p class="text-muted small py-4 text-center">No catalog courses registered to chart headcount allocations.</p>`;
+        return;
+      }
+
+      container.innerHTML = ""; // clear
+
+      const allocationCounts = courses.map(c => {
+        return {
+          title: c.title,
+          total: students.filter(s => s.course === c.title).length
+        }
+      });
+
+      const maxHeads = d3.max(allocationCounts, d => d.total) || 1;
+
+      let codeMarkup = "";
+      allocationCounts.forEach(c => {
+        const pctLoad = ((c.total / maxHeads) * 100).toFixed(0);
+        codeMarkup += `
+          <div class="mb-3">
+            <div class="d-flex justify-content-between text-dark fw-semibold small mb-1 font-sans">
+              <span>${c.title}</span>
+              <span class="text-primary font-mono">${c.total} Enrolled</span>
+            </div>
+            <div class="progress" style="height: 11px; background-color: #f1f5f9; border-radius: 999px;">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${pctLoad}%; background-color: #3b82f6; border-radius: 999px; transition: width 0.8s ease-out;" aria-valuenow="${c.total}" aria-valuemin="0" aria-valuemax="${maxHeads}"></div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = codeMarkup;
+    }
+  </script>
+</body>
+</html>
