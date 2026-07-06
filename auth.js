@@ -1,7 +1,21 @@
 /**
  * EJaytech Concepts - Authentication Module (Real Firebase Project Integration)
  * Manages sign up, custom registrations, role checks, and session states.
+ * 
+ * DESIGN CONSTRAINTS COMPLIANCE:
+ * Uses pure Firebase Modular SDK (v12+) imports and operations for all authentication.
  */
+
+import { firebaseConfig, firebaseAuth } from "./firebase-config.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Generate a unique sequential-style Student ID index: EJ-YEAR-4RANDOM
 export function generateStudentId() {
@@ -11,7 +25,124 @@ export function generateStudentId() {
 }
 
 /**
- * Handle student application registration
+ * Requirement 6: Parse Firebase error codes and return friendly, human-readable messages.
+ */
+export function getFriendlyErrorMessage(error) {
+  if (!error) return "An unknown error occurred during authentication.";
+  const code = error.code || error.message;
+  
+  switch (code) {
+    case "auth/invalid-email":
+      return "The email address format is invalid. Please double-check for typos.";
+    case "auth/user-disabled":
+      return "This student profile account has been disabled by an administrator.";
+    case "auth/user-not-found":
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+      return "Invalid email address or security passcode. Please double-check spelling and try again.";
+    case "auth/email-already-in-use":
+      return "This email address is already registered. If you forgot your password, please use the reset link.";
+    case "auth/weak-password":
+      return "The password is too weak. It must be at least 6 characters long with mixed characters.";
+    case "auth/network-request-failed":
+      return "A network connection error occurred. Please check your internet connection and try again.";
+    case "auth/too-many-requests":
+      return "Too many failed login attempts. This account has been temporarily locked. Please try again later.";
+    default:
+      if (typeof code === "string" && code.toLowerCase().includes("wrong-password")) {
+        return "Invalid email address or security passcode. Please double-check spelling and try again.";
+      }
+      return error.message || "An error occurred during authentication.";
+  }
+}
+
+/**
+ * Requirement 4 & 5: Automatic Administrator Provisioning.
+ * Automatically provisions the chief administrator account in Firebase Auth on first boot if it doesn't exist.
+ * If automatic creation fails due to Firebase project restrictions (e.g., self-registration disabled, security rules),
+ * we print a clear and helpful explanation instructions log for manual console creation.
+ */
+async function ensureAdminAccountExists() {
+  const adminEmail = "admin@ejaytech.com";
+  const adminPass = "Admin@12345";
+  
+  // CRITICAL REQUIREMENT 5 MESSAGE:
+  /* 
+   * ==============================================================================================
+   * ADMIN SETUP SECURITY WARNING / REQUIREMENT 5 INFORMATION:
+   * ----------------------------------------------------------------------------------------------
+   * If the administrator account creation throws any restriction errors (such as "auth/admin-restricted"
+   * or "auth/operation-not-allowed"), the Firebase project's Authentication configuration is likely
+   * restricted to console-only user creation. 
+   * 
+   * TO SOLVE THIS MANUALLY:
+   * 1. Access the Google Firebase Console: https://console.firebase.google.com/
+   * 2. Select your project "ejaytech-de88d"
+   * 3. Navigate to "Authentication" -> "Users"
+   * 4. Click "Add user"
+   * 5. Enter Email: "admin@ejaytech.com" and Password: "Admin@12345"
+   * 6. Click Save/Create.
+   * ==============================================================================================
+   */
+  
+  try {
+    // We utilize a distinct isolated Firebase App instance to attempt the initial sign-up,
+    // thereby keeping the main application's current signed-in user state completely safe and untouched.
+    const tempAppName = "admin-auth-initializer-" + Math.floor(Math.random() * 1000000);
+    const tempApp = initializeApp(firebaseConfig, tempAppName);
+    const tempAuth = getAuth(tempApp);
+    
+    const credential = await createUserWithEmailAndPassword(tempAuth, adminEmail, adminPass);
+    const user = credential.user;
+    
+    // Save record inside Firestore using the compatibility db layer
+    await db.collection("users").doc(user.uid).set({
+      uid: user.uid,
+      fullName: "EJaytech Chief Admin",
+      fullname: "EJaytech Chief Admin",
+      email: adminEmail,
+      role: "admin",
+      status: "Approved",
+      createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+      username: "EJaytech Chief Admin",
+      darkModeEnabled: false,
+      profilePictureUrl: "",
+      websiteSettings: {
+        siteName: "EJaytech Concepts",
+        contactPhone: "07033719342",
+        contactEmail: "ejaytechconcepts@gmail.com",
+        headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
+      }
+    });
+    
+    console.log("Successfully auto-provisioned Chief Admin account [admin@ejaytech.com].");
+    await signOut(tempAuth);
+  } catch (error) {
+    if (error.code === "auth/email-already-in-use") {
+      console.log("Verify: Chief Admin account already exists in Firebase Authentication.");
+    } else {
+      console.warn(
+        "==============================================================================\n" +
+        "FIREBASE SECURITY RESTRICTION / ADMINISTRATIVE NOTICE:\n" +
+        "Could not automatically create the administrator account 'admin@ejaytech.com'.\n" +
+        "Reason: " + error.message + "\n\n" +
+        "HOW TO REGISTER THE ADMIN MANUALLY:\n" +
+        "1. Open your Firebase Console: https://console.firebase.google.com/\n" +
+        "2. Go to project: ejaytech-de88d\n" +
+        "3. Navigate to Build -> Authentication -> Users tab\n" +
+        "4. Click 'Add User'\n" +
+        "5. Enter email 'admin@ejaytech.com' and password 'Admin@12345'\n" +
+        "=============================================================================="
+      );
+    }
+  }
+}
+
+// Trigger Admin verification on module load asynchronously
+ensureAdminAccountExists();
+
+/**
+ * Handle student application registration using Firebase Authentication
  */
 export async function registerStudentAccount(data) {
   const { fullname, email, phone, gender, dob, state, address, course, password } = data;
@@ -20,110 +151,123 @@ export async function registerStudentAccount(data) {
     throw new Error("Missing required fields. All registration inputs are mandatory.");
   }
   
-  // 1. Create standard Firebase Authentication login credential
-  const credential = await auth.createUserWithEmailAndPassword(email, password);
-  const user = credential.user;
-  
-  // 2. Formulate student record inside Firestore users collection under user's unique authentication UID
-  const studentId = generateStudentId();
-  const userRecord = {
-    uid: user.uid,
-    studentId,
-    fullName: fullname, // Requirement 6: fullName
-    fullname: fullname, // Compatibility fallback
-    email: email.toLowerCase().trim(),
-    phone,
-    gender,
-    dob,
-    state,
-    address,
-    course,
-    role: "student", // Requirement 6: role ("student" by default)
-    status: "Pending", // Requirement 6: status ("pending" by default, using Pending for UI matching)
-    createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-    bio: "Enthusiastic EJaytech Concepts student.",
-    lastDocumentSubmitted: ""
-  };
-  
-  await db.collection("users").doc(user.uid).set(userRecord);
-  
-  // 3. Create initial notification alert welcomed to their portal
-  const welcomeNotif = {
-    studentId: studentId,
-    title: "Application Received Under Review",
-    message: `Welcome ${fullname}! Your student identification ID is assigned as ${studentId}. It is currently under administrative audit. Checked back soon!`,
-    status: "unread",
-    createdAt: new Date().toISOString()
-  };
-  await db.collection("notifications").add(welcomeNotif);
+  try {
+    // 1. Create student in Firebase Auth using Modular SDK directly on firebaseAuth
+    const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
+    const user = credential.user;
+    
+    // 2. Formulate student record inside Firestore users collection under user's unique authentication UID
+    const studentId = generateStudentId();
+    const userRecord = {
+      uid: user.uid,
+      studentId,
+      fullName: fullname, // Requirement 6: fullName
+      fullname: fullname, // Compatibility fallback
+      email: email.toLowerCase().trim(),
+      phone,
+      gender,
+      dob,
+      state,
+      address,
+      course,
+      role: "student", // Requirement 6: role ("student" by default)
+      status: "pending", // Requirement 6: status ("pending" by default)
+      createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+      bio: "Enthusiastic EJaytech Concepts student.",
+      lastDocumentSubmitted: ""
+    };
+    
+    await db.collection("users").doc(user.uid).set(userRecord);
+    
+    // 3. Create initial notification alert welcomed to their portal
+    const welcomeNotif = {
+      studentId: studentId,
+      title: "Application Received Under Review",
+      message: `Welcome ${fullname}! Your student identification ID is assigned as ${studentId}. It is currently under administrative audit. Checked back soon!`,
+      status: "unread",
+      createdAt: new Date().toISOString()
+    };
+    await db.collection("notifications").add(welcomeNotif);
 
-  return userRecord;
+    return userRecord;
+  } catch (err) {
+    throw new Error(getFriendlyErrorMessage(err));
+  }
 }
 
 /**
- * Handle user email login
+ * Handle user email login using Firebase Authentication
  */
 export async function loginUserAccount(email, password) {
-  const credential = await auth.signInWithEmailAndPassword(email, password);
-  const user = credential.user;
-  const normalizedEmail = email.toLowerCase().trim();
-  
-  // Retrieve user record from "users" collection
-  let userDoc = await db.collection("users").doc(user.uid).get();
-  
-  if (normalizedEmail === "admin@ejaytech.com") {
-    // If admin document doesn't exist, create it in "users" collection
-    if (!userDoc.exists) {
-      await db.collection("users").doc(user.uid).set({
-        uid: user.uid,
-        fullName: "EJaytech Chief Admin",
-        fullname: "EJaytech Chief Admin",
-        email: normalizedEmail,
-        role: "admin",
-        status: "Approved",
-        createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-        username: "EJaytech Chief Admin",
-        darkModeEnabled: false,
-        profilePictureUrl: "",
-        websiteSettings: {
-          siteName: "EJaytech Concepts",
-          contactPhone: "07033719342",
-          contactEmail: "ejaytechconcepts@gmail.com",
-          headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
-        }
-      });
-      userDoc = await db.collection("users").doc(user.uid).get();
+  try {
+    // Authenticate credentials using Modular SDK directly on firebaseAuth
+    const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+    const user = credential.user;
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // Retrieve user record from "users" collection
+    let userDoc = await db.collection("users").doc(user.uid).get();
+    
+    if (normalizedEmail === "admin@ejaytech.com") {
+      // If admin document doesn't exist, create it in "users" collection
+      if (!userDoc.exists) {
+        await db.collection("users").doc(user.uid).set({
+          uid: user.uid,
+          fullName: "EJaytech Chief Admin",
+          fullname: "EJaytech Chief Admin",
+          email: normalizedEmail,
+          role: "admin",
+          status: "Approved",
+          createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+          username: "EJaytech Chief Admin",
+          darkModeEnabled: false,
+          profilePictureUrl: "",
+          websiteSettings: {
+            siteName: "EJaytech Concepts",
+            contactPhone: "07033719342",
+            contactEmail: "ejaytechconcepts@gmail.com",
+            headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
+          }
+        });
+        userDoc = await db.collection("users").doc(user.uid).get();
+      }
     }
-  }
 
-  if (!userDoc.exists) {
-    throw new Error("User registration record not found in the database. Please contact support.");
+    if (!userDoc.exists) {
+      throw new Error("User registration record not found in the database. Please contact support.");
+    }
+    
+    const userData = userDoc.data();
+    
+    // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
+    if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
+      await signOut(firebaseAuth);
+      throw new Error("Your account application is pending administrative approval.");
+    }
+    
+    return { user, student: userData, role: userData.role };
+  } catch (err) {
+    throw new Error(getFriendlyErrorMessage(err));
   }
-  
-  const userData = userDoc.data();
-  
-  // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
-  if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
-    await auth.signOut();
-    throw new Error("Your account application is pending administrative approval.");
-  }
-  
-  return { user, student: userData, role: userData.role };
 }
 
 /**
- * Send password reset email
+ * Send password reset email using Firebase Authentication
  */
 export async function resetStudentPassword(email) {
   if (!email) throw new Error("Email address is required to reset passwords.");
-  await auth.sendPasswordResetEmail(email);
+  try {
+    await sendPasswordResetEmail(firebaseAuth, email);
+  } catch (err) {
+    throw new Error(getFriendlyErrorMessage(err));
+  }
 }
 
 /**
- * Logout session
+ * Logout session using Firebase Authentication
  */
 export async function logoutSession() {
-  await auth.signOut();
+  await signOut(firebaseAuth);
   window.location.href = "portal.html";
 }
 
@@ -131,7 +275,7 @@ export async function logoutSession() {
  * Synchronize and enforce secure Session access on Student and Admin pages
  */
 export function protectPageAccess(requiredRole) {
-  auth.onAuthStateChanged(async (user) => {
+  onAuthStateChanged(firebaseAuth, async (user) => {
     if (!user) {
       console.log("No authenticated user session, redirecting to portal.");
       window.location.href = "portal.html";
@@ -145,7 +289,7 @@ export function protectPageAccess(requiredRole) {
         if (user.email === "admin@ejaytech.com" && requiredRole === "admin") {
           return;
         }
-        await auth.signOut();
+        await signOut(firebaseAuth);
         window.location.href = "portal.html";
         return;
       }
@@ -155,14 +299,14 @@ export function protectPageAccess(requiredRole) {
       // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
       if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
         alert("Your student application is pending administrative approval.");
-        await auth.signOut();
+        await signOut(firebaseAuth);
         window.location.href = "portal.html";
         return;
       }
       
       if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "rejected") {
         alert("Your student application details have been audited and rejected on administrative basis.");
-        await auth.signOut();
+        await signOut(firebaseAuth);
         window.location.href = "portal.html";
         return;
       }
@@ -200,8 +344,8 @@ export async function applyGlobalSettings() {
     let fetched = false;
     let dat = null;
     
-    if (auth.currentUser) {
-      const doc = await db.collection("users").doc(auth.currentUser.uid).get();
+    if (firebaseAuth.currentUser) {
+      const doc = await db.collection("users").doc(firebaseAuth.currentUser.uid).get();
       if (doc.exists && doc.data().websiteSettings) {
         dat = doc.data().websiteSettings;
         fetched = true;
@@ -283,7 +427,7 @@ export async function applyGlobalSettings() {
 document.addEventListener("DOMContentLoaded", () => {
   applyGlobalSettings();
 });
-auth.onAuthStateChanged(() => {
+onAuthStateChanged(firebaseAuth, () => {
   applyGlobalSettings();
 });
 

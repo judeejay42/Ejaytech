@@ -38,7 +38,7 @@ import {
   getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyDo-pOH9qR6dd-kDBFikkr2ohpZKK7EzGc",
   authDomain: "ejaytech-de88d.firebaseapp.com",
   projectId: "ejaytech-de88d",

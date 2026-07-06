@@ -561,7 +561,7 @@ export default function Auth({ onLoginSuccess, onAdminLoginSuccess, initialMode 
                   <div className="mt-4 p-4 bg-brand-accent rounded-xl text-[11px] text-slate-600 space-y-1 border border-slate-200">
                     <p className="font-bold">Initial Seeding Credentials for Review and Testing:</p>
                     <p className="font-mono">Email: <strong>admin@ejaytech.com</strong></p>
-                    <p className="font-mono">Password: <strong>admin12345</strong></p>
+                    <p className="font-mono">Password: <strong>Admin@12345</strong></p>
                   </div>
                 </form>
               )}
