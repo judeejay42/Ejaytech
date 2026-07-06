@@ -179,7 +179,11 @@ export async function rejectStudentApplication(uid, studentId) {
  * Update registry indexes of student records
  */
 export async function editStudentRecordAdmin(uid, data) {
-  await db.collection("users").doc(uid).update(data);
+  const updateData = { ...data };
+  if (updateData.fullname !== undefined) {
+    updateData.fullName = updateData.fullname;
+  }
+  await db.collection("users").doc(uid).update(updateData);
 }
 
 /**

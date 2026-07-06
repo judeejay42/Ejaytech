@@ -472,12 +472,14 @@
         const statusVal = data.status || "Pending";
         badge.textContent = statusVal;
 
-        if (statusVal === "Pending") {
+        const statusLower = statusVal.toLowerCase();
+
+        if (statusLower === "pending") {
           badge.classList.add("badge-status-pending");
           document.getElementById("pending-status-overlay").classList.remove("d-none");
           // Limit classroom tabs in pending state by blurring container
           document.getElementById("classroom-approved-workspace").style.opacity = "0.75";
-        } else if (statusVal === "Approved") {
+        } else if (statusLower === "approved") {
           badge.classList.add("badge-status-approved");
           document.getElementById("pending-status-overlay").classList.add("d-none");
           document.getElementById("classroom-approved-workspace").style.opacity = "1";
@@ -659,7 +661,7 @@
       e.preventDefault();
       
       // In default pending state, block file transfers
-      if (currentStudentData.status === "Pending") {
+      if ((currentStudentData.status || "").toLowerCase() === "pending") {
         alert("Your student account profile is listed as PENDING REVIEW. Please contact register at Suite B18 Capital Plaza Garki Abuja to approve files.");
         return;
       }

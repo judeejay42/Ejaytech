@@ -869,9 +869,9 @@
 
         // Calculate 7-metrics panels
         document.getElementById("stat-total-students").textContent = studentsMasterList.length;
-        document.getElementById("stat-pending-students").textContent = studentsMasterList.filter(s => s.status === "Pending").length;
-        document.getElementById("stat-approved-students").textContent = studentsMasterList.filter(s => s.status === "Approved").length;
-        document.getElementById("stat-rejected-students").textContent = studentsMasterList.filter(s => s.status === "Rejected").length;
+        document.getElementById("stat-pending-students").textContent = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "pending").length;
+        document.getElementById("stat-approved-students").textContent = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "approved").length;
+        document.getElementById("stat-rejected-students").textContent = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "rejected").length;
         document.getElementById("stat-total-courses").textContent = coursesMasterList.length;
         document.getElementById("stat-total-materials").textContent = materialsMasterList.length;
         document.getElementById("stat-total-announcements").textContent = announcementsMasterList.length;
@@ -972,9 +972,10 @@
 
       let innerSrcHtml = "";
       list.forEach(student => {
+        const statusLower = (student.status || "").toLowerCase();
         let badgeClass = "badge-status-pending";
-        if (student.status === "Approved") badgeClass = "badge-status-approved";
-        if (student.status === "Rejected") badgeClass = "badge-status-rejected";
+        if (statusLower === "approved") badgeClass = "badge-status-approved";
+        if (statusLower === "rejected") badgeClass = "badge-status-rejected";
 
         const hasSub = student.lastDocumentSubmitted ? `
           <a href="${student.lastDocumentSubmitted}" target="_blank" class="btn btn-link text-success fw-bold p-0 text-decoration-none" style="font-size: 0.8rem;">
@@ -997,7 +998,7 @@
             <td>${hasSub}</td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
-                ${student.status === 'Pending' ? `
+                ${statusLower === 'pending' ? `
                   <button onclick="approveRecord('${student.uid}', '${student.studentId}')" title="Approve" class="btn btn-outline-success btn-sm p-1 px-2"><i class="bi bi-check-lg"></i></button>
                   <button onclick="rejectRecord('${student.uid}', '${student.studentId}')" title="Reject" class="btn btn-outline-warning btn-sm p-1 px-2"><i class="bi bi-x-circle"></i></button>
                 ` : ''}
@@ -1023,7 +1024,7 @@
 
       // 1. Status Filter
       if (statusFilter !== "all") {
-        workList = workList.filter(s => s.status === statusFilter);
+        workList = workList.filter(s => (s.status || "").toLowerCase() === statusFilter.toLowerCase());
       }
 
       // 2. Search query filter
@@ -1819,9 +1820,9 @@
       if (!container) return;
       container.innerHTML = ""; // Clean coordinate canvas
 
-      const pendingCount = studentsMasterList.filter(s => s.status === "Pending").length;
-      const approvedCount = studentsMasterList.filter(s => s.status === "Approved").length;
-      const rejectedCount = studentsMasterList.filter(s => s.status === "Rejected").length;
+      const pendingCount = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "pending").length;
+      const approvedCount = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "approved").length;
+      const rejectedCount = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "rejected").length;
 
       const docData = [
         { label: "Pending", count: pendingCount, color: "#f59e0b" },

@@ -132,6 +132,7 @@ class QueryWrapper {
     }));
     return {
       docs,
+      empty: docs.length === 0,
       forEach: (callback) => docs.forEach(callback),
       size: docs.length
     };
@@ -171,6 +172,7 @@ class CollectionWrapper {
     }));
     return {
       docs,
+      empty: docs.length === 0,
       forEach: (callback) => docs.forEach(callback),
       size: docs.length
     };
