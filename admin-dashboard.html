@@ -845,15 +845,48 @@
     // Monitor Auth State and Initialize
     auth.onAuthStateChanged(async (user) => {
       if (user) {
+        console.log("Admin authentication success: Authenticated as " + user.email + " (UID: " + user.uid + ")");
         try {
-          const doc = await db.collection("users").doc(user.uid).get();
+          console.log("Firestore connection success: Verifying administrative user document...");
+          let doc = await db.collection("users").doc(user.uid).get();
+
+          // If the user document doesn't exist yet, but the user is logged in, and has an @ejaytech.com email address,
+          // we initialize their admin user document automatically so they have complete administrative workspace access.
+          if (!doc.exists && user.email && user.email.toLowerCase().endsWith("@ejaytech.com")) {
+            console.log("No administrator user document found in Firestore. Auto-initializing default admin records...");
+            const defaultAdminRecord = {
+              uid: user.uid,
+              fullName: "EJaytech Chief Admin",
+              fullname: "EJaytech Chief Admin",
+              email: user.email.toLowerCase().trim(),
+              role: "admin",
+              status: "approved",
+              createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+              username: "EJaytech Chief Admin",
+              darkModeEnabled: false,
+              profilePictureUrl: "",
+              websiteSettings: {
+                siteName: "EJaytech Concepts",
+                contactPhone: "07033719342",
+                contactEmail: "ejaytechconcepts@gmail.com",
+                headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
+              }
+            };
+            await db.collection("users").doc(user.uid).set(defaultAdminRecord);
+            console.log("Admin record successfully created. Re-fetching document...");
+            doc = await db.collection("users").doc(user.uid).get();
+          }
+
           if (doc.exists && doc.data().role === "admin") {
             const adminData = doc.data();
+            console.log("Administrative authorization verified for: " + (adminData.fullName || adminData.username));
             
             // Set dynamic values in sidebar
             document.getElementById("admin-sidebar-username").textContent = adminData.fullName || adminData.fullname || "Chief Director Admin";
             document.getElementById("admin-sidebar-email").textContent = adminData.email || user.email;
             
+            // Always stop the spinner and show active grid here
+            console.log("Stopping authorization loading spinner.");
             document.getElementById("admin-loading-screen").classList.add("d-none");
             document.getElementById("active-admin-grid").classList.remove("d-none");
             
@@ -867,11 +900,19 @@
 
             // Load other collections statically
             try {
-              coursesMasterList = await getCoursesList();
-              materialsMasterList = await getMaterialsList();
-              announcementsMasterList = await getAnnouncementsList();
+              console.log("Collections being loaded: Loading static datasets (courses, materials, announcements)...");
+              
+              coursesMasterList = await getCoursesList() || [];
+              console.log("Loaded courses dataset:", coursesMasterList);
+              
+              materialsMasterList = await getMaterialsList() || [];
+              console.log("Loaded materials dataset:", materialsMasterList);
+              
+              announcementsMasterList = await getAnnouncementsList() || [];
+              console.log("Loaded announcements dataset:", announcementsMasterList);
+              
             } catch (err) {
-              console.error("Static data load error:", err);
+              console.error("Static database collections load error:", err);
             }
 
             // Setup real-time listener for students collection
@@ -881,6 +922,7 @@
 
             console.log("Establishing real-time student snapshot listener...");
             studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
+              console.log("Real-time snapshot update triggered on 'users' collection.");
               const list = [];
               snapshot.forEach(doc => {
                 const data = doc.data();
@@ -890,21 +932,44 @@
                 }
               });
 
-              studentsMasterList = list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-              console.log("Dashboard refreshed");
+              studentsMasterList = list.sort((a, b) => {
+                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return (timeB || 0) - (timeA || 0);
+              });
+              
+              console.log("Student list sorted and loaded successfully:", studentsMasterList);
 
               // Render changes to screen
               updateUIWithFreshStudentData();
+            }, (error) => {
+              console.error("Error encountered in student real-time snapshot subscription:", error);
             });
           } else {
-            console.warn("User is not an authorized administrator. Redirecting...");
+            console.warn("User is not an authorized administrator (does not have the admin role). Redirecting to portal...");
             window.location.href = "portal.html";
           }
         } catch (err) {
-          console.error("Failed to verify administrator role:", err);
-          window.location.href = "portal.html";
+          console.error("Failed to verify administrator role or connect to database collections:", err);
+          
+          // Display a clear error message in the loading screen instead of keeping the spinner running forever
+          const loadingScreen = document.getElementById("admin-loading-screen");
+          if (loadingScreen) {
+            loadingScreen.innerHTML = `
+              <div class="alert alert-danger mx-auto mt-4 p-4 text-start" style="max-width: 550px; border-radius: 16px;">
+                <h5 class="fw-bold text-danger font-display mb-2"><i class="bi bi-shield-slash-fill me-2"></i> Administrative Portal Error</h5>
+                <p class="text-muted small mb-3">An unexpected database or credentials verification error occurred while loading your admin dashboard:</p>
+                <div class="bg-dark text-white font-mono p-3 rounded mb-3 small" style="opacity: 0.95;">${err.message || err}</div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-danger btn-sm" onclick="logoutSession()"><i class="bi bi-box-arrow-right"></i> Sign Out Session</button>
+                  <a href="portal.html" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Return to Portal</a>
+                </div>
+              </div>
+            `;
+          }
         }
       } else {
+        console.log("No authenticated administrator session. Booting to portal login page.");
         if (studentUnsubscribe) {
           studentUnsubscribe();
           studentUnsubscribe = null;
@@ -918,12 +983,13 @@
      */
     async function refreshAllAdminDashboardData() {
       try {
-        coursesMasterList = await getCoursesList();
-        materialsMasterList = await getMaterialsList();
-        announcementsMasterList = await getAnnouncementsList();
+        console.log("Refreshing static dashboard collections...");
+        coursesMasterList = await getCoursesList() || [];
+        materialsMasterList = await getMaterialsList() || [];
+        announcementsMasterList = await getAnnouncementsList() || [];
 
         await updateUIWithFreshStudentData();
-        console.log("Dashboard refreshed");
+        console.log("Dashboard refreshed successfully.");
       } catch (err) {
         console.error("General Refresh Error: ", err);
       }

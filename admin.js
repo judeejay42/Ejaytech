@@ -8,16 +8,25 @@
  * Fetch list of all registered students in the system
  */
 export async function getRegisteredStudentsList() {
-  const snapshot = await db.collection("users").get();
-  const list = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    // Exclude all administrators from the user/student list
-    if (data.role !== "admin") {
-      list.push({ uid: doc.id, ...data });
-    }
-  });
-  return list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  try {
+    const snapshot = await db.collection("users").get();
+    const list = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      // Exclude all administrators from the user/student list
+      if (data.role !== "admin") {
+        list.push({ uid: doc.id, ...data });
+      }
+    });
+    return list.sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return (timeB || 0) - (timeA || 0);
+    });
+  } catch (err) {
+    console.error("getRegisteredStudentsList error:", err);
+    return [];
+  }
 }
 
 /**
@@ -38,16 +47,21 @@ export async function logAdminActivity(actionMessage) {
  * Fetch all activity logs from Firestore sorted by createdAt desc
  */
 export async function getActivityLogsList() {
-  const snapshot = await db.collection("activity_logs").get();
-  const list = [];
-  snapshot.forEach(doc => {
-    list.push({ id: doc.id, ...doc.data() });
-  });
-  return list.sort((a, b) => {
-    const timeA = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt);
-    const timeB = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt);
-    return timeB - timeA;
-  });
+  try {
+    const snapshot = await db.collection("activity_logs").get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list.sort((a, b) => {
+      const timeA = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds * 1000 : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+      const timeB = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds * 1000 : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+      return (timeB || 0) - (timeA || 0);
+    });
+  } catch (err) {
+    console.error("getActivityLogsList error:", err);
+    return [];
+  }
 }
 
 /**
@@ -197,12 +211,17 @@ export async function deleteStudentRecordAdmin(uid) {
  * Retrieve courses list catalogue from database 
  */
 export async function getCoursesList() {
-  const snapshot = await db.collection("courses").get();
-  const list = [];
-  snapshot.forEach(doc => {
-    list.push({ id: doc.id, ...doc.data() });
-  });
-  return list;
+  try {
+    const snapshot = await db.collection("courses").get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list;
+  } catch (err) {
+    console.error("getCoursesList error:", err);
+    return [];
+  }
 }
 
 /**
@@ -278,12 +297,17 @@ export async function deleteCourseAdmin(courseId) {
  * Retrieve learning materials list
  */
 export async function getMaterialsList() {
-  const snapshot = await db.collection("materials").get();
-  const list = [];
-  snapshot.forEach(doc => {
-    list.push({ id: doc.id, ...doc.data() });
-  });
-  return list;
+  try {
+    const snapshot = await db.collection("materials").get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list;
+  } catch (err) {
+    console.error("getMaterialsList error:", err);
+    return [];
+  }
 }
 
 /**
@@ -344,12 +368,21 @@ export async function deleteLearningMaterialAdmin(materialId) {
  * Fetch campus Announcements
  */
 export async function getAnnouncementsList() {
-  const snapshot = await db.collection("announcements").get();
-  const list = [];
-  snapshot.forEach(doc => {
-    list.push({ id: doc.id, ...doc.data() });
-  });
-  return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  try {
+    const snapshot = await db.collection("announcements").get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list.sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return (timeB || 0) - (timeA || 0);
+    });
+  } catch (err) {
+    console.error("getAnnouncementsList error:", err);
+    return [];
+  }
 }
 
 /**
@@ -397,12 +430,21 @@ export async function deleteAnnouncementAdmin(annId) {
  * Fetch all notifications for notification management history
  */
 export async function getNotificationsHistoryList() {
-  const snapshot = await db.collection("notifications").get();
-  const list = [];
-  snapshot.forEach(doc => {
-    list.push({ id: doc.id, ...doc.data() });
-  });
-  return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  try {
+    const snapshot = await db.collection("notifications").get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list.sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return (timeB || 0) - (timeA || 0);
+    });
+  } catch (err) {
+    console.error("getNotificationsHistoryList error:", err);
+    return [];
+  }
 }
 
 /**
