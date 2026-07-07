@@ -130,39 +130,9 @@ export async function loginUserAccount(email, password) {
     const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
     const user = credential.user;
     
-    // 3. Print verification info as required
-    console.log("Firebase Project ID:", firebaseConfig.projectId);
-    console.log("Firebase Auth User Email:", user.email);
-    console.log("Current Logged User:", user.uid);
-    console.log("Authentication Result: Success");
-
     // Fetch user doc to get their role
     let userDoc = await db.collection("users").doc(user.uid).get();
     
-    // If the user document doesn't exist yet, but the user is logged in, and has an @ejaytech.com email address,
-    // we can initialize their admin user document automatically!
-    if (!userDoc.exists && normalizedEmail.endsWith("@ejaytech.com")) {
-      await db.collection("users").doc(user.uid).set({
-        uid: user.uid,
-        fullName: "EJaytech Chief Admin",
-        fullname: "EJaytech Chief Admin",
-        email: normalizedEmail,
-        role: "admin",
-        status: "approved",
-        createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-        username: "EJaytech Chief Admin",
-        darkModeEnabled: false,
-        profilePictureUrl: "",
-        websiteSettings: {
-          siteName: "EJaytech Concepts",
-          contactPhone: "07033719342",
-          contactEmail: "ejaytechconcepts@gmail.com",
-          headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
-        }
-      });
-      userDoc = await db.collection("users").doc(user.uid).get();
-    }
-
     if (!userDoc.exists) {
       throw new Error("User registration record not found in the database. Please contact support.");
     }
@@ -196,11 +166,7 @@ export async function loginUserAccount(email, password) {
     return { user, student: userData, role: userData.role };
   } catch (err) {
     // 5. If failure, preserve the actual Firebase error code instead of replacing it with a generic message
-    console.log("Firebase Project ID:", firebaseConfig.projectId);
-    console.log("Firebase Auth User Email:", normalizedEmail);
-    console.log("Current Logged User: None");
-    console.log("Authentication Result: Failure (" + (err.code || "unknown") + ")");
-    console.error(err.code, err.message);
+    console.error("Auth error:", err.code || err.message);
 
     const errorObj = new Error(getFriendlyErrorMessage(err));
     errorObj.code = err.code || "auth/unknown";

@@ -438,7 +438,7 @@ export async function getAdminProfile(uid) {
   return {
     fullName: "EJaytech Chief Admin",
     username: "EJaytech Chief Admin",
-    email: "administrator@ejaytech.com",
+    email: (window.auth && window.auth.currentUser && window.auth.currentUser.email) || "",
     darkModeEnabled: false,
     profilePictureUrl: "",
     websiteSettings: {
