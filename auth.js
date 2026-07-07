@@ -211,11 +211,20 @@ export async function loginUserAccount(email, password) {
     }
     
     const userData = userDoc.data();
+    const statusVal = (userData.status || "").toLowerCase().trim();
     
-    // Prevent users whose status is "pending" from accessing the dashboard.
-    if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
-      await signOut(firebaseAuth);
-      throw new Error("Your account application is pending administrative approval.");
+    // Prevent users whose status is not approved from accessing the student dashboard.
+    if (userData.role !== "admin") {
+      if (statusVal === "pending") {
+        await signOut(firebaseAuth);
+        throw new Error("Your student application is pending administrative approval.");
+      } else if (statusVal === "rejected") {
+        await signOut(firebaseAuth);
+        throw new Error("Your student application details have been audited and rejected on administrative basis.");
+      } else if (statusVal !== "approved") {
+        await signOut(firebaseAuth);
+        throw new Error("Your student application is pending administrative approval.");
+      }
     }
     
     return { user, student: userData, role: userData.role };
@@ -277,17 +286,25 @@ export function protectPageAccess(requiredRole) {
       }
 
       const userData = userDoc.data();
+      const statusVal = (userData.status || "").toLowerCase().trim();
       
       // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
-      if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
+      if (userData.role !== "admin" && statusVal === "pending") {
         alert("Your student application is pending administrative approval.");
         await signOut(firebaseAuth);
         window.location.href = "portal.html";
         return;
       }
       
-      if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "rejected") {
+      if (userData.role !== "admin" && statusVal === "rejected") {
         alert("Your student application details have been audited and rejected on administrative basis.");
+        await signOut(firebaseAuth);
+        window.location.href = "portal.html";
+        return;
+      }
+
+      if (userData.role !== "admin" && statusVal !== "approved") {
+        alert("Your student application is pending administrative approval.");
         await signOut(firebaseAuth);
         window.location.href = "portal.html";
         return;

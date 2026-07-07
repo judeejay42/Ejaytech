@@ -29,7 +29,8 @@ import {
   where, 
   orderBy, 
   limit, 
-  serverTimestamp 
+  serverTimestamp,
+  onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { 
   getStorage, 
@@ -137,6 +138,29 @@ class QueryWrapper {
       size: docs.length
     };
   }
+
+  onSnapshot(callback) {
+    const colRef = collection(this.firestoreInstance, this.colPath);
+    let q;
+    if (this.constraints.length > 0) {
+      q = query(colRef, ...this.constraints);
+    } else {
+      q = colRef;
+    }
+    return onSnapshot(q, (snap) => {
+      const docs = snap.docs.map(d => ({
+        id: d.id,
+        ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
+        data: () => d.data()
+      }));
+      callback({
+        docs,
+        empty: docs.length === 0,
+        forEach: (cb) => docs.forEach(cb),
+        size: docs.length
+      });
+    });
+  }
 }
 
 class CollectionWrapper {
@@ -176,6 +200,23 @@ class CollectionWrapper {
       forEach: (callback) => docs.forEach(callback),
       size: docs.length
     };
+  }
+
+  onSnapshot(callback) {
+    const colRef = collection(this.firestoreInstance, this.colPath);
+    return onSnapshot(colRef, (snap) => {
+      const docs = snap.docs.map(d => ({
+        id: d.id,
+        ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
+        data: () => d.data()
+      }));
+      callback({
+        docs,
+        empty: docs.length === 0,
+        forEach: (cb) => docs.forEach(cb),
+        size: docs.length
+      });
+    });
   }
 
   where(field, op, value) {

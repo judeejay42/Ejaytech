@@ -431,6 +431,7 @@
                     <th>Full Name Info</th>
                     <th>Contact Credentials</th>
                     <th>Course Stream</th>
+                    <th>Registration Date</th>
                     <th>Status Flag</th>
                     <th>Submission Check</th>
                     <th class="text-end">Command Options</th>
@@ -839,6 +840,8 @@
     let editingCourseId = null;
     let editingAnnId = null;
 
+    let studentUnsubscribe = null;
+
     // Monitor Auth State and Initialize
     auth.onAuthStateChanged(async (user) => {
       if (user && user.email === "admin@ejaytech.com") {
@@ -853,20 +856,67 @@
         document.getElementById("console-theme-switch").checked = storedTheme;
         toggleAdminConsoleTheme(storedTheme);
 
-        await refreshAllAdminDashboardData();
+        // Load other collections statically
+        try {
+          coursesMasterList = await getCoursesList();
+          materialsMasterList = await getMaterialsList();
+          announcementsMasterList = await getAnnouncementsList();
+        } catch (err) {
+          console.error("Static data load error:", err);
+        }
+
+        // Setup real-time listener for students collection
+        if (studentUnsubscribe) {
+          studentUnsubscribe();
+        }
+
+        console.log("Establishing real-time student snapshot listener...");
+        studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
+          const list = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            // Exclude the main administrator from the user/student list
+            if (data.email !== "admin@ejaytech.com") {
+              list.push({ uid: doc.id, ...data });
+              console.log("Student loaded:", data.fullname || data.fullName || "Unnamed Student");
+            }
+          });
+
+          studentsMasterList = list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+          console.log("Dashboard refreshed");
+
+          // Render changes to screen
+          updateUIWithFreshStudentData();
+        });
+      } else {
+        if (studentUnsubscribe) {
+          studentUnsubscribe();
+          studentUnsubscribe = null;
+        }
       }
     });
 
     /**
-     * Complete operational refresh loader
+     * Complete operational refresh loader (forces a full static reload of non-student collections)
      */
     async function refreshAllAdminDashboardData() {
       try {
-        studentsMasterList = await getRegisteredStudentsList();
         coursesMasterList = await getCoursesList();
         materialsMasterList = await getMaterialsList();
         announcementsMasterList = await getAnnouncementsList();
 
+        await updateUIWithFreshStudentData();
+        console.log("Dashboard refreshed");
+      } catch (err) {
+        console.error("General Refresh Error: ", err);
+      }
+    }
+
+    /**
+     * Update all dashboard UI segments with fresh data
+     */
+    async function updateUIWithFreshStudentData() {
+      try {
         // Calculate 7-metrics panels
         document.getElementById("stat-total-students").textContent = studentsMasterList.length;
         document.getElementById("stat-pending-students").textContent = studentsMasterList.filter(s => (s.status || "").toLowerCase() === "pending").length;
@@ -894,7 +944,7 @@
         await loadSettingsFormValues();
 
       } catch (err) {
-        console.error("General Refresh Error: ", err);
+        console.error("UI update error:", err);
       }
     }
 
@@ -966,13 +1016,13 @@
       const tbody = document.getElementById("student-table-rows");
       
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No matching student logs registered in database.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No matching student logs registered in database.</td></tr>`;
         return;
       }
 
       let innerSrcHtml = "";
       list.forEach(student => {
-        const statusLower = (student.status || "").toLowerCase();
+        const statusLower = (student.status || "").toLowerCase().trim();
         let badgeClass = "badge-status-pending";
         if (statusLower === "approved") badgeClass = "badge-status-approved";
         if (statusLower === "rejected") badgeClass = "badge-status-rejected";
@@ -981,6 +1031,12 @@
           <a href="${student.lastDocumentSubmitted}" target="_blank" class="btn btn-link text-success fw-bold p-0 text-decoration-none" style="font-size: 0.8rem;">
             <i class="bi bi-file-earmark-check-fill me-1"></i> Open <i class="bi bi-box-arrow-up-right text-success small"></i>
           </a>` : `<span class="text-muted text-start" style="font-size: 0.75rem;">None</span>`;
+
+        const regDateStr = student.createdAt 
+          ? (student.createdAt.seconds 
+             ? new Date(student.createdAt.seconds * 1000).toLocaleDateString() 
+             : new Date(student.createdAt).toLocaleDateString()) 
+          : "N/A";
 
         innerSrcHtml += `
           <tr id="reg-row-${student.uid}">
@@ -994,6 +1050,7 @@
               <span class="text-muted small">${student.phone}</span>
             </td>
             <td class="small fw-semibold text-primary-emphasis">${student.course}</td>
+            <td class="small text-muted font-mono">${regDateStr}</td>
             <td><span class="badge badge-status ${badgeClass}">${student.status}</span></td>
             <td>${hasSub}</td>
             <td class="text-end">

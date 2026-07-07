@@ -68,15 +68,14 @@ export async function approveStudentApplication(uid, studentId) {
     ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
-  const adminProfile = await getAdminProfile("admin-master");
-  const adminName = adminProfile.fullName || adminProfile.username || "Admin Elijah";
-
   // Update student status inside Firestore users collection
   await db.collection("users").doc(uid).update({
-    status: "Approved",
-    approvalDate: serverTimestamp,
-    approvedBy: adminName
+    status: "approved",
+    approvedAt: serverTimestamp,
+    approvedBy: "admin@ejaytech.com"
   });
+
+  console.log("Student approved:", studentId);
 
   // Retrieve student details to construct custom email components
   const studentDoc = await db.collection("users").doc(uid).get();
@@ -114,7 +113,7 @@ export async function approveStudentApplication(uid, studentId) {
   });
 
   // Record action in activity logs
-  const activityMessage = `Admin ${adminName} approved application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
+  const activityMessage = `Admin admin@ejaytech.com approved application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
   await logAdminActivity(activityMessage);
 }
 
@@ -126,15 +125,13 @@ export async function rejectStudentApplication(uid, studentId) {
     ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
-  const adminProfile = await getAdminProfile("admin-master");
-  const adminName = adminProfile.fullName || adminProfile.username || "Admin Elijah";
-
   // Update student status inside Firestore users collection
   await db.collection("users").doc(uid).update({
-    status: "Rejected",
-    rejectionDate: serverTimestamp,
-    rejectedBy: adminName
+    status: "rejected",
+    rejectedAt: serverTimestamp
   });
+
+  console.log("Student rejected:", studentId);
 
   // Retrieve student details to construct custom email components
   const studentDoc = await db.collection("users").doc(uid).get();
@@ -171,7 +168,7 @@ export async function rejectStudentApplication(uid, studentId) {
   });
 
   // Record action in activity logs
-  const activityMessage = `Admin ${adminName} rejected application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
+  const activityMessage = `Admin admin@ejaytech.com rejected application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
   await logAdminActivity(activityMessage);
 }
 
