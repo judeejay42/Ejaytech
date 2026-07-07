@@ -12,7 +12,8 @@ import {
   signInWithEmailAndPassword, 
   onAuthStateChanged, 
   signOut,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  fetchSignInMethodsForEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Generate a unique sequential-style Student ID index: EJ-YEAR-4RANDOM
@@ -117,17 +118,60 @@ export async function registerStudentAccount(data) {
  * Handle user email login using Firebase Authentication
  */
 export async function loginUserAccount(email, password) {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // 1. Detect whether admin@ejaytech.com exists in Firebase Auth
+  if (normalizedEmail === "admin@ejaytech.com") {
+    let adminExists = true;
+    try {
+      const methods = await fetchSignInMethodsForEmail(firebaseAuth, normalizedEmail);
+      if (!methods || methods.length === 0) {
+        adminExists = false;
+      }
+    } catch (err) {
+      if (err.code === "auth/user-not-found" || err.message?.includes("user-not-found")) {
+        adminExists = false;
+      }
+    }
+
+    if (!adminExists) {
+      const adminCreationInstructions = 
+        "The administrator account 'admin@ejaytech.com' does not exist in Firebase Authentication.\n\n" +
+        "HOW TO REGISTER THE ADMIN MANUALLY:\n" +
+        "1. Open your Firebase Console: https://console.firebase.google.com/\n" +
+        "2. Go to your project (ejaytech-de88d)\n" +
+        "3. Navigate to Build -> Authentication -> Users tab\n" +
+        "4. Click 'Add User'\n" +
+        "5. Enter email 'admin@ejaytech.com' and password 'Admin@12345'\n" +
+        "6. Click 'Add User' to complete.";
+      
+      const errorObj = new Error(adminCreationInstructions);
+      errorObj.code = "auth/user-not-found";
+
+      console.log("Firebase Project ID:", firebaseConfig.projectId);
+      console.log("Firebase Auth User Email:", normalizedEmail);
+      console.log("Current Logged User: None");
+      console.log("Authentication Result: Failure (auth/user-not-found - Account does not exist)");
+
+      throw errorObj;
+    }
+  }
+
   try {
-    // Authenticate credentials using Modular SDK directly on firebaseAuth
-    const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+    // 2. Authenticate credentials ONLY using: await signInWithEmailAndPassword(auth, email, password)
+    const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
     const user = credential.user;
-    const normalizedEmail = email.toLowerCase().trim();
     
-    // Retrieve user record from "users" collection
-    let userDoc = await db.collection("users").doc(user.uid).get();
-    
-    if (normalizedEmail === "admin@ejaytech.com") {
-      // If admin document doesn't exist, create it in "users" collection
+    // 3. Print verification info as required
+    console.log("Firebase Project ID:", firebaseConfig.projectId);
+    console.log("Firebase Auth User Email:", user.email);
+    console.log("Current Logged User:", user.uid);
+    console.log("Authentication Result: Success");
+
+    // 4. After successful login, verify: user.email === "admin@ejaytech.com"
+    if (user.email === "admin@ejaytech.com") {
+      // Save in Firestore if doc doesn't exist (ensuring correct session data)
+      let userDoc = await db.collection("users").doc(user.uid).get();
       if (!userDoc.exists) {
         await db.collection("users").doc(user.uid).set({
           uid: user.uid,
@@ -149,15 +193,26 @@ export async function loginUserAccount(email, password) {
         });
         userDoc = await db.collection("users").doc(user.uid).get();
       }
+
+      const userData = userDoc.data();
+      
+      // Redirect seamlessly to admin dashboard
+      setTimeout(() => {
+        window.location.href = "admin-dashboard.html";
+      }, 100);
+
+      return { user, student: userData, role: "admin" };
     }
 
+    // Retrieve user record from "users" collection for student
+    let userDoc = await db.collection("users").doc(user.uid).get();
     if (!userDoc.exists) {
       throw new Error("User registration record not found in the database. Please contact support.");
     }
     
     const userData = userDoc.data();
     
-    // Requirement 8: Prevent users whose status is "pending" from accessing the dashboard.
+    // Prevent users whose status is "pending" from accessing the dashboard.
     if (userData.role !== "admin" && (userData.status || '').toLowerCase() === "pending") {
       await signOut(firebaseAuth);
       throw new Error("Your account application is pending administrative approval.");
@@ -165,10 +220,16 @@ export async function loginUserAccount(email, password) {
     
     return { user, student: userData, role: userData.role };
   } catch (err) {
-    if (email.toLowerCase().trim() === "admin@ejaytech.com") {
-      throw new Error("Invalid administrator email or password.");
-    }
-    throw new Error(getFriendlyErrorMessage(err));
+    // 5. If failure, preserve the actual Firebase error code instead of replacing it with a generic message
+    console.log("Firebase Project ID:", firebaseConfig.projectId);
+    console.log("Firebase Auth User Email:", normalizedEmail);
+    console.log("Current Logged User: None");
+    console.log("Authentication Result: Failure (" + (err.code || "unknown") + ")");
+    console.error(err.code, err.message);
+
+    const errorObj = new Error(getFriendlyErrorMessage(err));
+    errorObj.code = err.code || "auth/unknown";
+    throw errorObj;
   }
 }
 
