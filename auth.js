@@ -7,9 +7,7 @@
  */
 
 import { firebaseConfig, firebaseAuth } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
-  getAuth, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   onAuthStateChanged, 
@@ -56,90 +54,6 @@ export function getFriendlyErrorMessage(error) {
   }
 }
 
-/**
- * Requirement 4 & 5: Automatic Administrator Provisioning.
- * Automatically provisions the chief administrator account in Firebase Auth on first boot if it doesn't exist.
- * If automatic creation fails due to Firebase project restrictions (e.g., self-registration disabled, security rules),
- * we print a clear and helpful explanation instructions log for manual console creation.
- */
-async function ensureAdminAccountExists() {
-  const adminEmail = "admin@ejaytech.com";
-  const adminPass = "Admin@12345";
-  
-  // CRITICAL REQUIREMENT 5 MESSAGE:
-  /* 
-   * ==============================================================================================
-   * ADMIN SETUP SECURITY WARNING / REQUIREMENT 5 INFORMATION:
-   * ----------------------------------------------------------------------------------------------
-   * If the administrator account creation throws any restriction errors (such as "auth/admin-restricted"
-   * or "auth/operation-not-allowed"), the Firebase project's Authentication configuration is likely
-   * restricted to console-only user creation. 
-   * 
-   * TO SOLVE THIS MANUALLY:
-   * 1. Access the Google Firebase Console: https://console.firebase.google.com/
-   * 2. Select your project "ejaytech-de88d"
-   * 3. Navigate to "Authentication" -> "Users"
-   * 4. Click "Add user"
-   * 5. Enter Email: "admin@ejaytech.com" and Password: "Admin@12345"
-   * 6. Click Save/Create.
-   * ==============================================================================================
-   */
-  
-  try {
-    // We utilize a distinct isolated Firebase App instance to attempt the initial sign-up,
-    // thereby keeping the main application's current signed-in user state completely safe and untouched.
-    const tempAppName = "admin-auth-initializer-" + Math.floor(Math.random() * 1000000);
-    const tempApp = initializeApp(firebaseConfig, tempAppName);
-    const tempAuth = getAuth(tempApp);
-    
-    const credential = await createUserWithEmailAndPassword(tempAuth, adminEmail, adminPass);
-    const user = credential.user;
-    
-    // Save record inside Firestore using the compatibility db layer
-    await db.collection("users").doc(user.uid).set({
-      uid: user.uid,
-      fullName: "EJaytech Chief Admin",
-      fullname: "EJaytech Chief Admin",
-      email: adminEmail,
-      role: "admin",
-      status: "Approved",
-      createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-      username: "EJaytech Chief Admin",
-      darkModeEnabled: false,
-      profilePictureUrl: "",
-      websiteSettings: {
-        siteName: "EJaytech Concepts",
-        contactPhone: "07033719342",
-        contactEmail: "ejaytechconcepts@gmail.com",
-        headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
-      }
-    });
-    
-    console.log("Successfully auto-provisioned Chief Admin account [admin@ejaytech.com].");
-    await signOut(tempAuth);
-  } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      console.log("Verify: Chief Admin account already exists in Firebase Authentication.");
-    } else {
-      console.warn(
-        "==============================================================================\n" +
-        "FIREBASE SECURITY RESTRICTION / ADMINISTRATIVE NOTICE:\n" +
-        "Could not automatically create the administrator account 'admin@ejaytech.com'.\n" +
-        "Reason: " + error.message + "\n\n" +
-        "HOW TO REGISTER THE ADMIN MANUALLY:\n" +
-        "1. Open your Firebase Console: https://console.firebase.google.com/\n" +
-        "2. Go to project: ejaytech-de88d\n" +
-        "3. Navigate to Build -> Authentication -> Users tab\n" +
-        "4. Click 'Add User'\n" +
-        "5. Enter email 'admin@ejaytech.com' and password 'Admin@12345'\n" +
-        "=============================================================================="
-      );
-    }
-  }
-}
-
-// Trigger Admin verification on module load asynchronously
-ensureAdminAccountExists();
 
 /**
  * Handle student application registration using Firebase Authentication
@@ -247,6 +161,9 @@ export async function loginUserAccount(email, password) {
     
     return { user, student: userData, role: userData.role };
   } catch (err) {
+    if (email.toLowerCase().trim() === "admin@ejaytech.com") {
+      throw new Error("Invalid administrator email or password.");
+    }
     throw new Error(getFriendlyErrorMessage(err));
   }
 }

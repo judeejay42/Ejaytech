@@ -373,7 +373,7 @@
         console.log(`[Firestore Query] Initiating student profile lookup matching UID: ${user.uid}`);
 
         // Establish real-time observer of student doc in Firestore matching Auth UID
-        studentUnsubscribe = db.collection("students").doc(user.uid).onSnapshot(async (doc) => {
+        studentUnsubscribe = db.collection("users").doc(user.uid).onSnapshot(async (doc) => {
           try {
             console.log(`[Firestore Query Result] Status updated. Doc ID: ${doc.id} | Exists: ${doc.exists}`);
 
