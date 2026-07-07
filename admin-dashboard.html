@@ -207,7 +207,7 @@
             <input type="file" id="admin-avatar-trigger" class="d-none" accept="image/*" onchange="uploadAdminAvatarPhoto(this)">
           </div>
           <h6 class="fw-bold font-display mb-1 text-white" id="admin-sidebar-username">Chief Director Admin</h6>
-          <p class="text-primary-emphasis mb-1 small" id="admin-sidebar-email">admin@ejaytech.com</p>
+          <p class="text-primary-emphasis mb-1 small" id="admin-sidebar-email">administrator@ejaytech.com</p>
           <span class="badge bg-success-subtle text-success border border-success fw-bold mx-auto px-2 py-1" style="font-size: 0.68rem;"><i class="bi bi-check-circle-fill me-1"></i> Root Verified</span>
         </div>
 
@@ -844,55 +844,72 @@
 
     // Monitor Auth State and Initialize
     auth.onAuthStateChanged(async (user) => {
-      if (user && user.email === "admin@ejaytech.com") {
-        document.getElementById("admin-loading-screen").classList.add("d-none");
-        document.getElementById("active-admin-grid").classList.remove("d-none");
-        
-        bootstrapEditModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
-        bootstrapDrilldownModal = new bootstrap.Modal(document.getElementById('drilldownStudentModal'));
-        
-        // Retrieve and bind console theme parameters
-        const storedTheme = localStorage.getItem("admin_dark_mode") === "true";
-        document.getElementById("console-theme-switch").checked = storedTheme;
-        toggleAdminConsoleTheme(storedTheme);
-
-        // Load other collections statically
+      if (user) {
         try {
-          coursesMasterList = await getCoursesList();
-          materialsMasterList = await getMaterialsList();
-          announcementsMasterList = await getAnnouncementsList();
-        } catch (err) {
-          console.error("Static data load error:", err);
-        }
+          const doc = await db.collection("users").doc(user.uid).get();
+          if (doc.exists && doc.data().role === "admin") {
+            const adminData = doc.data();
+            
+            // Set dynamic values in sidebar
+            document.getElementById("admin-sidebar-username").textContent = adminData.fullName || adminData.fullname || "Chief Director Admin";
+            document.getElementById("admin-sidebar-email").textContent = adminData.email || user.email;
+            
+            document.getElementById("admin-loading-screen").classList.add("d-none");
+            document.getElementById("active-admin-grid").classList.remove("d-none");
+            
+            bootstrapEditModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+            bootstrapDrilldownModal = new bootstrap.Modal(document.getElementById('drilldownStudentModal'));
+            
+            // Retrieve and bind console theme parameters
+            const storedTheme = localStorage.getItem("admin_dark_mode") === "true";
+            document.getElementById("console-theme-switch").checked = storedTheme;
+            toggleAdminConsoleTheme(storedTheme);
 
-        // Setup real-time listener for students collection
-        if (studentUnsubscribe) {
-          studentUnsubscribe();
-        }
-
-        console.log("Establishing real-time student snapshot listener...");
-        studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
-          const list = [];
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            // Exclude the main administrator from the user/student list
-            if (data.email !== "admin@ejaytech.com") {
-              list.push({ uid: doc.id, ...data });
-              console.log("Student loaded:", data.fullname || data.fullName || "Unnamed Student");
+            // Load other collections statically
+            try {
+              coursesMasterList = await getCoursesList();
+              materialsMasterList = await getMaterialsList();
+              announcementsMasterList = await getAnnouncementsList();
+            } catch (err) {
+              console.error("Static data load error:", err);
             }
-          });
 
-          studentsMasterList = list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-          console.log("Dashboard refreshed");
+            // Setup real-time listener for students collection
+            if (studentUnsubscribe) {
+              studentUnsubscribe();
+            }
 
-          // Render changes to screen
-          updateUIWithFreshStudentData();
-        });
+            console.log("Establishing real-time student snapshot listener...");
+            studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
+              const list = [];
+              snapshot.forEach(doc => {
+                const data = doc.data();
+                // Exclude all administrators from the user/student list
+                if (data.role !== "admin") {
+                  list.push({ uid: doc.id, ...data });
+                }
+              });
+
+              studentsMasterList = list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+              console.log("Dashboard refreshed");
+
+              // Render changes to screen
+              updateUIWithFreshStudentData();
+            });
+          } else {
+            console.warn("User is not an authorized administrator. Redirecting...");
+            window.location.href = "portal.html";
+          }
+        } catch (err) {
+          console.error("Failed to verify administrator role:", err);
+          window.location.href = "portal.html";
+        }
       } else {
         if (studentUnsubscribe) {
           studentUnsubscribe();
           studentUnsubscribe = null;
         }
+        window.location.href = "portal.html";
       }
     });
 

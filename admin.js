@@ -12,8 +12,8 @@ export async function getRegisteredStudentsList() {
   const list = [];
   snapshot.forEach(doc => {
     const data = doc.data();
-    // Exclude the main administrator from the user/student list
-    if (data.email !== "admin@ejaytech.com") {
+    // Exclude all administrators from the user/student list
+    if (data.role !== "admin") {
       list.push({ uid: doc.id, ...data });
     }
   });
@@ -68,11 +68,13 @@ export async function approveStudentApplication(uid, studentId) {
     ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
+  const adminEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || "administrator";
+
   // Update student status inside Firestore users collection
   await db.collection("users").doc(uid).update({
     status: "approved",
     approvedAt: serverTimestamp,
-    approvedBy: "admin@ejaytech.com"
+    approvedBy: adminEmail
   });
 
   console.log("Student approved:", studentId);
@@ -113,7 +115,7 @@ export async function approveStudentApplication(uid, studentId) {
   });
 
   // Record action in activity logs
-  const activityMessage = `Admin admin@ejaytech.com approved application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
+  const activityMessage = `Admin ${adminEmail} approved application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
   await logAdminActivity(activityMessage);
 }
 
@@ -167,8 +169,9 @@ export async function rejectStudentApplication(uid, studentId) {
     status: "sent"
   });
 
+  const adminEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || "administrator";
   // Record action in activity logs
-  const activityMessage = `Admin admin@ejaytech.com rejected application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
+  const activityMessage = `Admin ${adminEmail} rejected application for Student ID ${studentId} on ${new Date().toLocaleString()}.`;
   await logAdminActivity(activityMessage);
 }
 
@@ -435,7 +438,7 @@ export async function getAdminProfile(uid) {
   return {
     fullName: "EJaytech Chief Admin",
     username: "EJaytech Chief Admin",
-    email: "admin@ejaytech.com",
+    email: "administrator@ejaytech.com",
     darkModeEnabled: false,
     profilePictureUrl: "",
     websiteSettings: {

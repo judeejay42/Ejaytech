@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `contact_inquiries` (
 -- Seed Admin Profile (Password is: admin12345)
 -- Bcrypt Hash standard format: $2y$10$UoW083vL7uor7O7vJ2ySleY8AunGskhOn/p7M9T7eS98G0Esh9sZq
 INSERT INTO `admins` (`username`, `email`, `password_hash`) 
-VALUES ('EJaytech Admin', 'admin@ejaytech.com', '$2y$10$UoW083vL7uor7O7vJ2ySleY8AunGskhOn/p7M9T7eS98G0Esh9sZq')
+VALUES ('EJaytech Admin', 'authorized_admin@ejaytech.com', '$2y$10$UoW083vL7uor7O7vJ2ySleY8AunGskhOn/p7M9T7eS98G0Esh9sZq')
 ON DUPLICATE KEY UPDATE `username`=`username`;
 
 -- Seed Global Training Courses portfolio

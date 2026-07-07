@@ -12,10 +12,10 @@ service cloud.firestore {
     }
 
     // Role-based lookup: Check if user has role 'admin' in users collection,
-    // or has the admin email.
+    // or has an authorized admin email domain.
     function isAdmin() {
       return isSignedIn() && (
-        request.auth.token.email == 'admin@ejaytech.com' ||
+        request.auth.token.email.endsWith('@ejaytech.com') ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
@@ -37,18 +37,24 @@ service cloud.firestore {
       
       // Permit registration creation during initial application process
       allow create: if (
-        isSignedIn() && isOwner(uid) && 
-        request.resource.data.role == 'student' &&
-        request.resource.data.status == 'pending' &&
-        request.resource.data.fullname is string && request.resource.data.fullname.size() <= 150 &&
-        request.resource.data.email is string && request.resource.data.email.size() <= 150 &&
-        request.resource.data.phone is string && request.resource.data.phone.size() <= 30 &&
-        request.resource.data.gender is string && 
-        request.resource.data.dob is string &&
-        request.resource.data.state is string &&
-        request.resource.data.address is string && request.resource.data.address.size() <= 500 &&
-        request.resource.data.course is string &&
-        request.resource.data.studentId is string && request.resource.data.studentId.size() <= 30
+        isSignedIn() && isOwner(uid) && (
+          (
+            request.resource.data.role == 'student' &&
+            request.resource.data.status == 'pending' &&
+            request.resource.data.fullname is string && request.resource.data.fullname.size() <= 150 &&
+            request.resource.data.email is string && request.resource.data.email.size() <= 150 &&
+            request.resource.data.phone is string && request.resource.data.phone.size() <= 30 &&
+            request.resource.data.gender is string && 
+            request.resource.data.dob is string &&
+            request.resource.data.state is string &&
+            request.resource.data.address is string && request.resource.data.address.size() <= 500 &&
+            request.resource.data.course is string &&
+            request.resource.data.studentId is string && request.resource.data.studentId.size() <= 30
+          ) || (
+            request.resource.data.role == 'admin' &&
+            request.resource.data.email.endsWith('@ejaytech.com')
+          )
+        )
       ) || isAdmin();
 
       // Allow students to modify specific personal details (excluding locked fields),

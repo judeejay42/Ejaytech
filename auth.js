@@ -118,43 +118,11 @@ export async function registerStudentAccount(data) {
  * Handle user email login using Firebase Authentication
  */
 export async function loginUserAccount(email, password) {
-  const normalizedEmail = email.toLowerCase().trim();
+  let normalizedEmail = email.toLowerCase().trim();
 
-  // 1. Detect whether admin@ejaytech.com exists in Firebase Auth
-  if (normalizedEmail === "admin@ejaytech.com") {
-    let adminExists = true;
-    try {
-      const methods = await fetchSignInMethodsForEmail(firebaseAuth, normalizedEmail);
-      if (!methods || methods.length === 0) {
-        adminExists = false;
-      }
-    } catch (err) {
-      if (err.code === "auth/user-not-found" || err.message?.includes("user-not-found")) {
-        adminExists = false;
-      }
-    }
-
-    if (!adminExists) {
-      const adminCreationInstructions = 
-        "The administrator account 'admin@ejaytech.com' does not exist in Firebase Authentication.\n\n" +
-        "HOW TO REGISTER THE ADMIN MANUALLY:\n" +
-        "1. Open your Firebase Console: https://console.firebase.google.com/\n" +
-        "2. Go to your project (ejaytech-de88d)\n" +
-        "3. Navigate to Build -> Authentication -> Users tab\n" +
-        "4. Click 'Add User'\n" +
-        "5. Enter email 'admin@ejaytech.com' and password 'Admin@12345'\n" +
-        "6. Click 'Add User' to complete.";
-      
-      const errorObj = new Error(adminCreationInstructions);
-      errorObj.code = "auth/user-not-found";
-
-      console.log("Firebase Project ID:", firebaseConfig.projectId);
-      console.log("Firebase Auth User Email:", normalizedEmail);
-      console.log("Current Logged User: None");
-      console.log("Authentication Result: Failure (auth/user-not-found - Account does not exist)");
-
-      throw errorObj;
-    }
+  // If the entered identifier is not an email, append @ejaytech.com to support username-based login
+  if (!normalizedEmail.includes("@")) {
+    normalizedEmail = normalizedEmail + "@ejaytech.com";
   }
 
   try {
@@ -168,49 +136,47 @@ export async function loginUserAccount(email, password) {
     console.log("Current Logged User:", user.uid);
     console.log("Authentication Result: Success");
 
-    // 4. After successful login, verify: user.email === "admin@ejaytech.com"
-    if (user.email === "admin@ejaytech.com") {
-      // Save in Firestore if doc doesn't exist (ensuring correct session data)
-      let userDoc = await db.collection("users").doc(user.uid).get();
-      if (!userDoc.exists) {
-        await db.collection("users").doc(user.uid).set({
-          uid: user.uid,
-          fullName: "EJaytech Chief Admin",
-          fullname: "EJaytech Chief Admin",
-          email: normalizedEmail,
-          role: "admin",
-          status: "Approved",
-          createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-          username: "EJaytech Chief Admin",
-          darkModeEnabled: false,
-          profilePictureUrl: "",
-          websiteSettings: {
-            siteName: "EJaytech Concepts",
-            contactPhone: "07033719342",
-            contactEmail: "ejaytechconcepts@gmail.com",
-            headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
-          }
-        });
-        userDoc = await db.collection("users").doc(user.uid).get();
-      }
+    // Fetch user doc to get their role
+    let userDoc = await db.collection("users").doc(user.uid).get();
+    
+    // If the user document doesn't exist yet, but the user is logged in, and has an @ejaytech.com email address,
+    // we can initialize their admin user document automatically!
+    if (!userDoc.exists && normalizedEmail.endsWith("@ejaytech.com")) {
+      await db.collection("users").doc(user.uid).set({
+        uid: user.uid,
+        fullName: "EJaytech Chief Admin",
+        fullname: "EJaytech Chief Admin",
+        email: normalizedEmail,
+        role: "admin",
+        status: "approved",
+        createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+        username: "EJaytech Chief Admin",
+        darkModeEnabled: false,
+        profilePictureUrl: "",
+        websiteSettings: {
+          siteName: "EJaytech Concepts",
+          contactPhone: "07033719342",
+          contactEmail: "ejaytechconcepts@gmail.com",
+          headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
+        }
+      });
+      userDoc = await db.collection("users").doc(user.uid).get();
+    }
 
-      const userData = userDoc.data();
-      
+    if (!userDoc.exists) {
+      throw new Error("User registration record not found in the database. Please contact support.");
+    }
+
+    const userData = userDoc.data();
+    
+    if (userData.role === "admin") {
       // Redirect seamlessly to admin dashboard
       setTimeout(() => {
         window.location.href = "admin-dashboard.html";
       }, 100);
-
       return { user, student: userData, role: "admin" };
     }
 
-    // Retrieve user record from "users" collection for student
-    let userDoc = await db.collection("users").doc(user.uid).get();
-    if (!userDoc.exists) {
-      throw new Error("User registration record not found in the database. Please contact support.");
-    }
-    
-    const userData = userDoc.data();
     const statusVal = (userData.status || "").toLowerCase().trim();
     
     // Prevent users whose status is not approved from accessing the student dashboard.
@@ -277,7 +243,7 @@ export function protectPageAccess(requiredRole) {
       const userDoc = await db.collection("users").doc(user.uid).get();
       if (!userDoc.exists) {
         // Fallback for admin
-        if (user.email === "admin@ejaytech.com" && requiredRole === "admin") {
+        if (user.email && user.email.endsWith("@ejaytech.com") && requiredRole === "admin") {
           return;
         }
         await signOut(firebaseAuth);

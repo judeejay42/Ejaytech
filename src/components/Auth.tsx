@@ -527,7 +527,7 @@ export default function Auth({ onLoginSuccess, onAdminLoginSuccess, initialMode 
                         type="email" 
                         value={adminForm.email}
                         onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
-                        placeholder="admin@ejaytech.com"
+                        placeholder="admin-username"
                         className="bg-transparent text-sm w-full focus:outline-none"
                         required
                       />
@@ -557,11 +557,6 @@ export default function Auth({ onLoginSuccess, onAdminLoginSuccess, initialMode 
                     >
                       {loading ? 'Decrypting Secure Admin Node...' : 'Access Admin Workspace'} <ArrowRight className="w-4 h-4" />
                     </button>
-                  </div>
-                  <div className="mt-4 p-4 bg-brand-accent rounded-xl text-[11px] text-slate-600 space-y-1 border border-slate-200">
-                    <p className="font-bold">Initial Seeding Credentials for Review and Testing:</p>
-                    <p className="font-mono">Email: <strong>admin@ejaytech.com</strong></p>
-                    <p className="font-mono">Password: <strong>Admin@12345</strong></p>
                   </div>
                 </form>
               )}

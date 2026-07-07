@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 });
 
 // Explicit routes for pages
-const pages = ['about', 'services', 'courses', 'portal', 'student-dashboard', 'admin-dashboard', 'admin'];
+const pages = ['about', 'services', 'courses', 'portal', 'student-dashboard', 'admin-dashboard', 'secret-admin-login'];
 pages.forEach(page => {
   app.get(`/${page}`, (req, res) => {
     res.sendFile(path.join(staticPath, `${page}.html`));

@@ -30,16 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("Location: " . OFFICIAL_DOMAIN . "/admin/dashboard.php");
                 exit;
             } else {
-                // Double check fallback hardcoded backup check in case DB is unseeded
-                if ($username === 'admin@ejaytech.com' && $password === 'admin12345') {
-                    $_SESSION['admin_logged_in'] = true;
-                    $_SESSION['admin_id'] = 1;
-                    $_SESSION['admin_username'] = 'Backup administrator';
-                    $_SESSION['admin_email'] = 'admin@ejaytech.com';
-                    header("Location: " . OFFICIAL_DOMAIN . "/admin/dashboard.php");
-                    exit;
-                }
-                $error = 'Invalid administrative credentials. Try username: admin@ejaytech.com, password: admin12345';
+                $error = 'Invalid administrative credentials.';
             }
         } catch (PDOException $e) {
             $error = 'Database connection failure: ' . $e->getMessage();
@@ -150,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <div class="mb-3">
                     <label class="form-label">Authorized Username / Email</label>
-                    <input type="text" name="username" required class="form-control" placeholder="admin@ejaytech.com">
+                    <input type="text" name="username" required class="form-control" placeholder="username">
                 </div>
 
                 <div class="mb-4">
