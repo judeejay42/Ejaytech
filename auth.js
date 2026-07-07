@@ -105,7 +105,11 @@ export async function registerStudentAccount(data) {
 
     return userRecord;
   } catch (err) {
-    throw new Error(getFriendlyErrorMessage(err));
+    const errorObj = new Error(getFriendlyErrorMessage(err));
+    if (err.code) {
+      errorObj.code = err.code;
+    }
+    throw errorObj;
   }
 }
 
