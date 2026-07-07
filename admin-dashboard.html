@@ -1731,11 +1731,11 @@
     /**
      * =========================================
      * PANE 6: SETTINGS MANAGEMENT SUBMITS
-     * =========================================
-     */
+     * ========================================     */
     async function loadSettingsFormValues() {
       try {
-        const profile = await getAdminProfile("admin-master");
+        const adminUid = (auth.currentUser && auth.currentUser.uid) || "admin-master";
+        const profile = await getAdminProfile(adminUid);
         
         // Populate profile form inputs
         document.getElementById("s-name").value = profile.username || "Chief Executive Admin";
@@ -1773,7 +1773,8 @@
         subBtn.disabled = true;
         subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Updating coordinates...';
 
-        await updateAdminProfile("admin-master", {
+        const adminUid = (auth.currentUser && auth.currentUser.uid) || "admin-master";
+        await updateAdminProfile(adminUid, {
           websiteSettings: {
             siteName,
             contactPhone,
@@ -1825,7 +1826,8 @@
         subBtn.disabled = true;
         subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Modifying parameters...';
 
-        await updateAdminProfile("admin-master", { username });
+        const adminUid = (auth.currentUser && auth.currentUser.uid) || "admin-master";
+        await updateAdminProfile(adminUid, { username });
 
         if (newPass.length > 0) {
           await changeAdminPassword(currentPass, newPass);
@@ -1865,7 +1867,8 @@
         let downloadUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70";
         
         // Upload to storage emulated or real
-        const path = `admins/admin-master/profile_picture_${Date.now()}`;
+        const adminUid = (auth.currentUser && auth.currentUser.uid) || "admin-master";
+        const path = `admins/${adminUid}/profile_picture_${Date.now()}`;
         try {
           const snapshot = await storage.ref().child(path).put(file);
           downloadUrl = await snapshot.ref.getDownloadURL();
@@ -1873,7 +1876,7 @@
           downloadUrl = "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=70";
         }
 
-        await updateAdminProfile("admin-master", { profilePictureUrl: downloadUrl });
+        await updateAdminProfile(adminUid, { profilePictureUrl: downloadUrl });
         avatarImg.src = downloadUrl;
         avatarImg.classList.remove("opacity-50");
         alert("Admin profile image modified!");
@@ -1882,7 +1885,7 @@
         alert("Image upload aborted: " + err.message);
         avatarImg.classList.remove("opacity-50");
       }
-    }
+    } }
 
     /**
      * =========================================

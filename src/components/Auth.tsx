@@ -54,7 +54,7 @@ export default function Auth({ onLoginSuccess, onAdminLoginSuccess, initialMode 
 
   // Admin login Form State
   const [adminForm, setAdminForm] = useState({
-    email: '',
+    username: '',
     password: ''
   });
 
@@ -169,8 +169,8 @@ export default function Auth({ onLoginSuccess, onAdminLoginSuccess, initialMode 
     e.preventDefault();
     setError('');
 
-    if (!adminForm.email || !adminForm.password) {
-      setError('Admin email and master passwords required.');
+    if (!adminForm.username || !adminForm.password) {
+      setError('Admin username and master passwords required.');
       return;
     }
 
@@ -520,13 +520,13 @@ export default function Auth({ onLoginSuccess, onAdminLoginSuccess, initialMode 
               {mode === 'admin-login' && (
                 <form onSubmit={handleAdminLogin} className="space-y-5">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold uppercase text-slate-500">Admin Email</label>
+                    <label className="text-xs font-bold uppercase text-slate-500">Admin Username</label>
                     <div className="flex bg-slate-50 border border-slate-200 focus-within:border-brand-secondary rounded-xl px-3 py-2.5 items-center gap-2 transition">
                       <Mail className="w-4 h-4 text-slate-400" />
                       <input 
-                        type="email" 
-                        value={adminForm.email}
-                        onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                        type="text" 
+                        value={adminForm.username}
+                        onChange={(e) => setAdminForm({ ...adminForm, username: e.target.value })}
                         placeholder="admin-username"
                         className="bg-transparent text-sm w-full focus:outline-none"
                         required
