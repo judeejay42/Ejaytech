@@ -826,6 +826,9 @@
 
   <!-- Interactive Dashboard Administration Script Logic -->
   <script type="module">
+    import { firebaseAuth } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
     // Security restriction for page access
     protectPageAccess("admin");
 
@@ -863,7 +866,7 @@
     }
 
     // Monitor Auth State and Initialize
-    auth.onAuthStateChanged(async (user) => {
+    onAuthStateChanged(firebaseAuth, async (user) => {
       // Ensure loading state is reset upon auth check trigger
       const loadingScreen = document.getElementById("admin-loading-screen");
       const activeGrid = document.getElementById("active-admin-grid");

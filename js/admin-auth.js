@@ -46,7 +46,16 @@ export async function loginAdminAccount(email, password) {
   }
 
   try {
+    // 1. Await signInWithEmailAndPassword properly
     const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
+    
+    // 2. Verify the Firebase Authentication user exists
+    if (!credential || !credential.user) {
+      const authErr = new Error("Authentication failed: No user record returned from Firebase Auth.");
+      console.error("[Auth Failure]", authErr);
+      throw authErr;
+    }
+    
     const user = credential.user;
     
     // Check if user is the designated chief administrator or staff email
@@ -56,8 +65,14 @@ export async function loginAdminAccount(email, password) {
       normalizedEmail.includes("@ejaytech")
     );
 
-    // Fetch profile from the dedicated "administrators" collection
-    let adminDoc = await db.collection("administrators").doc(user.uid).get();
+    // 3. Fetch profile from the dedicated "administrators" collection with try/catch
+    let adminDoc;
+    try {
+      adminDoc = await db.collection("administrators").doc(user.uid).get();
+    } catch (fsErr) {
+      console.error("[Firestore Failure] Failed to look up administrator document:", fsErr);
+      throw new Error(`Database query failed: ${fsErr.message || fsErr}`);
+    }
     
     // Auto-create designated chief administrator record if it doesn't exist yet in the administrators collection
     if (!adminDoc.exists && isCandidateAdmin) {
@@ -80,14 +95,29 @@ export async function loginAdminAccount(email, password) {
           headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
         }
       };
-      await db.collection("administrators").doc(user.uid).set(defaultAdminRecord);
-      adminDoc = await db.collection("administrators").doc(user.uid).get();
+      try {
+        await db.collection("administrators").doc(user.uid).set(defaultAdminRecord);
+        adminDoc = await db.collection("administrators").doc(user.uid).get();
+      } catch (fsCreateErr) {
+        console.error("[Firestore Failure] Failed to auto-initialize administrator profile document:", fsCreateErr);
+        throw new Error(`Database write failed: ${fsCreateErr.message || fsCreateErr}`);
+      }
+    }
+
+    // 4. Verify the administrator Firestore document exists
+    if (!adminDoc || !adminDoc.exists) {
+      await signOut(firebaseAuth);
+      const docErr = new Error("Access denied. Administrator profile record not found in the database.");
+      console.error("[Auth Privilege Error]", docErr);
+      throw docErr;
     }
 
     // Verify presence and role inside the administrators collection
-    if (!adminDoc.exists || adminDoc.data().role !== "admin") {
+    if (adminDoc.data().role !== "admin") {
       await signOut(firebaseAuth);
-      throw new Error("Access denied. You are not authorized to access the Administrator Portal.");
+      const roleErr = new Error("Access denied. You are not authorized to access the Administrator Portal.");
+      console.error("[Auth Privilege Error]", roleErr);
+      throw roleErr;
     }
 
     // Save separate admin session indicator
@@ -96,11 +126,16 @@ export async function loginAdminAccount(email, password) {
 
     return { user, admin: adminDoc.data(), role: "admin" };
   } catch (err) {
-    console.error("Admin login error:", err.code || err.message);
+    // 5. Add console.error() for every authentication and Firestore failure
+    console.error("Admin authentication flow failure:", err.code || err.message, err);
+    
     let msg = getFriendlyErrorMessage(err);
     if (err.message && err.message.includes("Access denied")) {
-      msg = "Access denied. You are not authorized to access the Administrator Portal.";
+      msg = err.message;
+    } else if (err.message && err.message.includes("failed")) {
+      msg = err.message;
     }
+    
     const errorObj = new Error(msg);
     errorObj.code = err.code || "auth/unknown";
     throw errorObj;

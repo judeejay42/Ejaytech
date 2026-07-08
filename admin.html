@@ -150,9 +150,11 @@
   <!-- Form Controllers & Routing Logic -->
   <script type="module">
     import { loginAdminAccount } from "./js/admin-auth.js";
+    import { firebaseAuth } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     // Direct redirect if active admin session exists
-    auth.onAuthStateChanged(async (user) => {
+    onAuthStateChanged(firebaseAuth, async (user) => {
       const isAdminSession = sessionStorage.getItem("admin_logged_in") === "true";
       if (user && isAdminSession) {
         window.location.href = "admin-dashboard.html";
@@ -168,29 +170,43 @@
     }
 
     document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
+      // 1. Ensure event.preventDefault() is used correctly
       e.preventDefault();
       errorAlert.classList.add("d-none");
 
-      const email = document.getElementById("admin-email").value;
-      const pass = document.getElementById("admin-password").value;
+      const emailInput = document.getElementById("admin-email");
+      const passwordInput = document.getElementById("admin-password");
       const btn = document.getElementById("admin-submit-btn");
 
+      const email = emailInput.value;
+      const pass = passwordInput.value;
+
       try {
+        // 2. Ensure loading spinner appears during login
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating...';
 
-        await loginAdminAccount(email, pass);
+        // 3. Await loginAdminAccount properly
+        const result = await loginAdminAccount(email, pass);
         
+        console.log("Admin session authenticated successfully. UID:", result.user.uid);
         btn.innerHTML = '<i class="bi bi-shield-check me-2"></i> Authorization Granted';
-        setTimeout(() => {
-          window.location.href = "admin-dashboard.html";
-        }, 1000);
+        
+        // 4. If authentication succeeds, redirect immediately to admin-dashboard.html
+        window.location.href = "admin-dashboard.html";
 
       } catch (err) {
-        console.error(err);
+        // 5. Add console.error() for every authentication failure
+        console.error("Administrative Gateway authentication failure:", err);
+        
+        // 6. If authentication fails, remain on login page and show exact reason
+        displayError(err.message || "Access denied. Authentication rejected.");
+        
+        // 7. Ensure loading spinner disappears afterward on failure
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i> Authenticate Console';
-        displayError(err.message || "Access denied. Authentication rejected.");
+        
+        // Note: Email and password fields are NOT cleared, allowing the user to make corrections.
       }
     });
   </script>
