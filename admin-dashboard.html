@@ -864,6 +864,17 @@
 
     // Monitor Auth State and Initialize
     auth.onAuthStateChanged(async (user) => {
+      // Ensure loading state is reset upon auth check trigger
+      const loadingScreen = document.getElementById("admin-loading-screen");
+      const activeGrid = document.getElementById("active-admin-grid");
+      
+      if (loadingScreen) {
+        loadingScreen.classList.remove("d-none");
+      }
+      if (activeGrid) {
+        activeGrid.classList.add("d-none");
+      }
+
       if (user) {
         console.log("Admin authentication success: Authenticated administrator session (UID: " + user.uid + ")");
         try {
@@ -882,9 +893,15 @@
             throw fetchErr;
           }
 
-          // If the user document doesn't exist yet, but the user is logged in, and has an @ejaytech.com email address,
+          let isCandidateAdmin = user.email && (
+            user.email.toLowerCase().endsWith("@ejaytech.com") ||
+            user.email.toLowerCase().includes("@ejaytech") ||
+            user.email.toLowerCase() === "elijahyahuza@gmail.com"
+          );
+
+          // If the user document doesn't exist yet, but the user is logged in, and matches the admin candidates criteria,
           // we initialize their admin user document automatically so they have complete administrative workspace access.
-          if (!doc.exists && user.email && user.email.toLowerCase().endsWith("@ejaytech.com")) {
+          if (!doc.exists && isCandidateAdmin) {
             console.log("No administrator user document found in Firestore. Auto-initializing default admin records...");
             const defaultAdminRecord = {
               uid: user.uid,
@@ -923,6 +940,25 @@
             }
           }
 
+          // If the document exists but the role is not 'admin' yet, and they are our designated admin, upgrade them
+          if (doc.exists && doc.data().role !== "admin" && isCandidateAdmin) {
+            console.log("Upgrading existing user to admin role: " + user.email);
+            try {
+              await withTimeout(
+                db.collection("users").doc(user.uid).update({ role: "admin", status: "approved" }),
+                6000,
+                "Timed out while updating role to admin."
+              );
+              doc = await withTimeout(
+                db.collection("users").doc(user.uid).get(),
+                6000,
+                "Timed out while re-fetching administrative record."
+              );
+            } catch (upgradeErr) {
+              console.error("Failed to upgrade user role to admin:", upgradeErr);
+            }
+          }
+
           if (doc.exists && doc.data().role === "admin") {
             const adminData = doc.data();
             console.log("Administrative authorization verified for: " + (adminData.fullName || adminData.username));
@@ -934,11 +970,9 @@
             
             // Always stop the spinner and show active grid here
             console.log("Stopping authorization loading spinner: Transitioning workspace to active administrative console.");
-            const loadingScreen = document.getElementById("admin-loading-screen");
             if (loadingScreen) {
               loadingScreen.classList.add("d-none");
             }
-            const activeGrid = document.getElementById("active-admin-grid");
             if (activeGrid) {
               activeGrid.classList.remove("d-none");
             }
@@ -1040,14 +1074,13 @@
               updateUIWithFreshStudentData();
             }
           } else {
-            console.warn("User is not an authorized administrator (does not have the admin role). Redirecting to portal...");
-            window.location.href = "portal.html";
+            console.error("User is authenticated but does not have administrative privileges in Firestore (UID: " + user.uid + ").");
+            throw new Error("Access Denied! The Firestore document for this account cannot be found with administrative privileges. Please log in with an authorized admin account.");
           }
         } catch (err) {
           console.error("Any errors encountered (Failed to verify administrator role or connect to database collections):", err);
           
           // Display a clear error message in the loading screen instead of keeping the spinner running forever
-          const loadingScreen = document.getElementById("admin-loading-screen");
           if (loadingScreen) {
             loadingScreen.innerHTML = `
               <div class="alert alert-danger mx-auto mt-4 p-4 text-start" style="max-width: 550px; border-radius: 16px;">
