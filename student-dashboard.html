@@ -284,7 +284,7 @@
   </div>
 
   <!-- App Custom Logic Modules -->
-  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/student-auth.js"></script>
   <script type="module" src="student.js"></script>
 
@@ -293,7 +293,7 @@
 
   <!-- Page Dashboard Script -->
   <script type="module">
-    import { db, auth } from "./firebase-config.js";
+    import { db, auth } from "./js/firebase-config.js";
     import { protectStudentPage as protectPageAccess } from "./js/student-auth.js";
 
     // Enforce student session protection

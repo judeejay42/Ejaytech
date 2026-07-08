@@ -1,0 +1,66 @@
+/* ==========================================================================
+   EJaytech Concepts - Responsive Stylesheet (Phase 1)
+   ========================================================================== */
+
+/* Large screens and above */
+@media (min-width: 1200px) {
+  .hero-title {
+    font-size: 3.5rem;
+    line-height: 1.25;
+  }
+}
+
+/* Tablets and Desktop margins */
+@media (max-width: 991.98px) {
+  .navbar-custom {
+    padding: 0.75rem 1rem;
+  }
+  
+  .navbar-nav {
+    padding-top: 1rem;
+    gap: 0.25rem;
+  }
+  
+  .navbar-nav .nav-link {
+    padding: 0.6rem 1rem !important;
+  }
+  
+  .btn-primary-custom, .btn-secondary-custom {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .footer-custom {
+    padding: 4rem 0 2rem;
+  }
+}
+
+/* Mobile Devices and below */
+@media (max-width: 575.98px) {
+  .brand-logo {
+    font-size: 1.25rem;
+  }
+  
+  .brand-tagline {
+    font-size: 0.62rem;
+  }
+
+  .footer-custom h5 {
+    margin-bottom: 1.2rem;
+  }
+  
+  .footer-custom {
+    text-align: center;
+  }
+  
+  .footer-custom h5::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .footer-custom .social-icon {
+    margin: 0 0.25rem;
+  }
+}

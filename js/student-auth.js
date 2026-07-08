@@ -3,7 +3,7 @@
  * Manages sign-up, login, password reset, and session routing for students.
  */
 
-import { firebaseAuth, db } from "/firebase-config.js";
+import { firebaseAuth, db } from "./firebase-config.js";
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 

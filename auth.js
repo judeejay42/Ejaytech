@@ -3,7 +3,7 @@
  * Backward-compatible bridge pointing to the modern students and administrators databases.
  */
 
-import { firebaseConfig, firebaseAuth, db, auth } from "./firebase-config.js";
+import { firebaseConfig, firebaseAuth, db, auth } from "./js/firebase-config.js";
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 

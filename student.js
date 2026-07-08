@@ -3,7 +3,7 @@
  * Manages profile loading, class materials listing, and assignments/materials upload triggers.
  */
 
-import { db, storage } from "./firebase-config.js";
+import { db, storage } from "./js/firebase-config.js";
 
 /**
  * Fetch and load student profile data
