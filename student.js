@@ -7,7 +7,10 @@
  * Fetch and load student profile data
  */
 export async function getStudentProfile(uid) {
-  const docRef = await db.collection("students").doc(uid).get();
+  let docRef = await db.collection("users").doc(uid).get();
+  if (!docRef.exists) {
+    docRef = await db.collection("students").doc(uid).get();
+  }
   if (docRef.exists) {
     return docRef.data();
   }
@@ -29,7 +32,16 @@ export async function updateStudentProfile(uid, fields) {
     bio: fields.bio || ""
   };
   
-  await db.collection("students").doc(uid).update(sanitisedFields);
+  try {
+    await db.collection("users").doc(uid).update(sanitisedFields);
+  } catch (err) {
+    console.warn("Could not update users collection:", err);
+  }
+  try {
+    await db.collection("students").doc(uid).update(sanitisedFields);
+  } catch (err) {
+    console.warn("Could not update students collection:", err);
+  }
   return getStudentProfile(uid);
 }
 
@@ -96,10 +108,21 @@ export async function uploadAssignmentFile(uid, studentId, fileObj) {
   const uploadTask = await storage.ref().child(storagePath).put(fileObj);
   const downloadUrl = await uploadTask.ref.getDownloadURL();
   
-  // Update users collection registry linking the file
-  await db.collection("students").doc(uid).update({
-    lastDocumentSubmitted: downloadUrl
-  });
+  // Update users and students collection registries linking the file
+  try {
+    await db.collection("users").doc(uid).update({
+      lastDocumentSubmitted: downloadUrl
+    });
+  } catch (err) {
+    console.warn("Could not update users collection with assignment:", err);
+  }
+  try {
+    await db.collection("students").doc(uid).update({
+      lastDocumentSubmitted: downloadUrl
+    });
+  } catch (err) {
+    console.warn("Could not update students collection with assignment:", err);
+  }
 
   // Notify admin
   await db.collection("notifications").add({

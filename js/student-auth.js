@@ -32,7 +32,7 @@ export function getFriendlyErrorMessage(error) {
     case "auth/user-not-found":
     case "auth/invalid-credential":
     case "auth/wrong-password":
-      return "Invalid email address or security passcode. Please double-check spelling and try again.";
+      return "Invalid email or password.";
     case "auth/email-already-in-use":
       return "This email address is already registered. If you forgot your password, please use the reset link.";
     case "auth/weak-password":
@@ -43,7 +43,7 @@ export function getFriendlyErrorMessage(error) {
       return "Too many failed login attempts. This account has been temporarily locked. Please try again later.";
     default:
       if (typeof code === "string" && code.toLowerCase().includes("wrong-password")) {
-        return "Invalid email address or security passcode. Please double-check spelling and try again.";
+        return "Invalid email or password.";
       }
       return error.message || "An error occurred during authentication.";
   }
@@ -81,11 +81,13 @@ export async function registerStudentAccount(data) {
       course,
       role: "student",
       status: "pending",
+      approvalStatus: "pending",
       createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
       bio: "Enthusiastic EJaytech Concepts student.",
       lastDocumentSubmitted: ""
     };
     
+    await db.collection("users").doc(user.uid).set(studentRecord);
     await db.collection("students").doc(user.uid).set(studentRecord);
     
     // 3. Create initial notice alert for the new student
@@ -121,8 +123,11 @@ export async function loginStudentAccount(email, password) {
     const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
     const user = credential.user;
     
-    // Fetch document from the dedicated "students" collection
-    const studentDoc = await db.collection("students").doc(user.uid).get();
+    // Fetch document from the dedicated "users" collection (falling back to "students")
+    let studentDoc = await db.collection("users").doc(user.uid).get();
+    if (!studentDoc.exists) {
+      studentDoc = await db.collection("students").doc(user.uid).get();
+    }
     
     if (!studentDoc.exists) {
       // Not a student - sign out immediately
@@ -131,7 +136,15 @@ export async function loginStudentAccount(email, password) {
     }
 
     const studentData = studentDoc.data();
-    const statusVal = (studentData.status || "").toLowerCase().trim();
+    
+    // Verify role
+    if (studentData.role && studentData.role !== "student") {
+      await signOut(firebaseAuth);
+      throw new Error("Access denied. You are not authorized to access the Student Portal.");
+    }
+
+    const rawStatus = studentData.approvalStatus || studentData.status || "pending";
+    const statusVal = rawStatus.toLowerCase().trim();
     
     if (statusVal === "pending") {
       await signOut(firebaseAuth);
@@ -150,8 +163,21 @@ export async function loginStudentAccount(email, password) {
 
     return { user, student: studentData, role: "student" };
   } catch (err) {
-    console.error("Student login error:", err.code || err.message);
-    const errorObj = new Error(getFriendlyErrorMessage(err));
+    console.error("Student login error:", err.code || err.message, err);
+    
+    let msg;
+    const code = err.code || "";
+    if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+      msg = "Invalid email or password.";
+    } else {
+      msg = getFriendlyErrorMessage(err);
+    }
+    
+    if (err.message && (err.message.includes("pending") || err.message.includes("rejected") || err.message.includes("denied"))) {
+      msg = err.message;
+    }
+
+    const errorObj = new Error(msg);
     errorObj.code = err.code || "auth/unknown";
     throw errorObj;
   }
@@ -198,7 +224,11 @@ export function protectStudentPage() {
 
     try {
       const db = window.db;
-      const studentDoc = await db.collection("students").doc(user.uid).get();
+      let studentDoc = await db.collection("users").doc(user.uid).get();
+      if (!studentDoc.exists) {
+        studentDoc = await db.collection("students").doc(user.uid).get();
+      }
+      
       if (!studentDoc.exists) {
         console.error("No student document found. Booting to login.");
         sessionStorage.removeItem("student_logged_in");
@@ -211,7 +241,8 @@ export function protectStudentPage() {
       }
 
       const studentData = studentDoc.data();
-      const statusVal = (studentData.status || "").toLowerCase().trim();
+      const rawStatus = studentData.approvalStatus || studentData.status || "pending";
+      const statusVal = rawStatus.toLowerCase().trim();
       
       if (statusVal !== "approved") {
         alert("Your student application status is: " + statusVal + ".");

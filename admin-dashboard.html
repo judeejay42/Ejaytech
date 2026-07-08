@@ -894,10 +894,18 @@
           let doc;
           try {
             doc = await withTimeout(
-              db.collection("administrators").doc(user.uid).get(),
+              db.collection("users").doc(user.uid).get(),
               8000,
               "Firestore fetch timed out while authorizing administrative privilege validation keys."
             );
+            if (!doc.exists) {
+              console.log("Checking administrators collection fallback...");
+              doc = await withTimeout(
+                db.collection("administrators").doc(user.uid).get(),
+                8000,
+                "Firestore fetch timed out while authorizing administrative privilege validation keys."
+              );
+            }
             console.log("Firestore connection success: Verifying administrative user document...");
           } catch (fetchErr) {
             console.error("Any errors encountered (initial user fetch failed):", fetchErr);
@@ -921,6 +929,7 @@
               email: "admin@ejaytech-concepts.local", // Masked/secure email to prevent exposure
               role: "admin",
               status: "approved",
+              approvalStatus: "approved",
               createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
               username: "EJaytech Chief Admin",
               darkModeEnabled: false,
@@ -935,13 +944,18 @@
             
             try {
               await withTimeout(
+                db.collection("users").doc(user.uid).set(defaultAdminRecord),
+                6000,
+                "Timed out while writing default administrative record to Firestore."
+              );
+              await withTimeout(
                 db.collection("administrators").doc(user.uid).set(defaultAdminRecord),
                 6000,
                 "Timed out while writing default administrative record to Firestore."
               );
               console.log("Admin record successfully created. Re-fetching document...");
               doc = await withTimeout(
-                db.collection("administrators").doc(user.uid).get(),
+                db.collection("users").doc(user.uid).get(),
                 6000,
                 "Timed out while re-fetching administrative record."
               );
@@ -956,12 +970,17 @@
             console.log("Upgrading existing user to admin role: " + user.email);
             try {
               await withTimeout(
-                db.collection("administrators").doc(user.uid).update({ role: "admin", status: "approved" }),
+                db.collection("users").doc(user.uid).update({ role: "admin", status: "approved", approvalStatus: "approved" }),
+                6000,
+                "Timed out while updating role to admin."
+              );
+              await withTimeout(
+                db.collection("administrators").doc(user.uid).update({ role: "admin", status: "approved", approvalStatus: "approved" }),
                 6000,
                 "Timed out while updating role to admin."
               );
               doc = await withTimeout(
-                db.collection("administrators").doc(user.uid).get(),
+                db.collection("users").doc(user.uid).get(),
                 6000,
                 "Timed out while re-fetching administrative record."
               );
@@ -1039,9 +1058,9 @@
 
             console.log("Establishing real-time student snapshot listener...");
             try {
-              studentUnsubscribe = db.collection("students").onSnapshot((snapshot) => {
-                console.log("Real-time snapshot update triggered on 'students' collection.");
-                const list = [];
+              studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
+                console.log("Real-time snapshot update triggered on 'users' collection.");
+                let list = [];
                 try {
                   if (snapshot && snapshot.forEach) {
                     snapshot.forEach(doc => {
@@ -1053,6 +1072,27 @@
                   }
                 } catch (snapProcessErr) {
                   console.error("Any errors encountered (snapshot processing error):", snapProcessErr);
+                }
+
+                // If no students found in users, fallback to students collection
+                if (list.length === 0) {
+                  db.collection("students").get().then((fallbackSnap) => {
+                    const fallbackList = [];
+                    fallbackSnap.forEach(doc => {
+                      const data = doc.data();
+                      if (data && data.role !== "admin") {
+                        fallbackList.push({ uid: doc.id, ...data });
+                      }
+                    });
+                    if (fallbackList.length > 0) {
+                      studentsMasterList = fallbackList.sort((a, b) => {
+                        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                        return (timeB || 0) - (timeA || 0);
+                      });
+                      updateUIWithFreshStudentData();
+                    }
+                  }).catch(err => console.warn("Fallback fetch failed:", err));
                 }
 
                 studentsMasterList = list.sort((a, b) => {

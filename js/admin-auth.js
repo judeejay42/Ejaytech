@@ -23,18 +23,21 @@ export function getFriendlyErrorMessage(error) {
     case "auth/user-not-found":
     case "auth/invalid-credential":
     case "auth/wrong-password":
-      return "Invalid email address or security passcode. Please double-check spelling and try again.";
+      return "Invalid email or password.";
     case "auth/network-request-failed":
       return "A network connection error occurred. Please check your internet connection and try again.";
     case "auth/too-many-requests":
       return "Too many failed attempts. This account has been temporarily locked. Please try again later.";
     default:
+      if (typeof code === "string" && code.toLowerCase().includes("wrong-password")) {
+        return "Invalid email or password.";
+      }
       return error.message || "An error occurred during administrative authentication.";
   }
 }
 
 /**
- * Handle administrative login with credentials verification in the "administrators" collection.
+ * Handle administrative login with credentials verification in the "users" collection.
  */
 export async function loginAdminAccount(email, password) {
   let normalizedEmail = email.toLowerCase().trim();
@@ -65,16 +68,19 @@ export async function loginAdminAccount(email, password) {
       normalizedEmail.includes("@ejaytech")
     );
 
-    // 3. Fetch profile from the dedicated "administrators" collection with try/catch
+    // 3. Fetch profile from the dedicated "users" collection (falling back to "administrators")
     let adminDoc;
     try {
-      adminDoc = await db.collection("administrators").doc(user.uid).get();
+      adminDoc = await db.collection("users").doc(user.uid).get();
+      if (!adminDoc.exists) {
+        adminDoc = await db.collection("administrators").doc(user.uid).get();
+      }
     } catch (fsErr) {
       console.error("[Firestore Failure] Failed to look up administrator document:", fsErr);
       throw new Error(`Database query failed: ${fsErr.message || fsErr}`);
     }
     
-    // Auto-create designated chief administrator record if it doesn't exist yet in the administrators collection
+    // Auto-create designated chief administrator record if it doesn't exist yet in users/administrators collections
     if (!adminDoc.exists && isCandidateAdmin) {
       console.log("Auto-initializing chief administrator profile...");
       const defaultAdminRecord = {
@@ -84,6 +90,7 @@ export async function loginAdminAccount(email, password) {
         email: normalizedEmail,
         role: "admin",
         status: "approved",
+        approvalStatus: "approved",
         createdAt: new Date().toISOString(),
         username: "EJaytech Chief Admin",
         darkModeEnabled: false,
@@ -96,8 +103,9 @@ export async function loginAdminAccount(email, password) {
         }
       };
       try {
+        await db.collection("users").doc(user.uid).set(defaultAdminRecord);
         await db.collection("administrators").doc(user.uid).set(defaultAdminRecord);
-        adminDoc = await db.collection("administrators").doc(user.uid).get();
+        adminDoc = await db.collection("users").doc(user.uid).get();
       } catch (fsCreateErr) {
         console.error("[Firestore Failure] Failed to auto-initialize administrator profile document:", fsCreateErr);
         throw new Error(`Database write failed: ${fsCreateErr.message || fsCreateErr}`);
@@ -112,8 +120,10 @@ export async function loginAdminAccount(email, password) {
       throw docErr;
     }
 
-    // Verify presence and role inside the administrators collection
-    if (adminDoc.data().role !== "admin") {
+    const adminData = adminDoc.data();
+
+    // Verify presence and role inside the users collection
+    if (adminData.role !== "admin") {
       await signOut(firebaseAuth);
       const roleErr = new Error("Access denied. You are not authorized to access the Administrator Portal.");
       console.error("[Auth Privilege Error]", roleErr);
@@ -124,7 +134,7 @@ export async function loginAdminAccount(email, password) {
     sessionStorage.setItem("admin_logged_in", "true");
     sessionStorage.setItem("admin_uid", user.uid);
 
-    return { user, admin: adminDoc.data(), role: "admin" };
+    return { user, admin: adminData, role: "admin" };
   } catch (err) {
     // 5. Add console.error() for every authentication and Firestore failure
     console.error("Admin authentication flow failure:", err.code || err.message, err);
@@ -171,7 +181,11 @@ export function protectAdminPage() {
 
     try {
       const db = window.db;
-      const adminDoc = await db.collection("administrators").doc(user.uid).get();
+      let adminDoc = await db.collection("users").doc(user.uid).get();
+      if (!adminDoc.exists) {
+        adminDoc = await db.collection("administrators").doc(user.uid).get();
+      }
+      
       if (!adminDoc.exists || adminDoc.data().role !== "admin") {
         console.error("Access denied. User does not have administrative permissions.");
         sessionStorage.removeItem("admin_logged_in");

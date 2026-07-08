@@ -9,8 +9,8 @@
  */
 export async function getRegisteredStudentsList() {
   try {
-    const snapshot = await db.collection("students").get();
-    const list = [];
+    let snapshot = await db.collection("users").get();
+    let list = [];
     snapshot.forEach(doc => {
       const data = doc.data();
       // Exclude all administrators from the list
@@ -18,6 +18,17 @@ export async function getRegisteredStudentsList() {
         list.push({ uid: doc.id, ...data });
       }
     });
+    
+    if (list.length === 0) {
+      snapshot = await db.collection("students").get();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.role !== "admin") {
+          list.push({ uid: doc.id, ...data });
+        }
+      });
+    }
+
     return list.sort((a, b) => {
       const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -84,17 +95,31 @@ export async function approveStudentApplication(uid, studentId) {
 
   const adminEmail = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || "administrator";
 
-  // Update student status inside Firestore students collection
+  // Update student status inside Firestore students and users collections
   await db.collection("students").doc(uid).update({
     status: "approved",
+    approvalStatus: "approved",
     approvedAt: serverTimestamp,
     approvedBy: adminEmail
   });
+  try {
+    await db.collection("users").doc(uid).update({
+      status: "approved",
+      approvalStatus: "approved",
+      approvedAt: serverTimestamp,
+      approvedBy: adminEmail
+    });
+  } catch (err) {
+    console.warn("Could not update users collection:", err);
+  }
 
   console.log("Student approved:", studentId);
 
   // Retrieve student details to construct custom email components
-  const studentDoc = await db.collection("students").doc(uid).get();
+  let studentDoc = await db.collection("users").doc(uid).get();
+  if (!studentDoc.exists) {
+    studentDoc = await db.collection("students").doc(uid).get();
+  }
   if (!studentDoc.exists) throw new Error("Student profile record not found.");
   const studentData = studentDoc.data();
   const studentEmail = studentData.email || "";
@@ -141,16 +166,29 @@ export async function rejectStudentApplication(uid, studentId) {
     ? window.firebaseServerTimestamp() 
     : new Date().toISOString();
 
-  // Update student status inside Firestore students collection
+  // Update student status inside Firestore students and users collections
   await db.collection("students").doc(uid).update({
     status: "rejected",
+    approvalStatus: "rejected",
     rejectedAt: serverTimestamp
   });
+  try {
+    await db.collection("users").doc(uid).update({
+      status: "rejected",
+      approvalStatus: "rejected",
+      rejectedAt: serverTimestamp
+    });
+  } catch (err) {
+    console.warn("Could not update users collection:", err);
+  }
 
   console.log("Student rejected:", studentId);
 
   // Retrieve student details to construct custom email components
-  const studentDoc = await db.collection("students").doc(uid).get();
+  let studentDoc = await db.collection("users").doc(uid).get();
+  if (!studentDoc.exists) {
+    studentDoc = await db.collection("students").doc(uid).get();
+  }
   if (!studentDoc.exists) throw new Error("Student profile record not found.");
   const studentData = studentDoc.data();
   const studentEmail = studentData.email || "";
@@ -197,7 +235,18 @@ export async function editStudentRecordAdmin(uid, data) {
   if (updateData.fullname !== undefined) {
     updateData.fullName = updateData.fullname;
   }
+  if (updateData.status !== undefined) {
+    updateData.approvalStatus = updateData.status;
+  }
+  if (updateData.approvalStatus !== undefined) {
+    updateData.status = updateData.approvalStatus;
+  }
   await db.collection("students").doc(uid).update(updateData);
+  try {
+    await db.collection("users").doc(uid).update(updateData);
+  } catch (err) {
+    console.warn("Could not update users collection:", err);
+  }
 }
 
 /**
@@ -205,6 +254,11 @@ export async function editStudentRecordAdmin(uid, data) {
  */
 export async function deleteStudentRecordAdmin(uid) {
   await db.collection("students").doc(uid).delete();
+  try {
+    await db.collection("users").doc(uid).delete();
+  } catch (err) {
+    console.warn("Could not delete from users collection:", err);
+  }
 }
 
 /**

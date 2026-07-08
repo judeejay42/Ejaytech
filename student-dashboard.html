@@ -370,10 +370,24 @@
         if (studentUnsubscribe) studentUnsubscribe();
         if (notificationsUnsubscribe) notificationsUnsubscribe();
 
-        console.log(`[Firestore Query] Initiating student profile lookup matching UID: ${user.uid}`);
+        // Determine whether to use users or students collection
+        let activeCollection = "users";
+        try {
+          const checkDoc = await db.collection("users").doc(user.uid).get();
+          if (!checkDoc.exists) {
+            const checkStudentDoc = await db.collection("students").doc(user.uid).get();
+            if (checkStudentDoc.exists) {
+              activeCollection = "students";
+            }
+          }
+        } catch (checkErr) {
+          console.warn("Could not determine student collection, defaulting to users:", checkErr);
+        }
+
+        console.log(`[Firestore Query] Initiating student profile lookup matching UID: ${user.uid} in collection: ${activeCollection}`);
 
         // Establish real-time observer of student doc in Firestore matching Auth UID
-        studentUnsubscribe = db.collection("students").doc(user.uid).onSnapshot(async (doc) => {
+        studentUnsubscribe = db.collection(activeCollection).doc(user.uid).onSnapshot(async (doc) => {
           try {
             console.log(`[Firestore Query Result] Status updated. Doc ID: ${doc.id} | Exists: ${doc.exists}`);
 
