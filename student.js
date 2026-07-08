@@ -7,7 +7,7 @@
  * Fetch and load student profile data
  */
 export async function getStudentProfile(uid) {
-  const docRef = await db.collection("users").doc(uid).get();
+  const docRef = await db.collection("students").doc(uid).get();
   if (docRef.exists) {
     return docRef.data();
   }
@@ -29,7 +29,7 @@ export async function updateStudentProfile(uid, fields) {
     bio: fields.bio || ""
   };
   
-  await db.collection("users").doc(uid).update(sanitisedFields);
+  await db.collection("students").doc(uid).update(sanitisedFields);
   return getStudentProfile(uid);
 }
 
@@ -97,7 +97,7 @@ export async function uploadAssignmentFile(uid, studentId, fileObj) {
   const downloadUrl = await uploadTask.ref.getDownloadURL();
   
   // Update users collection registry linking the file
-  await db.collection("users").doc(uid).update({
+  await db.collection("students").doc(uid).update({
     lastDocumentSubmitted: downloadUrl
   });
 

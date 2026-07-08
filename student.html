@@ -3,24 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Portal Entry - EJaytech Concepts</title>
+  <title>Student Portal - EJaytech Concepts</title>
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet" id="bootstrap-icons">
-  <!-- Custom Core CSS -->
-  <link href="assets/css/style.css" rel="stylesheet" id="custom-style">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Academic Theme Stylesheet -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <style>
+    :root {
+      --student-blue-primary: #1e40af;
+      --student-blue-light: #eff6ff;
+      --student-blue-hover: #1d4ed8;
+      --student-text-dark: #1e293b;
+    }
+    body {
+      background-color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      color: var(--student-text-dark);
+    }
+    .student-navbar {
+      background-color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .btn-academic {
+      background-color: var(--student-blue-primary);
+      color: #ffffff;
+      font-weight: 500;
+      border: none;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-academic:hover, .btn-academic:focus {
+      background-color: var(--student-blue-hover);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+    }
+    .portal-card-academic {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+    .nav-pills-academic .nav-link {
+      color: #64748b;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .nav-pills-academic .nav-link.active {
+      background-color: var(--student-blue-primary);
+      color: #ffffff;
+    }
+    .footer-academic {
+      background-color: #0f172a;
+      color: #94a3b8;
+      border-top: 1px solid #1e293b;
+    }
+    .footer-academic a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .footer-academic a:hover {
+      color: #ffffff;
+    }
+    .form-control:focus {
+      border-color: var(--student-blue-primary);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+    }
+  </style>
 </head>
 <body>
 
   <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
+  <nav class="navbar navbar-expand-lg student-navbar sticky-top py-3">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
-        <div class="me-2 text-primary" style="font-size: 1.8rem;"><i class="bi bi-cpu-fill"></i></div>
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <div class="me-2" style="font-size: 1.8rem; color: var(--student-blue-primary);"><i class="bi bi-mortarboard-fill"></i></div>
         <div>
-          <span class="brand-logo">EJaytech Concepts</span>
-          <span class="brand-tagline">Innovating Ideas, Delivering Solutions</span>
+          <span class="fw-bold" style="letter-spacing: -0.5px; color: #0f172a;">EJaytech Student Portal</span>
+          <span class="small d-block text-muted" style="font-size: 0.75rem;">Abuja Digital Vocational Hub</span>
         </div>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,38 +91,38 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
-          <li class="nav-item"><a class="nav-link" href="index.html" id="link-home">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html" id="link-about">About Us</a></li>
-          <li class="nav-item"><a class="nav-link" href="services.html" id="link-services">Our Services</a></li>
-          <li class="nav-item"><a class="nav-link" href="courses.html" id="link-courses">Courses</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="about.html">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="courses.html">Courses</a></li>
           <li class="nav-item">
-            <a class="btn btn-primary-custom ms-lg-2 active" href="portal.html" id="nav-portal-btn"><i class="bi bi-door-open-fill me-1"></i> Student Portal</a>
+            <a class="btn btn-academic ms-lg-2 px-4 rounded-pill" href="student.html"><i class="bi bi-person-fill me-1"></i> Student Login</a>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Main Portal Grid Center -->
-  <main class="container py-5" style="min-height: 75vh;" id="portal-frame">
+  <!-- Main Portal Layout -->
+  <main class="container py-5 my-3" style="min-height: 70vh;">
     <div class="row justify-content-center">
       <div class="col-lg-8 col-xl-7">
         
         <!-- Welcome Card Wrapper -->
-        <div class="bg-white border rounded-4 p-4 p-md-5 shadow-sm text-start" id="portal-card">
+        <div class="portal-card-academic p-4 p-md-5">
           <div class="text-center mb-4">
-            <div class="text-primary fs-1 mb-2"><i class="bi bi-person-badge-fill"></i></div>
-            <h2 class="fw-bold font-display text-dark">EJaytech Concepts Portal Gateway</h2>
-            <p class="text-muted small">Login to access study materials or submit official course enrollment forms.</p>
+            <div class="text-primary fs-1 mb-2" style="color: var(--student-blue-primary) !important;"><i class="bi bi-person-badge"></i></div>
+            <h2 class="fw-bold text-dark">Welcome to your Gateway</h2>
+            <p class="text-muted small">Login to access courses materials or register a new student account below.</p>
           </div>
 
           <!-- Tabs Pills Controls -->
-          <ul class="nav nav-pills nav-pills-custom justify-content-center mb-4" id="portalTabs" role="tablist">
+          <ul class="nav nav-pills nav-pills-academic justify-content-center mb-4 gap-2" id="portalTabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="login-tab-btn" data-bs-toggle="pill" data-bs-target="#login-panel" type="button" role="tab" aria-selected="true"><i class="bi bi-shield-lock-fill me-1"></i> Account Login</button>
+              <button class="nav-link active px-4 py-2" id="login-tab-btn" data-bs-toggle="pill" data-bs-target="#login-panel" type="button" role="tab" aria-selected="true"><i class="bi bi-shield-lock me-1"></i> Student Login</button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="register-tab-btn" data-bs-toggle="pill" data-bs-target="#register-panel" type="button" role="tab" aria-selected="false"><i class="bi bi-pencil-square me-1"></i> Register Student</button>
+              <button class="nav-link px-4 py-2" id="register-tab-btn" data-bs-toggle="pill" data-bs-target="#register-panel" type="button" role="tab" aria-selected="false"><i class="bi bi-pencil-square me-1"></i> Student Registration</button>
             </li>
           </ul>
 
@@ -88,7 +151,7 @@
                   <label for="login-password" class="form-label">Password</label>
                   <div class="input-group">
                     <span class="input-group-text bg-white text-muted"><i class="bi bi-key"></i></span>
-                    <input type="password" class="form-control" id="login-password" required placeholder="Enter password (e.g., student123)">
+                    <input type="password" class="form-control" id="login-password" required placeholder="Enter password">
                   </div>
                 </div>
                 
@@ -97,7 +160,7 @@
                 </div>
 
                 <div class="text-end">
-                  <button type="submit" class="btn btn-primary-custom w-100" id="login-submit-btn"><i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway</button>
+                  <button type="submit" class="btn btn-academic w-100 py-2.5 rounded-3" id="login-submit-btn"><i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway</button>
                 </div>
               </form>
             </div>
@@ -144,7 +207,7 @@
                   <!-- Course Selecting Dynamic -->
                   <div class="col-md-12">
                     <label for="reg-course" class="form-label">Select Learning Course Track</label>
-                    <select class="form-select text-dark font-display fw-semibold" id="reg-course" required>
+                    <select class="form-select text-dark" id="reg-course" required>
                       <option value="" disabled selected>Choose the vocational track...</option>
                       <option value="Frontend Web Development">Frontend Web Development (₦120,000 / 12 Weeks)</option>
                       <option value="Graphic Design">Graphic Design (Canva Pro + Photoshop) (₦80,000 / 8 Weeks)</option>
@@ -168,8 +231,8 @@
                 </div>
 
                 <div class="mt-4 pt-3 border-top d-flex gap-2 flex-wrap align-items-center justify-content-between">
-                  <span class="small text-muted mb-0">Initial status is cataloged as <code class="text-warning">Pending</code> approval.</span>
-                  <button type="submit" class="btn btn-primary-custom" id="reg-submit-btn"><i class="bi bi-person-fill-add me-1"></i> Register Student Account</button>
+                  <span class="small text-muted mb-0">Initial status is listed as <span class="badge bg-warning text-dark">Pending Review</span></span>
+                  <button type="submit" class="btn btn-academic px-4 py-2 rounded-3" id="reg-submit-btn"><i class="bi bi-person-fill-add me-1"></i> Register Student Account</button>
                 </div>
               </form>
             </div>
@@ -181,77 +244,51 @@
     </div>
   </main>
 
-  <!-- Complete Premium Footer -->
-  <footer class="footer-custom" id="main-footer">
-    <div class="container">
-      <div class="row g-5">
-        <div class="col-lg-5 col-md-12 text-start">
-          <div class="d-flex align-items-center mb-4">
-            <div class="me-2 text-primary" style="font-size: 2rem;"><i class="bi bi-cpu-fill"></i></div>
-            <div>
-              <h5 class="mb-0 fw-bold text-white font-display">EJaytech Concepts</h5>
-              <span class="small text-muted font-mono" style="font-size: 0.75rem;">INNOVATING IDEAS, DELIVERING SOLUTIONS</span>
-            </div>
-          </div>
-          <p class="mb-4" style="font-size: 0.93rem; max-width: 400px;">
-            At EJaytech Concepts, we fuse professional technology configurations with world-class curriculum skills transfers to launch the next digital creators.
+  <!-- Professional Footer with Admin Gateway Portal Link -->
+  <footer class="footer-academic py-5 mt-auto">
+    <div class="container text-center text-md-start">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <h5 class="text-white fw-bold mb-3"><i class="bi bi-mortarboard-fill text-primary me-2"></i>EJaytech Concepts</h5>
+          <p class="small text-muted" style="max-width: 400px;">
+            Enabling vocational excellence, modern visual branding patterns, and certified coding pathways in Garki, Abuja.
           </p>
-          <div class="d-flex gap-3 text-white fs-5" id="social-handles">
-            <a href="https://facebook.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-            <a href="https://x.com/ejaytech_c" target="_blank" class="text-muted hover-whiteLink" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-            <a href="https://linkedin.com/company/ejaytech-concepts" target="_blank" class="text-muted hover-whiteLink" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-            <a href="https://instagram.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-          </div>
         </div>
-        
-        <div class="col-lg-3 col-md-6 text-start">
-          <h5 class="fw-bold font-display text-white mb-4">Functional Pages</h5>
-          <ul class="list-unstyled d-grid gap-2 text-start p-0">
-            <li><a href="index.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Home Entry</a></li>
-            <li><a href="about.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Who We Are (Contact)</a></li>
-            <li><a href="services.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Core Services</a></li>
-            <li><a href="courses.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Vocational Schedules</a></li>
-            <li><a href="portal.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Student Portal</a></li>
+        <div class="col-md-3">
+          <h6 class="text-white fw-semibold mb-3">Links</h6>
+          <ul class="list-unstyled p-0">
+            <li><a href="index.html" class="small">Home</a></li>
+            <li><a href="about.html" class="small">About us</a></li>
+            <li><a href="courses.html" class="small">Syllabi Catalog</a></li>
           </ul>
         </div>
-
-        <div class="col-lg-4 col-md-6 text-start">
-          <h5 class="fw-bold font-display text-white mb-4">Physical Head Office</h5>
-          <ul class="list-unstyled d-grid gap-3 text-start p-0">
-            <li class="d-flex gap-3">
-              <i class="bi bi-geo-alt-fill text-primary mt-1"></i>
-              <span>04 Akande Oke Street, Eleweran, Abeokuta, Nigeria.</span>
-            </li>
-            <li class="d-flex gap-3">
-              <i class="bi bi-telephone-fill text-primary mt-1"></i>
-              <span>+234 (0) 703 371 9342</span>
-            </li>
-            <li class="d-flex gap-3">
-              <i class="bi bi-envelope-fill text-primary mt-1"></i>
-              <span>ejaytechconcepts@gmail.com</span>
-            </li>
+        <div class="col-md-3 text-md-end">
+          <h6 class="text-white fw-semibold mb-3">Staff</h6>
+          <ul class="list-unstyled p-0">
+            <!-- Small, professional footer link to Admin Portal as required by Requirement 3 -->
+            <li><a href="admin.html" class="small text-decoration-none text-muted hover-link"><i class="bi bi-shield-lock-fill me-1"></i> Staff Portal</a></li>
           </ul>
         </div>
       </div>
-      
-      <div class="border-top border-secondary mt-5 pt-4 text-center">
-        <p class="mb-0 small" style="opacity: 0.7;">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved. Designed for Static &amp; GitHub Pages Deployments.</p>
+      <div class="border-top border-secondary mt-4 pt-3 text-center small text-muted">
+        &copy; <span id="current-year">2026</span> EJaytech Concepts. All rights reserved.
       </div>
     </div>
   </footer>
 
   <!-- App Custom Logic Modules -->
   <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="auth.js"></script>
+  <script type="module" src="js/student-auth.js"></script>
 
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Form Controllers & Routing Logic -->
   <script type="module">
+    import { loginStudentAccount, registerStudentAccount, resetStudentPassword } from "./js/student-auth.js";
+
     document.getElementById('current-year').textContent = new Date().getFullYear();
 
-    // Reset register form when switching away from register tab to preserve data ONLY until tab is switched
+    // Reset register form when switching away from register tab
     const registerTabBtn = document.getElementById('register-tab-btn');
     if (registerTabBtn) {
       registerTabBtn.addEventListener('hide.bs.tab', () => {
@@ -264,12 +301,9 @@
     const applyCourse = urlParams.get('apply');
     if (applyCourse) {
       console.log(`Auto focusing registration form for selected course: ${applyCourse}`);
-      
-      // Toggle tab pane to register and activate nav pillow
       const registerTab = new bootstrap.Tab(document.getElementById('register-tab-btn'));
       registerTab.show();
       
-      // Select the value corresponding in dropdown
       const courseDropdown = document.getElementById('reg-course');
       for (let i = 0; i < courseDropdown.options.length; i++) {
         if (courseDropdown.options[i].value === applyCourse || courseDropdown.options[i].text.includes(applyCourse)) {
@@ -281,17 +315,9 @@
 
     // Auto router if user is active already
     auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          const doc = await db.collection("users").doc(user.uid).get();
-          if (doc.exists && doc.data().role === "admin") {
-            window.location.href = "admin-dashboard.html";
-          } else {
-            window.location.href = "student-dashboard.html";
-          }
-        } catch (err) {
-          window.location.href = "student-dashboard.html";
-        }
+      const isStudentSession = sessionStorage.getItem("student_logged_in") === "true";
+      if (user && isStudentSession) {
+        window.location.href = "student-dashboard.html";
       }
     });
 
@@ -323,24 +349,20 @@
 
       try {
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating credentials...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating...';
         
-        const result = await loginUserAccount(email, pass);
+        const result = await loginStudentAccount(email, pass);
         displaySuccess("Access granted! Entering classroom dashboard...");
         
         setTimeout(() => {
-          if (result.role === "admin") {
-            window.location.href = "admin-dashboard.html";
-          } else {
-            window.location.href = "student-dashboard.html";
-          }
+          window.location.href = "student-dashboard.html";
         }, 1200);
 
       } catch (err) {
         console.error(err);
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway';
-        displayError(err.message || "Invalid authentication credentials. Check spelling and try again.");
+        displayError(err.message || "Invalid credentials. Please verify and try again.");
       }
     });
 
@@ -360,7 +382,7 @@
 
       try {
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating student profile...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing registration...';
 
         const record = await registerStudentAccount({
           fullname, email, phone, gender, dob, state, address, course, password
@@ -378,37 +400,32 @@
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-person-fill-add me-1"></i> Register Student Account';
         
-        // Custom requirements for existing email (auth/email-already-in-use)
-        if (err.code === "auth/email-already-in-use" || (err.message && (err.message.includes("already registered") || err.message.includes("already exists") || err.message.includes("email-already-in-use")))) {
+        if (err.code === "auth/email-already-in-use" || (err.message && err.message.includes("already registered"))) {
           displayError("An account with this email already exists. Please log in instead.");
           setTimeout(() => {
             const loginTab = new bootstrap.Tab(document.getElementById('login-tab-btn'));
             loginTab.show();
-            // Pre-fill login email input
-            const loginEmailInput = document.getElementById("login-email");
-            if (loginEmailInput) {
-              loginEmailInput.value = email;
-            }
+            document.getElementById("login-email").value = email;
           }, 2000);
         } else {
-          displayError(err.message || "Registration encountered an issue. Ensure password length is 6+ or email is unique.");
+          displayError(err.message || "Registration failed. Ensure password length is 6+ or email is unique.");
         }
       }
     });
 
-    // Forgot password simulation
+    // Forgot password link
     document.getElementById("forgot-password-link").addEventListener("click", async (e) => {
       e.preventDefault();
       const email = document.getElementById("login-email").value;
       if (!email) {
-        alert("Please enters your email address in the input field above first.");
+        alert("Please enter your email address in the input field first.");
         return;
       }
       try {
         await resetStudentPassword(email);
-        alert(`A password recovery reset instructions links has been dispatched to: ${email}`);
+        alert(`Password reset instructions have been dispatched to: ${email}`);
       } catch (err) {
-        alert("Encounters problem: " + err.message);
+        alert("Reset error: " + err.message);
       }
     });
   </script>

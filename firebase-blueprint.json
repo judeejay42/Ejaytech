@@ -100,7 +100,7 @@
       "schema": "student",
       "description": "Document mapping student attributes indexed by their authentication uid"
     },
-    "/admins/{adminIdRaw}": {
+    "/administrators/{adminIdRaw}": {
       "schema": "admin",
       "description": "System admin whitelist mappings"
     },
