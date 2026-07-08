@@ -293,8 +293,11 @@
 
   <!-- Page Dashboard Script -->
   <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import { protectStudentPage as protectPageAccess } from "./js/student-auth.js";
+
     // Enforce student session protection
-    protectPageAccess("student");
+    protectPageAccess();
 
     let currentStudentData = null;
     let studentUnsubscribe = null;

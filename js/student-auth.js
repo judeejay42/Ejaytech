@@ -3,7 +3,7 @@
  * Manages sign-up, login, password reset, and session routing for students.
  */
 
-import { firebaseAuth } from "/firebase-config.js";
+import { firebaseAuth, db } from "/firebase-config.js";
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
@@ -59,7 +59,6 @@ export async function registerStudentAccount(data) {
     throw new Error("Missing required fields. All registration inputs are mandatory.");
   }
   
-  const db = window.db;
   try {
     // 1. Create user in Firebase Auth
     const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
@@ -117,7 +116,6 @@ export async function registerStudentAccount(data) {
  */
 export async function loginStudentAccount(email, password) {
   const normalizedEmail = email.toLowerCase().trim();
-  const db = window.db;
 
   try {
     const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
@@ -223,7 +221,6 @@ export function protectStudentPage() {
     }
 
     try {
-      const db = window.db;
       let studentDoc = await db.collection("users").doc(user.uid).get();
       if (!studentDoc.exists) {
         studentDoc = await db.collection("students").doc(user.uid).get();

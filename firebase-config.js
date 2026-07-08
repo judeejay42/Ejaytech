@@ -282,8 +282,8 @@ class StorageWrapper {
 }
 
 // Expose instances globally
-window.db = new DbWrapper(firestore);
-window.auth = {
+const db = new DbWrapper(firestore);
+const auth = {
   get currentUser() {
     return firebaseAuth.currentUser;
   },
@@ -303,7 +303,11 @@ window.auth = {
     return await sendPasswordResetEmail(firebaseAuth, email);
   }
 };
-window.storage = new StorageWrapper(storageInstance);
+const storage = new StorageWrapper(storageInstance);
+
+window.db = db;
+window.auth = auth;
+window.storage = storage;
 window.isRealFirebase = true;
 window.firebaseServerTimestamp = serverTimestamp;
 
@@ -315,5 +319,8 @@ export {
   storageInstance,
   updatePassword,
   reauthenticateWithCredential,
-  EmailAuthProvider
+  EmailAuthProvider,
+  db,
+  auth,
+  storage
 };

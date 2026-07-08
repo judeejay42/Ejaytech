@@ -4,6 +4,8 @@
  * posting public notifications, and uploading study resource files.
  */
 
+import { db, storage, auth } from "./firebase-config.js";
+
 /**
  * Fetch list of all registered students in the system
  */

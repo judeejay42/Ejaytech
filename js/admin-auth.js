@@ -3,7 +3,7 @@
  * Manages admin login, session isolation, and administrative page protection.
  */
 
-import { firebaseAuth } from "/firebase-config.js";
+import { firebaseAuth, db } from "/firebase-config.js";
 import { 
   signInWithEmailAndPassword, 
   signOut,
@@ -41,7 +41,6 @@ export function getFriendlyErrorMessage(error) {
  */
 export async function loginAdminAccount(email, password) {
   let normalizedEmail = email.toLowerCase().trim();
-  const db = window.db;
 
   // Append default domain if not full email
   if (!normalizedEmail.includes("@")) {
@@ -49,7 +48,7 @@ export async function loginAdminAccount(email, password) {
   }
 
   try {
-    // 1. Await signInWithEmailAndPassword properly
+    // 1. Create user in Firebase Auth
     const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
     
     // 2. Verify the Firebase Authentication user exists
@@ -180,7 +179,6 @@ export function protectAdminPage() {
     }
 
     try {
-      const db = window.db;
       let adminDoc = await db.collection("users").doc(user.uid).get();
       if (!adminDoc.exists) {
         adminDoc = await db.collection("administrators").doc(user.uid).get();
