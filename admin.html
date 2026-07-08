@@ -145,74 +145,13 @@
 
   <!-- App Custom Logic Modules -->
   <script type="module" src="/firebase-config.js"></script>
-  <script type="module" src="/js/admin-auth.js"></script>
 
   <!-- Form Controllers & Routing Logic -->
   <script type="module">
-    import { loginAdminAccount } from "/js/admin-auth.js";
-    import { firebaseAuth } from "/firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // Direct redirect if active admin session exists
-    onAuthStateChanged(firebaseAuth, async (user) => {
-      const isAdminSession = sessionStorage.getItem("admin_logged_in") === "true";
-      if (user && isAdminSession) {
-        window.location.href = "admin-dashboard.html";
-      }
-    });
-
-    const errorAlert = document.getElementById("admin-error-alert");
-    const errMsg = document.getElementById("admin-err-msg");
-
-    function displayError(txt) {
-      errorAlert.classList.remove("d-none");
-      errMsg.textContent = txt;
-    }
-
-    document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
-      // 1. Ensure event.preventDefault() is used correctly
+    // Admin authentication logic removed. Ready for a new authentication system.
+    document.getElementById("admin-login-form").addEventListener("submit", (e) => {
       e.preventDefault();
-      errorAlert.classList.add("d-none");
-
-      const emailInput = document.getElementById("admin-email");
-      const passwordInput = document.getElementById("admin-password");
-      const btn = document.getElementById("admin-submit-btn");
-
-      const email = emailInput.value;
-      const pass = passwordInput.value;
-
-      let authenticationSucceeded = false;
-
-      try {
-        // 2. Ensure loading spinner appears during login
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating...';
-
-        // 3. Await loginAdminAccount properly
-        const result = await loginAdminAccount(email, pass);
-        
-        console.log("Admin session authenticated successfully. UID:", result.user.uid);
-        btn.innerHTML = '<i class="bi bi-shield-check me-2"></i> Authorization Granted';
-        
-        authenticationSucceeded = true;
-
-        // 4. If authentication succeeds, redirect immediately to admin-dashboard.html
-        window.location.href = "admin-dashboard.html";
-
-      } catch (err) {
-        // 5. Add console.error() for every authentication failure
-        console.error("Administrative Gateway authentication failure:", err);
-        
-        // 6. If authentication fails, remain on login page and show exact reason
-        displayError(err.message || "Access denied. Authentication rejected.");
-        
-      } finally {
-        // 7. Ensure loading spinner disappears afterward on failure, and fields are NOT cleared
-        if (!authenticationSucceeded) {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i> Authenticate Console';
-        }
-      }
+      console.log("Admin login form submitted. Authentication system is currently being re-engineered.");
     });
   </script>
 </body>

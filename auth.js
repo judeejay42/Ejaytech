@@ -106,13 +106,6 @@ export async function loginUserAccount(email, password) {
     const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
     const user = credential.user;
     
-    // Check administrators first
-    let adminDoc = await db.collection("administrators").doc(user.uid).get();
-    if (adminDoc.exists) {
-      const adminData = adminDoc.data();
-      return { user, student: adminData, role: "admin" };
-    }
-    
     // Check students
     let studentDoc = await db.collection("students").doc(user.uid).get();
     if (studentDoc.exists) {
@@ -144,23 +137,15 @@ export async function logoutSession() {
 export function protectPageAccess(requiredRole) {
   onAuthStateChanged(firebaseAuth, async (user) => {
     if (!user) {
-      window.location.href = requiredRole === "admin" ? "admin.html" : "student.html";
+      window.location.href = "student.html";
       return;
     }
 
     try {
-      if (requiredRole === "admin") {
-        const adminDoc = await db.collection("administrators").doc(user.uid).get();
-        if (!adminDoc.exists || adminDoc.data().role !== "admin") {
-          await signOut(firebaseAuth);
-          window.location.href = "admin.html";
-        }
-      } else {
-        const studentDoc = await db.collection("students").doc(user.uid).get();
-        if (!studentDoc.exists) {
-          await signOut(firebaseAuth);
-          window.location.href = "student.html";
-        }
+      const studentDoc = await db.collection("students").doc(user.uid).get();
+      if (!studentDoc.exists) {
+        await signOut(firebaseAuth);
+        window.location.href = "student.html";
       }
     } catch (err) {
       console.error("Protection check error:", err);

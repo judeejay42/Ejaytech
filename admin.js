@@ -528,15 +528,18 @@ export async function createSystemAnnouncement(title, message, studentId) {
 /**
  * Fetch logged Admin document
  */
+/**
+ * Fetch generic public website settings profile
+ */
 export async function getAdminProfile(uid) {
-  const docRef = await db.collection("administrators").doc(uid).get();
+  const docRef = await db.collection("settings").doc("website").get();
   if (docRef.exists) {
     return docRef.data();
   }
   return {
-    fullName: "EJaytech Chief Admin",
-    username: "EJaytech Chief Admin",
-    email: (window.auth && window.auth.currentUser && window.auth.currentUser.email) || "",
+    fullName: "Chief Director Admin",
+    username: "Chief Director Admin",
+    email: "admin@ejaytech-concepts.local",
     darkModeEnabled: false,
     profilePictureUrl: "",
     websiteSettings: {
@@ -549,83 +552,10 @@ export async function getAdminProfile(uid) {
 }
 
 /**
- * Edit administrator settings profile details
+ * Update generic public website settings profile
  */
 export async function updateAdminProfile(uid, data) {
-  await db.collection("administrators").doc(uid).update(data);
-}
-
-/**
- * Change authenticated user's password using standard Firebase Modular Auth SDK API
- */
-export async function changeAdminPassword(currentPassword, newPassword) {
-  const user = auth.currentUser;
-  if (!user) {
-    const err = new Error("No active administrator user session. Please sign in again.");
-    err.code = "auth/no-current-user";
-    throw err;
-  }
-
-  if (!currentPassword) {
-    const err = new Error("Current password is required to change security credentials.");
-    err.code = "auth/missing-current-password";
-    throw err;
-  }
-
-  if (!newPassword || newPassword.length < 8) {
-    const err = new Error("New password must be at least 8 characters long.");
-    err.code = "auth/weak-password";
-    throw err;
-  }
-
-  // Import from modular config
-  const configModule = await import("./firebase-config.js");
-  const updatePassFn = configModule.updatePassword;
-  const reauthFn = configModule.reauthenticateWithCredential;
-  const providerCls = configModule.EmailAuthProvider;
-
-  // Reauthenticate the currently signed-in user
-  try {
-    const credential = providerCls.credential(user.email, currentPassword);
-    await reauthFn(user, credential);
-  } catch (reauthErr) {
-    console.error("Reauthentication failed:", reauthErr);
-    const code = reauthErr.code || "";
-    if (code === "auth/wrong-password" || reauthErr.message?.toLowerCase().includes("wrong-password") || reauthErr.message?.toLowerCase().includes("incorrect password")) {
-      const err = new Error("Incorrect current password. Reauthentication failed.");
-      err.code = "auth/wrong-password";
-      throw err;
-    } else if (code === "auth/network-request-failed" || reauthErr.message?.toLowerCase().includes("network")) {
-      const err = new Error("Network request failed. Please check your connection and try again.");
-      err.code = "auth/network-request-failed";
-      throw err;
-    } else {
-      throw new Error("Reauthentication failed: " + reauthErr.message);
-    }
-  }
-
-  // Perform password update using the modular SDK API
-  try {
-    await updatePassFn(user, newPassword);
-  } catch (updateErr) {
-    console.error("Password update failed:", updateErr);
-    const code = updateErr.code || "";
-    if (code === "auth/requires-recent-login" || updateErr.message?.toLowerCase().includes("recent-login")) {
-      const err = new Error("Security verification expired. Please sign out and sign back in to change your password.");
-      err.code = "auth/requires-recent-login";
-      throw err;
-    } else if (code === "auth/weak-password" || updateErr.message?.toLowerCase().includes("weak")) {
-      const err = new Error("The new password is too weak. Please choose a stronger password (at least 8 characters).");
-      err.code = "auth/weak-password";
-      throw err;
-    } else if (code === "auth/network-request-failed" || updateErr.message?.toLowerCase().includes("network")) {
-      const err = new Error("Network request failed during password update. Please try again.");
-      err.code = "auth/network-request-failed";
-      throw err;
-    } else {
-      throw new Error("Password update failed: " + updateErr.message);
-    }
-  }
+  await db.collection("settings").doc("website").set(data, { merge: true });
 }
 
 // Expose functions globally to window
@@ -654,4 +584,4 @@ window.deleteNotificationAdmin = deleteNotificationAdmin;
 window.createSystemAnnouncement = createSystemAnnouncement;
 window.getAdminProfile = getAdminProfile;
 window.updateAdminProfile = updateAdminProfile;
-window.changeAdminPassword = changeAdminPassword;
+

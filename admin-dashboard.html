@@ -702,34 +702,11 @@
 
             <!-- Administrator Username & Account configs (Right) -->
             <div class="col-lg-6">
-              <div class="card p-4 rounded-3 border bg-white shadow-sm">
-                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-key text-primary me-1"></i> Secure Admin Credentials</h5>
-                <p class="text-muted small mb-4">Update executive security password keys and administrator display tags.</p>
-                
-                <form id="admin-security-profile-form" onsubmit="handleAdminProfileSubmit(event)">
-                  <div class="row g-3">
-                    <div class="col-12 text-start">
-                      <label for="s-name" class="form-label small fw-semibold text-dark">Executive Profile Username</label>
-                      <input type="text" class="form-control form-control-sm" id="s-name" required>
-                    </div>
-                    <div class="col-12 text-start">
-                      <label for="s-current-pass" class="form-label small fw-semibold text-dark">Current Password</label>
-                      <input type="password" class="form-control form-control-sm" id="s-current-pass" placeholder="Enter current password to verify identity">
-                    </div>
-                    <div class="col-12 text-start">
-                      <label for="s-pass" class="form-label small fw-semibold text-dark">Choose New Password (At least 8 characters)</label>
-                      <input type="password" class="form-control form-control-sm" id="s-pass" placeholder="Enter new secret code if modifying">
-                    </div>
-                    <div class="col-12 text-start">
-                      <label for="s-pass-confirm" class="form-label small fw-semibold text-dark">Verify Password Code</label>
-                      <input type="password" class="form-control form-control-sm" id="s-pass-confirm" placeholder="Re-type new secret code">
-                    </div>
-                  </div>
-
-                  <div class="text-end mt-4 border-top pt-3">
-                    <button type="submit" class="btn btn-primary btn-sm" id="ps-submit-btn"><i class="bi bi-lock"></i> Update Admin Account</button>
-                  </div>
-                </form>
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100 d-flex flex-column justify-content-center align-items-center text-center py-5">
+                <div class="text-primary fs-1 mb-3"><i class="bi bi-shield-slash"></i></div>
+                <h5 class="fw-bold text-dark font-display mb-1">Administrative Authentication Disabled</h5>
+                <p class="text-muted small px-3 mb-0" style="max-width: 380px;">The administrative password and role-checking modules have been completely decoupled and removed as requested. The console remains fully operational for student registry, lectures, and notice board management.</p>
+                <input type="hidden" id="s-name" value="Chief Director Admin">
               </div>
             </div>
 
@@ -819,26 +796,13 @@
   }
   </script>
   <script type="module" src="/firebase-config.js"></script>
-  <script type="module" src="/js/admin-auth.js"></script>
   <script type="module" src="/admin.js"></script>
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Interactive Dashboard Administration Script Logic -->
   <script type="module">
-    import { firebaseAuth } from "/firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // Security restriction for page access
-    if (typeof window.protectPageAccess === "function") {
-      window.protectPageAccess("admin");
-    } else {
-      console.warn("protectPageAccess not yet bound to window. Checking session storage.");
-      const isSessionActive = sessionStorage.getItem("admin_logged_in") === "true";
-      if (!isSessionActive) {
-        window.location.href = "admin.html";
-      }
-    }
+    import { firebaseAuth, db } from "/firebase-config.js";
 
     let studentsMasterList = [];
     let coursesMasterList = [];
@@ -853,7 +817,6 @@
 
     let studentUnsubscribe = null;
 
-    // Monitor Auth State and Initialize
     // Helper function to enforce a maximum wait duration on database promises
     function withTimeout(promise, ms = 8000, errorMsg = "Database request timed out.") {
       return new Promise((resolve, reject) => {
@@ -873,292 +836,94 @@
       });
     }
 
-    // Monitor Auth State and Initialize
-    onAuthStateChanged(firebaseAuth, async (user) => {
-      // Ensure loading state is reset upon auth check trigger
+    // Direct dashboard initialization without authentication checks
+    (async function() {
+      // Ensure loading state is reset
       const loadingScreen = document.getElementById("admin-loading-screen");
       const activeGrid = document.getElementById("active-admin-grid");
       
       if (loadingScreen) {
-        loadingScreen.classList.remove("d-none");
+        loadingScreen.classList.add("d-none");
       }
       if (activeGrid) {
-        activeGrid.classList.add("d-none");
+        activeGrid.classList.remove("d-none");
       }
 
-      if (user) {
-        console.log("Admin authentication success: Authenticated administrator session (UID: " + user.uid + ")");
-        try {
-          console.log("Firestore connection success: Attempting to fetch administrative user document...");
+      // Set default sidebar text
+      document.getElementById("admin-sidebar-username").textContent = "Chief Director Admin";
+      document.getElementById("admin-sidebar-email").textContent = "admin@ejaytech-concepts.local";
+
+      try {
+        bootstrapEditModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+        bootstrapDrilldownModal = new bootstrap.Modal(document.getElementById('drilldownStudentModal'));
+      } catch (modalErr) {
+        console.warn("Bootstrap modal initialization warning:", modalErr);
+      }
+
+      // Theme toggle initialization
+      const storedTheme = localStorage.getItem("admin_dark_mode") === "true";
+      const consoleThemeSwitch = document.getElementById("console-theme-switch");
+      if (consoleThemeSwitch) {
+        consoleThemeSwitch.checked = storedTheme;
+      }
+      try {
+        toggleAdminConsoleTheme(storedTheme);
+      } catch (themeErr) {
+        console.error("Theme toggle error:", themeErr);
+      }
+
+      await refreshAllAdminDashboardData();
+      await loadSettingsFormValues();
+
+      // Setup real-time snapshot listener on the users collection
+      console.log("Establishing real-time student snapshot listener...");
+      try {
+        studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
+          console.log("Real-time snapshot update triggered on 'users' collection.");
+          let list = [];
+          if (snapshot && snapshot.forEach) {
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              if (data && data.role !== "admin") {
+                list.push({ uid: doc.id, ...data });
+              }
+            });
+          }
           
-          let doc;
-          try {
-            doc = await withTimeout(
-              db.collection("users").doc(user.uid).get(),
-              8000,
-              "Firestore fetch timed out while authorizing administrative privilege validation keys."
-            );
-            if (!doc.exists) {
-              console.log("Checking administrators collection fallback...");
-              doc = await withTimeout(
-                db.collection("administrators").doc(user.uid).get(),
-                8000,
-                "Firestore fetch timed out while authorizing administrative privilege validation keys."
-              );
-            }
-            console.log("Firestore connection success: Verifying administrative user document...");
-          } catch (fetchErr) {
-            console.error("Any errors encountered (initial user fetch failed):", fetchErr);
-            throw fetchErr;
-          }
-
-          let isCandidateAdmin = user.email && (
-            user.email.toLowerCase().endsWith("@ejaytech.com") ||
-            user.email.toLowerCase().includes("@ejaytech") ||
-            user.email.toLowerCase() === "elijahyahuza@gmail.com"
-          );
-
-          // If the user document doesn't exist yet, but the user is logged in, and matches the admin candidates criteria,
-          // we initialize their admin user document automatically so they have complete administrative workspace access.
-          if (!doc.exists && isCandidateAdmin) {
-            console.log("No administrator user document found in Firestore. Auto-initializing default admin records...");
-            const defaultAdminRecord = {
-              uid: user.uid,
-              fullName: "EJaytech Chief Admin",
-              fullname: "EJaytech Chief Admin",
-              email: "admin@ejaytech-concepts.local", // Masked/secure email to prevent exposure
-              role: "admin",
-              status: "approved",
-              approvalStatus: "approved",
-              createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
-              username: "EJaytech Chief Admin",
-              darkModeEnabled: false,
-              profilePictureUrl: "",
-              websiteSettings: {
-                siteName: "EJaytech Concepts",
-                contactPhone: "07033719342",
-                contactEmail: "ejaytechconcepts@gmail.com",
-                headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
-              }
-            };
-            
-            try {
-              await withTimeout(
-                db.collection("users").doc(user.uid).set(defaultAdminRecord),
-                6000,
-                "Timed out while writing default administrative record to Firestore."
-              );
-              await withTimeout(
-                db.collection("administrators").doc(user.uid).set(defaultAdminRecord),
-                6000,
-                "Timed out while writing default administrative record to Firestore."
-              );
-              console.log("Admin record successfully created. Re-fetching document...");
-              doc = await withTimeout(
-                db.collection("users").doc(user.uid).get(),
-                6000,
-                "Timed out while re-fetching administrative record."
-              );
-            } catch (writeErr) {
-              console.error("Any errors encountered (admin auto-initialization write error):", writeErr);
-              throw writeErr;
-            }
-          }
-
-          // If the document exists but the role is not 'admin' yet, and they are our designated admin, upgrade them
-          if (doc.exists && doc.data().role !== "admin" && isCandidateAdmin) {
-            console.log("Upgrading existing user to admin role: " + user.email);
-            try {
-              await withTimeout(
-                db.collection("users").doc(user.uid).update({ role: "admin", status: "approved", approvalStatus: "approved" }),
-                6000,
-                "Timed out while updating role to admin."
-              );
-              await withTimeout(
-                db.collection("administrators").doc(user.uid).update({ role: "admin", status: "approved", approvalStatus: "approved" }),
-                6000,
-                "Timed out while updating role to admin."
-              );
-              doc = await withTimeout(
-                db.collection("users").doc(user.uid).get(),
-                6000,
-                "Timed out while re-fetching administrative record."
-              );
-            } catch (upgradeErr) {
-              console.error("Failed to upgrade user role to admin:", upgradeErr);
-            }
-          }
-
-          if (doc.exists && doc.data().role === "admin") {
-            const adminData = doc.data();
-            console.log("Administrative authorization verified for: " + (adminData.fullName || adminData.username));
-            
-            // Set dynamic values in sidebar
-            document.getElementById("admin-sidebar-username").textContent = adminData.fullName || adminData.fullname || "Chief Director Admin";
-            // Strictly protect administrator email address by setting a safe, masked local address in the UI
-            document.getElementById("admin-sidebar-email").textContent = "admin@ejaytech-concepts.local";
-            
-            // Always stop the spinner and show active grid here
-            console.log("Stopping authorization loading spinner: Transitioning workspace to active administrative console.");
-            if (loadingScreen) {
-              loadingScreen.classList.add("d-none");
-            }
-            if (activeGrid) {
-              activeGrid.classList.remove("d-none");
-            }
-            
-            try {
-              bootstrapEditModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
-              bootstrapDrilldownModal = new bootstrap.Modal(document.getElementById('drilldownStudentModal'));
-            } catch (modalErr) {
-              console.warn("Any errors encountered (Bootstrap modal initialization warning):", modalErr);
-            }
-            
-            // Retrieve and bind console theme parameters
-            const storedTheme = localStorage.getItem("admin_dark_mode") === "true";
-            const consoleThemeSwitch = document.getElementById("console-theme-switch");
-            if (consoleThemeSwitch) {
-              consoleThemeSwitch.checked = storedTheme;
-            }
-            try {
-              toggleAdminConsoleTheme(storedTheme);
-            } catch (themeErr) {
-              console.error("Theme toggle error:", themeErr);
-            }
-
-            // Load other collections statically
-            try {
-              console.log("Collections being loaded: Loading static datasets (courses, materials, announcements)...");
-              
-              coursesMasterList = await withTimeout(getCoursesList(), 8000, "Timed out loading courses dataset.") || [];
-              console.log("Loaded courses dataset successfully:", coursesMasterList);
-              
-              materialsMasterList = await withTimeout(getMaterialsList(), 8000, "Timed out loading materials dataset.") || [];
-              console.log("Loaded materials dataset successfully:", materialsMasterList);
-              
-              announcementsMasterList = await withTimeout(getAnnouncementsList(), 8000, "Timed out loading announcements dataset.") || [];
-              console.log("Loaded announcements dataset successfully:", announcementsMasterList);
-              
-            } catch (err) {
-              console.error("Any errors encountered (Static database collections load error):", err);
-              // Fallback to safe empty arrays if Firestore is empty, missing, or throws errors
-              coursesMasterList = coursesMasterList || [];
-              materialsMasterList = materialsMasterList || [];
-              announcementsMasterList = announcementsMasterList || [];
-            }
-
-            // Setup real-time listener for students collection
-            if (studentUnsubscribe) {
-              try {
-                studentUnsubscribe();
-              } catch (unsubErr) {
-                console.warn("Unsubscribe warning:", unsubErr);
-              }
-            }
-
-            console.log("Establishing real-time student snapshot listener...");
-            try {
-              studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
-                console.log("Real-time snapshot update triggered on 'users' collection.");
-                let list = [];
-                try {
-                  if (snapshot && snapshot.forEach) {
-                    snapshot.forEach(doc => {
-                      const data = doc.data();
-                      if (data && data.role !== "admin") {
-                        list.push({ uid: doc.id, ...data });
-                      }
-                    });
-                  }
-                } catch (snapProcessErr) {
-                  console.error("Any errors encountered (snapshot processing error):", snapProcessErr);
+          if (list.length === 0) {
+            db.collection("students").get().then((fallbackSnap) => {
+              const fallbackList = [];
+              fallbackSnap.forEach(doc => {
+                const data = doc.data();
+                if (data && data.role !== "admin") {
+                  fallbackList.push({ uid: doc.id, ...data });
                 }
-
-                // If no students found in users, fallback to students collection
-                if (list.length === 0) {
-                  db.collection("students").get().then((fallbackSnap) => {
-                    const fallbackList = [];
-                    fallbackSnap.forEach(doc => {
-                      const data = doc.data();
-                      if (data && data.role !== "admin") {
-                        fallbackList.push({ uid: doc.id, ...data });
-                      }
-                    });
-                    if (fallbackList.length > 0) {
-                      studentsMasterList = fallbackList.sort((a, b) => {
-                        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                        return (timeB || 0) - (timeA || 0);
-                      });
-                      updateUIWithFreshStudentData();
-                    }
-                  }).catch(err => console.warn("Fallback fetch failed:", err));
-                }
-
-                studentsMasterList = list.sort((a, b) => {
+              });
+              if (fallbackList.length > 0) {
+                studentsMasterList = fallbackList.sort((a, b) => {
                   const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                   const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
                   return (timeB || 0) - (timeA || 0);
                 });
-                
-                console.log("Student list sorted and loaded successfully:", studentsMasterList);
+                updateUIWithFreshStudentData();
+              }
+            }).catch(err => console.warn("Fallback fetch failed:", err));
+          }
 
-                // Render changes to screen
-                try {
-                  updateUIWithFreshStudentData();
-                } catch (uiUpdateErr) {
-                  console.error("Any errors encountered (UI render update error):", uiUpdateErr);
-                }
-              }, (error) => {
-                console.error("Any errors encountered (student real-time snapshot subscription error):", error);
-                // Fallback to empty array on subscription error so the app loads instead of hanging
-                studentsMasterList = [];
-                try {
-                  updateUIWithFreshStudentData();
-                } catch (uiUpdateErr) {
-                  console.error("Any errors encountered (UI render update fallback error):", uiUpdateErr);
-                }
-              });
-            } catch (subErr) {
-              console.error("Any errors encountered (onSnapshot subscription creation error):", subErr);
-              studentsMasterList = [];
-              updateUIWithFreshStudentData();
-            }
-          } else {
-            console.error("User is authenticated but does not have administrative privileges in Firestore (UID: " + user.uid + ").");
-            throw new Error("Access Denied! The Firestore document for this account cannot be found with administrative privileges. Please log in with an authorized admin account.");
-          }
-        } catch (err) {
-          console.error("Any errors encountered (Failed to verify administrator role or connect to database collections):", err);
+          studentsMasterList = list.sort((a, b) => {
+            const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return (timeB || 0) - (timeA || 0);
+          });
           
-          // Display a clear error message in the loading screen instead of keeping the spinner running forever
-          if (loadingScreen) {
-            loadingScreen.innerHTML = `
-              <div class="alert alert-danger mx-auto mt-4 p-4 text-start" style="max-width: 550px; border-radius: 16px;">
-                <h5 class="fw-bold text-danger font-display mb-2"><i class="bi bi-shield-slash-fill me-2"></i> Administrative Portal Error</h5>
-                <p class="text-muted small mb-3">An unexpected database or credentials verification error occurred while loading your admin dashboard:</p>
-                <div class="bg-dark text-white font-mono p-3 rounded mb-3 small" style="opacity: 0.95; overflow-x: auto; max-width: 100%; white-space: pre-wrap;">${err.message || err}</div>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-outline-danger btn-sm" onclick="logoutSession()"><i class="bi bi-box-arrow-right"></i> Sign Out Session</button>
-                  <a href="admin.html" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Return to Portal</a>
-                </div>
-              </div>
-            `;
-          }
-        }
-      } else {
-        console.log("No authenticated administrator session. Booting to portal login page.");
-        if (studentUnsubscribe) {
-          try {
-            studentUnsubscribe();
-          } catch (unsubErr) {
-            console.warn("Unsubscribe error on logout:", unsubErr);
-          }
-          studentUnsubscribe = null;
-        }
-        window.location.href = "admin.html";
+          updateUIWithFreshStudentData();
+        });
+      } catch (subErr) {
+        console.error("onSnapshot subscription error:", subErr);
+        studentsMasterList = [];
+        updateUIWithFreshStudentData();
       }
-    });
+    })();
 
     /**
      * Complete operational refresh loader (forces a full static reload of non-student collections)
@@ -2043,97 +1808,6 @@
         subBtn.innerHTML = '<i class="bi bi-check-circle"></i> Commit Settings Overrides';
       }
     }
-
-    // Admin security Profile submissions
-    async function handleAdminProfileSubmit(e) {
-      e.preventDefault();
-      const username = document.getElementById("s-name").value;
-      const currentPass = document.getElementById("s-current-pass") ? document.getElementById("s-current-pass").value : "";
-      const newPass = document.getElementById("s-pass").value;
-      const confirmPass = document.getElementById("s-pass-confirm").value;
-
-      const subBtn = document.getElementById("ps-submit-btn");
-
-      // Validate credentials parameters if modifying password
-      if (newPass.length > 0) {
-        if (!currentPass) {
-          alert("Please enter your Current Password to verify identity before changing credentials.");
-          return;
-        }
-        if (newPass.length < 8) {
-          alert("The new password must be at least 8 characters long.");
-          return;
-        }
-        if (newPass !== confirmPass) {
-          alert("Verify Password Code does not match Choose New Password. Please re-enter.");
-          return;
-        }
-      }
-
-      try {
-        subBtn.disabled = true;
-        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Modifying parameters...';
-
-        const adminUid = (auth.currentUser && auth.currentUser.uid) || "admin-master";
-        await updateAdminProfile(adminUid, { username });
-
-        if (newPass.length > 0) {
-          await changeAdminPassword(currentPass, newPass);
-          alert("Admin account credentials and security keys updated successfully!");
-        } else {
-          alert("Admin account profile parameters successfully saved.");
-        }
-
-        // Clear password fields on success
-        if (document.getElementById("s-current-pass")) {
-          document.getElementById("s-current-pass").value = "";
-        }
-        document.getElementById("s-pass").value = "";
-        document.getElementById("s-pass-confirm").value = "";
-
-        subBtn.disabled = false;
-        subBtn.innerHTML = '<i class="bi bi-lock"></i> Update Admin Account';
-
-        await refreshAllAdminDashboardData();
-
-      } catch (err) {
-        alert("Parameters update failed: " + err.message);
-        subBtn.disabled = false;
-        subBtn.innerHTML = '<i class="bi bi-lock"></i> Update Admin Account';
-      }
-    }
-
-    // Interactive custom upload for profile pictures
-    async function uploadAdminAvatarPhoto(input) {
-      const file = input.files[0];
-      if (!file) return;
-
-      const avatarImg = document.getElementById("admin-sidebar-avatar");
-      avatarImg.classList.add("opacity-50");
-
-      try {
-        let downloadUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70";
-        
-        // Upload to storage emulated or real
-        const adminUid = (auth.currentUser && auth.currentUser.uid) || "admin-master";
-        const path = `admins/${adminUid}/profile_picture_${Date.now()}`;
-        try {
-          const snapshot = await storage.ref().child(path).put(file);
-          downloadUrl = await snapshot.ref.getDownloadURL();
-        } catch (e) {
-          downloadUrl = "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=70";
-        }
-
-        await updateAdminProfile(adminUid, { profilePictureUrl: downloadUrl });
-        avatarImg.src = downloadUrl;
-        avatarImg.classList.remove("opacity-50");
-        alert("Admin profile image modified!");
-        
-      } catch (err) {
-        alert("Image upload aborted: " + err.message);
-        avatarImg.classList.remove("opacity-50");
-      }
-    } }
 
     /**
      * =========================================

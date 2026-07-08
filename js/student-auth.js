@@ -200,10 +200,7 @@ export async function logoutStudentSession() {
   sessionStorage.removeItem("student_logged_in");
   sessionStorage.removeItem("student_uid");
   
-  // Only sign out from Firebase Auth if administrator is not also logged in
-  if (sessionStorage.getItem("admin_logged_in") !== "true") {
-    await signOut(firebaseAuth);
-  }
+  await signOut(firebaseAuth);
   
   window.location.href = "student.html";
 }
@@ -230,9 +227,7 @@ export function protectStudentPage() {
         console.error("No student document found. Booting to login.");
         sessionStorage.removeItem("student_logged_in");
         sessionStorage.removeItem("student_uid");
-        if (sessionStorage.getItem("admin_logged_in") !== "true") {
-          await signOut(firebaseAuth);
-        }
+        await signOut(firebaseAuth);
         window.location.href = "student.html";
         return;
       }
@@ -245,9 +240,7 @@ export function protectStudentPage() {
         alert("Your student application status is: " + statusVal + ".");
         sessionStorage.removeItem("student_logged_in");
         sessionStorage.removeItem("student_uid");
-        if (sessionStorage.getItem("admin_logged_in") !== "true") {
-          await signOut(firebaseAuth);
-        }
+        await signOut(firebaseAuth);
         window.location.href = "student.html";
         return;
       }
