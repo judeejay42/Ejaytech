@@ -803,6 +803,13 @@
   <!-- Interactive Dashboard Administration Script Logic -->
   <script type="module">
     import { firebaseAuth, db } from "/firebase-config.js";
+    import { protectAdminDashboard, logoutAdmin } from "/admin-auth.js";
+
+    // Deep enforce administrative session verification
+    protectAdminDashboard();
+
+    // Bind logout internationally to the Sign Out button
+    window.logoutSession = logoutAdmin;
 
     let studentsMasterList = [];
     let coursesMasterList = [];
@@ -836,8 +843,14 @@
       });
     }
 
-    // Direct dashboard initialization without authentication checks
+    // Direct dashboard initialization with protective verification checks
     (async function() {
+      const isLocalSession = sessionStorage.getItem("admin_logged_in") === "true";
+      if (!isLocalSession) {
+        window.location.href = "admin.html";
+        return;
+      }
+
       // Ensure loading state is reset
       const loadingScreen = document.getElementById("admin-loading-screen");
       const activeGrid = document.getElementById("active-admin-grid");

@@ -148,10 +148,68 @@
 
   <!-- Form Controllers & Routing Logic -->
   <script type="module">
-    // Admin authentication logic removed. Ready for a new authentication system.
-    document.getElementById("admin-login-form").addEventListener("submit", (e) => {
+    import { loginAdmin, redirectIfSessionActive } from "/admin-auth.js";
+
+    // Automatic session check on page load
+    redirectIfSessionActive();
+
+    const loginForm = document.getElementById("admin-login-form");
+    const errorAlert = document.getElementById("admin-error-alert");
+    const errMsg = document.getElementById("admin-err-msg");
+    const submitBtn = document.getElementById("admin-submit-btn");
+
+    function displayError(txt) {
+      errorAlert.classList.remove("d-none");
+      errMsg.textContent = txt;
+    }
+
+    function clearError() {
+      errorAlert.classList.add("d-none");
+    }
+
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      console.log("Admin login form submitted. Authentication system is currently being re-engineered.");
+      clearError();
+
+      const emailInput = document.getElementById("admin-email");
+      const passwordInput = document.getElementById("admin-password");
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      let loginSuccessful = false;
+
+      try {
+        // Show loading spinner and disable inputs/button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating...';
+        emailInput.disabled = true;
+        passwordInput.disabled = true;
+
+        // Perform login through the new admin-auth system
+        const session = await loginAdmin(email, password);
+        
+        submitBtn.innerHTML = '<i class="bi bi-shield-check me-2"></i> Authorization Granted';
+        loginSuccessful = true;
+
+        // Redirect immediately to the admin dashboard on success
+        window.location.href = "admin-dashboard.html";
+
+      } catch (err) {
+        console.error("Administrative Gateway authentication failed:", err);
+        
+        // Render precise error message
+        displayError(err.message || "Incorrect email or password.");
+        
+      } finally {
+        // Re-enable form controls only on failure. This ensures fields are NOT cleared and page does not reload.
+        if (!loginSuccessful) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i> Authenticate Console';
+          emailInput.disabled = false;
+          passwordInput.disabled = false;
+        }
+      }
     });
   </script>
 </body>
