@@ -3,26 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EJaytech Concepts - Innovating Ideas, Delivering Solutions</title>
+  <title>EJaytech Concepts - Empowering Businesses Through Innovative Technology</title>
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet" id="bootstrap-icons">
-  <!-- Custom Core CSS -->
-  <link href="css/style.css" rel="stylesheet" id="custom-style">
-  <link href="css/responsive.css" rel="stylesheet" id="custom-responsive">
-  <script type="module" src="js/app.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
 
-  <!-- Navigation Bar -->
+  <!-- 1. Sticky Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
-        <div class="me-2 text-primary" style="font-size: 1.8rem;"><i class="bi bi-cpu-fill"></i></div>
+        <img src="assets/images/logo.jpg" alt="EJaytech Concepts Logo" class="me-2" style="height: 48px; width: 48px; object-fit: contain; border-radius: 50%;">
         <div>
-          <span class="brand-logo">EJaytech Concepts</span>
-          <span class="brand-tagline">Innovating Ideas, Delivering Solutions</span>
+          <span class="brand-logo fs-4 text-dark fw-bold">EJaytech Concepts</span>
+          <span class="brand-tagline text-muted font-monospace" style="font-size: 0.68rem; display: block; letter-spacing: 0.05em; text-transform: uppercase;">Innovate &bull; Create &bull; Elevate</span>
         </div>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,41 +34,40 @@
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
           <li class="nav-item"><a class="nav-link active" href="index.html" id="link-home">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="about.html" id="link-about">About Us</a></li>
-          <li class="nav-item"><a class="nav-link" href="services.html" id="link-services">Our Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html" id="link-services">Services</a></li>
           <li class="nav-item"><a class="nav-link" href="courses.html" id="link-courses">Courses</a></li>
-          <li class="nav-item">
-            <a class="btn btn-primary-custom ms-lg-2" href="student.html" id="nav-portal-btn"><i class="bi bi-door-open-fill me-1"></i> Student Portal</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="student.html" id="link-student">Student Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin.html" id="link-admin">Admin Login</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <header class="hero-section d-flex align-items-center" id="hero-banner">
+  <!-- 2. Hero Section -->
+  <header class="hero-section d-flex align-items-center py-5" id="hero-banner">
     <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-7 text-start py-4">
-          <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-3 font-display"><i class="bi bi-journal-check me-1"></i> ADMISSION OPEN &bull; Abuja Learning Campuses</span>
-          <h1 class="display-4 fw-bold tracking-tight mb-3" style="font-size: 2.85rem; line-height: 1.2;">
-            Transforming Ideas Into <span class="text-primary">Digital Solutions</span>
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 text-start">
+          <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-3" style="font-size: 0.85rem;"><i class="bi bi-lightning-charge-fill me-1"></i> Abuja's Leading Tech Enterprise</span>
+          <h1 class="display-4 fw-bold mb-3" style="line-height: 1.25; color: #0F172A;">
+            Empowering Businesses Through <span class="text-primary">Innovative Technology</span>
           </h1>
-          <p class="lead text-muted mb-4 fs-5" style="max-width: 650px;">
-            Empowering businesses, organizations, ministries, schools, and individuals through innovative technology software configurations, premium graphics branding schemes, and government-approved vocational course workflows.
+          <p class="lead text-muted mb-4" style="font-size: 1.05rem;">
+            We provide Software Development, Cybersecurity, Networking, ICT Training, Graphics Design, and Digital Solutions for businesses and individuals.
           </p>
           <div class="d-flex flex-wrap gap-3">
-            <a href="courses.html" class="btn btn-primary-custom px-4 py-2" id="hero-courses-btn"><i class="bi bi-mortarboard-fill me-2"></i> Explore Courses</a>
-            <a href="student.html" class="btn btn-secondary-custom px-4 py-2" id="hero-portal-btn"><i class="bi bi-person-fill-lock me-2"></i> Student Portal</a>
+            <a href="#services-section" class="btn btn-primary-custom px-4 py-2.5"><i class="bi bi-cpu-fill me-2"></i> Our Services</a>
+            <a href="#featured-courses" class="btn btn-secondary-custom px-4 py-2.5"><i class="bi bi-mortarboard-fill me-2"></i> Explore Courses</a>
           </div>
         </div>
-        <div class="col-lg-5 d-none d-lg-block">
-          <div class="position-relative">
-            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80" alt="Technology Training Core" class="img-fluid rounded-4 shadow-lg border" referrerPolicy="no-referrer">
-            <div class="position-absolute bottom-0 start-0 bg-white p-3 rounded-3 shadow m-3 border d-flex align-items-center gap-3">
+        <div class="col-lg-6">
+          <div class="position-relative img-zoom-hover rounded-4 shadow-lg">
+            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80" alt="EJaytech Digital Learning" class="img-fluid rounded-4 w-full" referrerPolicy="no-referrer">
+            <div class="position-absolute bottom-0 start-0 bg-white p-3 rounded-3 shadow m-4 border d-flex align-items-center gap-3">
               <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-check-lg"></i></div>
               <div>
-                <p class="mb-0 fw-bold text-dark font-display" style="font-size: 0.9rem;">Practical Workstations</p>
-                <p class="mb-0 text-muted" style="font-size: 0.8rem;">100% Case Study-Based</p>
+                <p class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;">Modern Learning Lab</p>
+                <p class="mb-0 text-muted" style="font-size: 0.8rem;">100% Practical Classrooms</p>
               </div>
             </div>
           </div>
@@ -75,154 +76,421 @@
     </div>
   </header>
 
-  <!-- Brief Company Introduction -->
-  <section class="py-5" id="company-intro">
+  <!-- 3. About Preview Section -->
+  <section class="py-5 bg-white border-top border-bottom" id="about-preview">
     <div class="container py-3">
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" alt="Team Synergy Work" class="img-fluid rounded-4 border shadow-sm" referrerPolicy="no-referrer">
+          <div class="img-zoom-hover rounded-4 shadow-sm border">
+            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" alt="EJaytech Team Synergy" class="img-fluid rounded-4" referrerPolicy="no-referrer">
+          </div>
         </div>
         <div class="col-lg-6 text-start">
-          <h5 class="text-uppercase text-primary fw-bold mb-2 font-display" style="font-size: 0.85rem; letter-spacing: 0.08em;">WELCOME TO EJAYTECH</h5>
-          <h2 class="fw-bold mb-3 font-display">Who We Are & What We Excel At</h2>
+          <h5 class="text-uppercase text-primary fw-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">ABOUT EJAYTECH CONCEPTS</h5>
+          <h2 class="fw-bold mb-3" style="color: #0F172A;">Fusing Innovation with Professional Execution</h2>
           <p class="text-muted mb-3">
-            EJaytech Concepts is a leading-edge technology solutions consultancy and premium digital skills resource institute. Operating from Abuja, Nigeria, we bridges client concepts to delivery execution, designing bespoke business software while preparing the next digital leaders.
+            EJaytech Concepts is a premium, client-focused technology company specializing in professional software development, comprehensive cyberdefense setups, structural networking topologies, and highly structured vocational ICT skill transfers.
           </p>
           <p class="text-muted mb-4">
-            We are dedicated to unlocking potential. Whether you're a ministry looking to optimize communications, a business expanding storefronts, or an ambitious scholar seeking premium freelance software or graphic skills pathways, EJaytech delivers!
+            We deliver premium business-enhancing software systems while simultaneously mentoring students through structured syllabus modules. Our dual-focused operational model ensures our curriculum aligns perfectly with global corporate practices.
           </p>
-          <div class="row g-3">
-            <div class="col-sm-6">
-              <h6 class="fw-bold text-dark mb-1"><i class="bi bi-patch-check-fill text-primary me-2"></i> Certified Mentorship</h6>
-              <p class="text-muted small mb-0">Learn from active IT specialists.</p>
+          <div class="d-flex flex-wrap gap-4 mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-patch-check-fill text-success fs-4"></i>
+              <span class="fw-semibold text-dark">Certified Mentorship</span>
             </div>
-            <div class="col-sm-6">
-              <h6 class="fw-bold text-dark mb-1"><i class="bi bi-headset text-primary me-2"></i> Prompt Delivery Support</h6>
-              <p class="text-muted small mb-0">Continuous post-implementation care.</p>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-lightning-fill text-warning fs-4"></i>
+              <span class="fw-semibold text-dark">Real-World Case Studies</span>
             </div>
+          </div>
+          <a href="about.html" class="btn btn-primary-custom px-4 py-2"><i class="bi bi-info-circle-fill me-2"></i> Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Services Section -->
+  <section class="py-5 bg-light" id="services-section">
+    <div class="container py-3">
+      <div class="text-center mb-5">
+        <h5 class="text-uppercase text-primary fw-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">OUR EXPERTISE</h5>
+        <h2 class="fw-bold" style="color: #0F172A;">Innovative Business Services</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">We specialize in designing, configuring, and executing premium technological solutions that optimize business workflows.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Service 1: Software Development -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-code-slash"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Software Development</h4>
+            <p class="text-muted small">
+              Designing scalable, clean, robust enterprise business applications customized perfectly for unique organizational workflows and operational goals.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 2: Web Development -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-globe"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Web Development</h4>
+            <p class="text-muted small">
+              Building lightning-fast, fully responsive, SEO-optimized, and premium websites that convert visitors into loyal paying customers.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 3: Mobile App Development -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-phone-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Mobile App Development</h4>
+            <p class="text-muted small">
+              Engineering high-fidelity native and cross-platform mobile apps for iOS and Android platforms using modern architecture.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 4: Cybersecurity -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-shield-lock-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Cybersecurity</h4>
+            <p class="text-muted small">
+              Securing critical business data configurations, conducting vulnerability audits, and implementing comprehensive cyberdefense rules.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 5: Networking -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-diagram-3-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Networking</h4>
+            <p class="text-muted small">
+              Configuring reliable computer networking architectures, active server connections, and robust wireless infrastructures.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 6: ICT Training -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">ICT Training</h4>
+            <p class="text-muted small">
+              Coordinating professional vocational skill tracks tailored specifically for modern developers, designers, and system security engineers.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 7: Graphics Design -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-palette-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Graphics Design</h4>
+            <p class="text-muted small">
+              Illustrating clean layouts, dynamic visuals, promotional flyers, and corporate publications that engage target audiences.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 8: Branding -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-briefcase-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Branding</h4>
+            <p class="text-muted small">
+              Formulating professional visual identity packages, guidelines, custom logos, stationery templates, and brand narratives.
+            </p>
+          </div>
+        </div>
+
+        <!-- Service 9: IT Consulting -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom">
+            <div class="card-custom-icon"><i class="bi bi-chat-left-quote-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">IT Consulting</h4>
+            <p class="text-muted small">
+              Advising businesses on digital transformations, infrastructure modernization, technology stacks selection, and workflow optimizations.
+            </p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Why Choose Bento Section -->
+  <!-- 5. Why Choose Us -->
   <section class="py-5 bg-white border-top border-bottom" id="why-choose-us">
     <div class="container py-3">
-      <div class="text-start mb-5">
-        <h5 class="text-uppercase text-primary fw-bold mb-2 font-display" style="font-size: 0.85rem; letter-spacing: 0.08em;">OUR ADVANTAGES</h5>
-        <h2 class="fw-bold mb-2 font-display">Why Choose EJaytech Concepts?</h2>
-        <p class="text-muted" style="max-width: 600px;">We fuse interactive physical-classroom learning models with standard enterprise consulting experiences.</p>
+      <div class="text-center mb-5">
+        <h5 class="text-uppercase text-primary fw-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">OUR ADVANTAGES</h5>
+        <h2 class="fw-bold" style="color: #0F172A;">Why Choose EJaytech Concepts?</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">We bridge technical complexity with clear, client-centric values to deliver exceptional technology experiences.</p>
       </div>
-      
-      <div class="bento-grid">
-        <!-- Bento Large Card -->
-        <div class="card-custom bento-large d-flex flex-column justify-content-between p-4" id="bento-card-main">
-          <div>
-            <div class="card-custom-icon"><i class="bi bi-trophy-fill"></i></div>
-            <h4 class="fw-bold fs-4 font-display mb-3">Government Approved Curriculum & Real Projects</h4>
-            <p class="text-muted">
-              Unlike theoretical bootcamps, our course pathways align strictly with verified corporate demands. Our students build public live apps, design marketing campaigns for operating businesses, draft enterprise UI mockups, and graduate with live case-portfolios.
-            </p>
-          </div>
-          <div class="mt-4 d-flex align-items-center gap-3">
-            <div class="d-flex -space-x-2">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Scholar 1" class="rounded-circle border border-white border-2" style="width: 38px; height: 38px; margin-right: -10px;" referrerPolicy="no-referrer">
-              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" alt="Scholar 2" class="rounded-circle border border-white border-2" style="width: 38px; height: 38px; margin-right: -10px;" referrerPolicy="no-referrer">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Scholar 3" class="rounded-circle border border-white border-2" style="width: 38px; height: 38px;" referrerPolicy="no-referrer">
-            </div>
-            <span class="small fw-semibold text-muted">Join over 600+ certified alumni network.</span>
-          </div>
-        </div>
 
-        <!-- Bento Card 2 -->
-        <div class="card-custom p-4" id="bento-card-2">
-          <div class="card-custom-icon"><i class="bi bi-shield-check"></i></div>
-          <h4 class="fw-bold font-display mb-2">Authentic Mentorship</h4>
-          <p class="text-muted small">
-            We operate physically right here in Abuja, enabling face-to-face labs, continuous workspace audits, and physical certification awards. No purely pre-recorded videos.
-          </p>
-        </div>
-
-        <!-- Bento Card 3 -->
-        <div class="card-custom p-4" id="bento-card-3">
-          <div class="card-custom-icon"><i class="bi bi-clock-history"></i></div>
-          <h4 class="fw-bold font-display mb-2">Flexible Schedules</h4>
-          <p class="text-muted small">
-            Choose morning, afternoon, or dedicated weekend modules designed perfectly for full-time workers, state youth corps members (NYSC), and tertiary school students.
-          </p>
-        </div>
-
-        <!-- Bento Large Card 4 -->
-        <div class="card-custom bento-large d-flex flex-column justify-content-between p-4" id="bento-card-4">
-          <div>
-            <div class="card-custom-icon" style="background-color: var(--color-success-light); color: var(--color-success);"><i class="bi bi-laptop-fill"></i></div>
-            <h4 class="fw-bold font-display mb-3">Live Interactive Student Workspaces</h4>
-            <p class="text-muted">
-              Enrollment gives you full, continuous access to our automated Student Portal dashboard. Download detailed lessons manuals, monitor assignment evaluations, receive instant feedback archives, and view official certificates.
-            </p>
-          </div>
-          <div class="mt-3">
-            <a href="student.html" class="text-primary fw-bold text-decoration-none small">Access Portal Gateway <i class="bi bi-arrow-right"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Statistics Counters -->
-  <section class="py-5 bg-light" id="statistics-counter">
-    <div class="container py-3">
       <div class="row g-4">
-        <div class="col-md-3 col-6">
-          <div class="stat-card" id="stat-students">
-            <p class="stat-number">600+</p>
-            <p class="stat-label">Graduates</p>
+        <!-- Card 1: Professional Team -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom p-4">
+            <div class="card-custom-icon" style="background-color: #e6f0ff; color: #0D6EFD;"><i class="bi bi-people-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Professional Team</h4>
+            <p class="text-muted small">Our technical operations are led by certified developers, cyber engineers, and visual designers with years of experience.</p>
           </div>
         </div>
-        <div class="col-md-3 col-6">
-          <div class="stat-card" id="stat-success">
-            <p class="stat-number">98%</p>
-            <p class="stat-label">Success Rate</p>
+
+        <!-- Card 2: Affordable Solutions -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom p-4">
+            <div class="card-custom-icon" style="background-color: #e6f0ff; color: #0D6EFD;"><i class="bi bi-cash-coin"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Affordable Solutions</h4>
+            <p class="text-muted small">We build premium layouts and configurations tailored perfectly to optimize client budgets without compromising quality.</p>
           </div>
         </div>
-        <div class="col-md-3 col-6">
-          <div class="stat-card" id="stat-tracks">
-            <p class="stat-number">4</p>
-            <p class="stat-label">Core Tracks</p>
+
+        <!-- Card 3: Modern Technology -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom p-4">
+            <div class="card-custom-icon" style="background-color: #e6f0ff; color: #0D6EFD;"><i class="bi bi-cpu-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Modern Technology</h4>
+            <p class="text-muted small">We leverage cutting-edge frameworks, server configurations, and agile paradigms to deliver future-proof results.</p>
           </div>
         </div>
-        <div class="col-md-3 col-6">
-          <div class="stat-card" id="stat-consults">
-            <p class="stat-number">25+</p>
-            <p class="stat-label">Client Projects</p>
+
+        <!-- Card 4: Reliable Support -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom p-4">
+            <div class="card-custom-icon" style="background-color: #e6f0ff; color: #0D6EFD;"><i class="bi bi-headset"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Reliable Support</h4>
+            <p class="text-muted small">Get round-the-clock technical troubleshooting, post-implementation code review, and dedicated deployment support.</p>
+          </div>
+        </div>
+
+        <!-- Card 5: Practical Training -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom p-4">
+            <div class="card-custom-icon" style="background-color: #e6f0ff; color: #0D6EFD;"><i class="bi bi-laptop"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Practical Training</h4>
+            <p class="text-muted small">We abandon dry theoretical lectures. Our students build live, interactive web apps and realistic security topologies.</p>
+          </div>
+        </div>
+
+        <!-- Card 6: Customer Satisfaction -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card-custom p-4">
+            <div class="card-custom-icon" style="background-color: #e6f0ff; color: #0D6EFD;"><i class="bi bi-emoji-smile-fill"></i></div>
+            <h4 class="fw-bold mb-2 fs-5">Customer Satisfaction</h4>
+            <p class="text-muted small">We maintain a proud 98% positive evaluation score across our software consulting clients and vocational graduates.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Student Success Highlights -->
-  <section class="py-5 bg-white border-top border-bottom" id="success-highlights">
+  <!-- 6. Statistics Section -->
+  <section class="py-5 bg-light" id="statistics-section">
     <div class="container py-3">
-      <div class="text-start mb-5">
-        <h5 class="text-uppercase text-primary fw-bold mb-2 font-display" style="font-size: 0.85rem; letter-spacing: 0.08em;">TESTIMONIALS</h5>
-        <h2 class="fw-bold mb-2 font-display">Student Success Highlights</h2>
-        <p class="text-muted" style="max-width: 600px;">Read inspiring updates from absolute beginners who took our professional technical paths.</p>
+      <div class="row g-4 text-center">
+        <div class="col-lg-3 col-md-6">
+          <div class="stat-card border-0 shadow-sm">
+            <p class="stat-number counter-number" data-target="1200" data-suffix="+">0+</p>
+            <p class="stat-label">Students Trained</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="stat-card border-0 shadow-sm">
+            <p class="stat-number counter-number" data-target="150" data-suffix="+">0+</p>
+            <p class="stat-label">Projects Completed</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="stat-card border-0 shadow-sm">
+            <p class="stat-number counter-number" data-target="250" data-suffix="+">0+</p>
+            <p class="stat-label">Happy Clients</p>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="stat-card border-0 shadow-sm">
+            <p class="stat-number counter-number" data-target="8" data-suffix="+">0+</p>
+            <p class="stat-label">Years of Experience</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Featured Courses Section -->
+  <section class="py-5 bg-white border-top border-bottom" id="featured-courses">
+    <div class="container py-3">
+      <div class="text-center mb-5">
+        <h5 class="text-uppercase text-primary fw-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">EDUCATIONAL TRACKS</h5>
+        <h2 class="fw-bold" style="color: #0F172A;">Featured Vocational Courses</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">Unlock professional, certified technology skills with our 100% case-study-driven courses.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Course 1: Frontend Development -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1547082299-de196ea013d6?w=600&auto=format&fit=crop&q=80" alt="Frontend Development" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">3 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Frontend Development</h5>
+                <p class="text-muted small mb-4">Learn responsive layout principles, semantic HTML5, clean CSS3 animations, and core dynamic Vanilla JavaScript DOM workflows.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 2: Backend Development -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80" alt="Backend Development" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">3 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Backend Development</h5>
+                <p class="text-muted small mb-4">Master server setups, REST API patterns, relational SQL databases design, user authentication systems, and cloud architecture.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 3: Full Stack Development -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80" alt="Full Stack Development" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">6 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Full Stack Development</h5>
+                <p class="text-muted small mb-4">Combine frontend aesthetics with backend scale, connecting responsive layouts securely to databases for complete workflows.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 4: Cybersecurity -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=80" alt="Cybersecurity" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">4 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Cybersecurity</h5>
+                <p class="text-muted small mb-4">Analyze dynamic web threats, secure critical server parameters, audit active code bases, and configure network firewalls.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 5: Networking -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=80" alt="Networking" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">3 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Networking</h5>
+                <p class="text-muted small mb-4">Configure structural network devices, static subnet routings, dynamic routing protocols, and active server connections.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 6: UI/UX Design -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&auto=format&fit=crop&q=80" alt="UI/UX Design" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">2.5 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">UI/UX Design</h5>
+                <p class="text-muted small mb-4">Draft detailed user mapping diagrams, high-fidelity wireframes in Figma, responsive web layouts, and interactive components.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 7: Graphics Design -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=600&auto=format&fit=crop&q=80" alt="Graphics Design" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">2 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Graphics Design</h5>
+                <p class="text-muted small mb-4">Master visual design fundamentals, elegant typography settings, brand guideline assets, and vector layouts in Illustrator.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course 8: Python Programming -->
+        <div class="col-lg-3 col-md-6">
+          <div class="card-custom p-0 d-flex flex-column h-100 overflow-hidden">
+            <div class="img-zoom-hover" style="height: 180px;">
+              <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80" alt="Python Programming" class="img-fluid w-100 h-100 object-fit-cover" referrerPolicy="no-referrer">
+            </div>
+            <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div>
+                <span class="badge bg-primary-subtle text-primary mb-2" style="font-size: 0.75rem;">2.5 Months</span>
+                <h5 class="fw-bold mb-2 text-dark">Python Programming</h5>
+                <p class="text-muted small mb-4">Understand script structures, core automation rules, dynamic dataset analysis, web scrapers design, and backend connections.</p>
+              </div>
+              <a href="courses.html" class="btn btn-primary-custom w-100 text-center py-2"><i class="bi bi-eye-fill me-2"></i> View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Testimonials Section -->
+  <section class="py-5 bg-light" id="testimonials">
+    <div class="container py-3">
+      <div class="text-center mb-5">
+        <h5 class="text-uppercase text-primary fw-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em;">TESTIMONIALS</h5>
+        <h2 class="fw-bold" style="color: #0F172A;">What Our Alumni Say</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">Hear directly from former students who turned professional skills into local and remote tech roles.</p>
       </div>
 
       <div class="row g-4">
         <!-- Testimonial 1 -->
         <div class="col-lg-4 col-md-6">
-          <div class="card-custom p-4 text-start d-flex flex-column justify-content-between h-100" id="testi-1">
+          <div class="card-custom p-4 d-flex flex-column justify-content-between h-100">
             <p class="text-muted italic mb-4" style="font-style: italic;">
-              "EJaytech's Frontend development program is unparalleled. We focused entirely on custom layouts, real DOM events, and client landing pages. Within a month after graduating, I launched three websites for local Abuja businesses!"
+              "EJaytech's Frontend development program is unparalleled. We focused entirely on custom layouts, real DOM events, and client landing pages. Within a month after graduating, I launched three websites for local businesses!"
             </p>
             <div class="d-flex align-items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80" alt="Chinedu" class="rounded-circle border" style="width: 44px; height: 44px;" referrerPolicy="no-referrer">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80" alt="Chinedu Okafor" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;" referrerPolicy="no-referrer">
               <div>
-                <h6 class="mb-0 fw-bold @font-display">Chinedu Okafor</h6>
-                <p class="mb-0 text-muted small">Frontend Alumni (Freelancer)</p>
+                <h6 class="mb-0 fw-bold">Chinedu Okafor</h6>
+                <p class="mb-0 text-muted small">Frontend Graduate</p>
               </div>
             </div>
           </div>
@@ -230,15 +498,15 @@
 
         <!-- Testimonial 2 -->
         <div class="col-lg-4 col-md-6">
-          <div class="card-custom p-4 text-start d-flex flex-column justify-content-between h-100" id="testi-2">
+          <div class="card-custom p-4 d-flex flex-column justify-content-between h-100">
             <p class="text-muted italic mb-4" style="font-style: italic;">
               "I knew nothing about Figma or component rules. The UI/UX labs at EJaytech broke down complex wireframes, user research mapping, and hand-off guides. Now I confidently handle remote product styling projects."
             </p>
             <div class="d-flex align-items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Hadiza" class="rounded-circle border" style="width: 44px; height: 44px;" referrerPolicy="no-referrer">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Hadiza Bello" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;" referrerPolicy="no-referrer">
               <div>
-                <h6 class="mb-0 fw-bold @font-display">Hadiza Bello</h6>
-                <p class="mb-0 text-muted small">UI/UX Alumni (Product Designer)</p>
+                <h6 class="mb-0 fw-bold">Hadiza Bello</h6>
+                <p class="mb-0 text-muted small">UI/UX Designer</p>
               </div>
             </div>
           </div>
@@ -246,15 +514,15 @@
 
         <!-- Testimonial 3 -->
         <div class="col-lg-4 col-md-12">
-          <div class="card-custom p-4 text-start d-flex flex-column justify-content-between h-100" id="testi-3">
+          <div class="card-custom p-4 d-flex flex-column justify-content-between h-100">
             <p class="text-muted italic mb-4" style="font-style: italic;">
               "EJaytech Concepts transformed my career through their graphic design track. The instructors are incredibly patient, outlining precise branding assets design, typography hierarchy, and pre-prep files settings."
             </p>
             <div class="d-flex align-items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" alt="Grace" class="rounded-circle border" style="width: 44px; height: 44px;" referrerPolicy="no-referrer">
+              <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" alt="Grace Adebayo" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;" referrerPolicy="no-referrer">
               <div>
-                <h6 class="mb-0 fw-bold @font-display">Grace Adebayo</h6>
-                <p class="mb-0 text-muted small">Graphic Design Graduate</p>
+                <h6 class="mb-0 fw-bold">Grace Adebayo</h6>
+                <p class="mb-0 text-muted small">Graphics Graduate</p>
               </div>
             </div>
           </div>
@@ -263,38 +531,38 @@
     </div>
   </section>
 
-  <!-- Dynamic Call To Action Section -->
+  <!-- 9. Call To Action Section -->
   <section class="container py-5" id="cta-enroll">
-    <div class="cta-section text-center p-5 shadow-lg">
+    <div class="cta-section text-center p-5 shadow-lg border-0" style="background-color: #0F172A;">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <h2 class="display-6 fw-bold mb-3 font-display text-white">Secure Your Seat at Abuja's Premier Tech Hub</h2>
-          <p class="lead mb-4" style="opacity: 0.9;">
+          <h2 class="display-6 fw-bold mb-3 text-white">Ready to Start Your Tech Journey?</h2>
+          <p class="lead mb-4 text-white-50" style="font-size: 1.05rem;">
             Enrolling today guarantees interactive practical workstations, dedicated expert instructors, lifetime access to lesson downloads, and professional certification credentials upon graduation.
           </p>
           <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="student.html" class="btn btn-light btn-lg text-primary fw-bold font-display px-4" id="cta-portal-btn"><i class="bi bi-pencil-square me-2"></i> Register Student Account</a>
-            <a href="about.html#contact-section" class="btn btn-outline-light btn-lg font-display px-4" id="cta-contact-btn"><i class="bi bi-chat-text me-2"></i> Inquire Via WhatsApp</a>
+            <a href="student.html" class="btn btn-primary btn-lg px-4" style="background-color: #0D6EFD; border-color: #0D6EFD; font-weight: 600;"><i class="bi bi-pencil-square me-2"></i> Enroll Now</a>
+            <a href="about.html#contact-section" class="btn btn-outline-light btn-lg px-4" style="font-weight: 600;"><i class="bi bi-chat-text me-2"></i> Contact Us</a>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Complete Premium Footer -->
-  <footer class="footer-custom" id="main-footer">
-    <div class="container">
+  <!-- 10. Footer -->
+  <footer class="footer-custom" id="main-footer" style="background-color: #0F172A; border-top: 1px solid #1E293B;">
+    <div class="container py-5">
       <div class="row g-5">
-        <div class="col-lg-5 col-md-12 text-start">
+        <div class="col-lg-4 col-md-12 text-start">
           <div class="d-flex align-items-center mb-4">
-            <div class="me-2 text-primary" style="font-size: 2rem;"><i class="bi bi-cpu-fill"></i></div>
+            <img src="assets/images/logo.jpg" alt="EJaytech Concepts Logo" class="me-2" style="height: 48px; width: 48px; object-fit: contain; border-radius: 50%;">
             <div>
-              <h5 class="mb-0 fw-bold text-white font-display">EJaytech Concepts</h5>
-              <span class="small text-muted font-mono" style="font-size: 0.75rem;">INNOVATING IDEAS, DELIVERING SOLUTIONS</span>
+              <h5 class="mb-0 fw-bold text-white">EJaytech Concepts</h5>
+              <span class="small text-muted font-monospace" style="font-size: 0.68rem; display: block;">INNOVATE &bull; CREATE &bull; ELEVATE</span>
             </div>
           </div>
-          <p class="mb-4" style="font-size: 0.93rem; max-width: 400px;">
-            At EJaytech Concepts, we fuse professional technology configurations with world-class curriculum skills transfers to launch the next digital creators.
+          <p class="mb-4 text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+            We fuse professional technology software configurations, premium graphics branding schemes, and government-approved vocational course workflows to launch the next digital creators.
           </p>
           <div class="d-flex gap-3 text-white fs-5" id="social-handles">
             <a href="https://facebook.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
@@ -304,51 +572,59 @@
           </div>
         </div>
         
-        <div class="col-lg-3 col-md-6 text-start">
-          <h5 class="fw-bold font-display text-white mb-4">Functional Pages</h5>
-          <ul class="list-unstyled d-grid gap-2 text-start p-0">
-            <li><a href="index.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Home Entry</a></li>
-            <li><a href="about.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Who We Are (Contact)</a></li>
-            <li><a href="services.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Core Services</a></li>
-            <li><a href="courses.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Vocational Schedules</a></li>
-            <li><a href="student.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Student Portal</a></li>
+        <div class="col-lg-2 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Quick Links</h5>
+          <ul class="list-unstyled d-grid gap-2 p-0">
+            <li><a href="index.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Home</a></li>
+            <li><a href="about.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> About Us</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Services</a></li>
+            <li><a href="courses.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Courses</a></li>
           </ul>
         </div>
 
-        <div class="col-lg-4 col-md-6 text-start">
-          <h5 class="fw-bold font-display text-white mb-4">Physical Head Office</h5>
-          <ul class="list-unstyled d-grid gap-3 text-start p-0">
-            <li class="d-flex gap-3">
-              <i class="bi bi-geo-alt-fill text-primary mt-1"></i>
-              <span class="settings-address">04 Akande Oke Street, Eleweran, Abeokuta, Nigeria.</span>
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Services</h5>
+          <ul class="list-unstyled d-grid gap-2 p-0" style="font-size: 0.9rem;">
+            <li><a href="services.html" class="text-muted text-decoration-none">Software Development</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Web Development</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Cybersecurity Setups</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Network Engineering</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Contact Info</h5>
+          <ul class="list-unstyled d-grid gap-3 p-0" style="font-size: 0.9rem;">
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-geo-alt-fill text-primary"></i>
+              <span>EJaytech Concepts, Abuja, Nigeria.</span>
             </li>
-            <li class="d-flex gap-3">
-              <i class="bi bi-telephone-fill text-primary mt-1"></i>
-              <a href="tel:07033719342" class="text-white text-decoration-none settings-phone">+234 (0) 703 371 9342</a>
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-telephone-fill text-primary"></i>
+              <a href="tel:+2347033719342" class="text-muted text-decoration-none">+2347033719342</a>
             </li>
-            <li class="d-flex gap-3">
-              <i class="bi bi-envelope-fill text-primary mt-1"></i>
-              <a href="mailto:ejaytechconcepts@gmail.com" class="text-white text-decoration-none settings-email">ejaytechconcepts@gmail.com</a>
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-envelope-fill text-primary"></i>
+              <a href="mailto:ejaytechconcepts@gmail.com" class="text-muted text-decoration-none">ejaytechconcepts@gmail.com</a>
             </li>
           </ul>
         </div>
       </div>
       
       <div class="border-top border-secondary mt-5 pt-4 text-center">
-        <p class="mb-0 small" style="opacity: 0.7;">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved. Designed for Static &amp; GitHub Pages Deployments.</p>
+        <p class="mb-0 small text-muted">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- App Custom Logic Modules -->
-  <script type="module" src="js/firebase-config.js" id="fb-config-script"></script>
-  <script type="module" src="auth.js" id="auth-script"></script>
-  
+  <!-- Back-to-top button -->
+  <button type="button" class="btn-back-to-top" id="btn-back-to-top" aria-label="Back to top">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <script>
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  </script>
+  <!-- Custom JS -->
+  <script src="assets/js/main.js"></script>
 </body>
 </html>

@@ -3,89 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Portal - EJaytech Concepts</title>
+  <title>Student Login - EJaytech Concepts</title>
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
-  <!-- Custom Academic Theme Stylesheet -->
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/responsive.css" rel="stylesheet">
-  <script type="module" src="js/app.js"></script>
-  <style>
-    :root {
-      --student-blue-primary: #1e40af;
-      --student-blue-light: #eff6ff;
-      --student-blue-hover: #1d4ed8;
-      --student-text-dark: #1e293b;
-    }
-    body {
-      background-color: #f8fafc;
-      font-family: 'Inter', sans-serif;
-      color: var(--student-text-dark);
-    }
-    .student-navbar {
-      background-color: #ffffff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .btn-academic {
-      background-color: var(--student-blue-primary);
-      color: #ffffff;
-      font-weight: 500;
-      border: none;
-      transition: all 0.2s ease-in-out;
-    }
-    .btn-academic:hover, .btn-academic:focus {
-      background-color: var(--student-blue-hover);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
-    }
-    .portal-card-academic {
-      background-color: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    }
-    .nav-pills-academic .nav-link {
-      color: #64748b;
-      font-weight: 500;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-    }
-    .nav-pills-academic .nav-link.active {
-      background-color: var(--student-blue-primary);
-      color: #ffffff;
-    }
-    .footer-academic {
-      background-color: #0f172a;
-      color: #94a3b8;
-      border-top: 1px solid #1e293b;
-    }
-    .footer-academic a {
-      color: #94a3b8;
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-    .footer-academic a:hover {
-      color: #ffffff;
-    }
-    .form-control:focus {
-      border-color: var(--student-blue-primary);
-      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
-    }
-  </style>
+  <!-- Custom CSS -->
+  <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
 
   <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg student-navbar sticky-top py-3">
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="index.html">
-        <div class="me-2" style="font-size: 1.8rem; color: var(--student-blue-primary);"><i class="bi bi-mortarboard-fill"></i></div>
+      <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
+        <img src="assets/images/logo.jpg" alt="EJaytech Concepts Logo" class="me-2" style="height: 48px; width: 48px; object-fit: contain; border-radius: 50%;">
         <div>
-          <span class="fw-bold" style="letter-spacing: -0.5px; color: #0f172a;">EJaytech Student Portal</span>
-          <span class="small d-block text-muted" style="font-size: 0.75rem;">Abuja Digital Vocational Hub</span>
+          <span class="brand-logo fs-4 text-dark fw-bold">EJaytech Concepts</span>
+          <span class="brand-tagline text-muted font-monospace" style="font-size: 0.68rem; display: block; letter-spacing: 0.05em; text-transform: uppercase;">Innovate &bull; Create &bull; Elevate</span>
         </div>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,343 +32,312 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
-          <li class="nav-item"><a class="nav-link text-dark" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link text-dark" href="about.html">About Us</a></li>
-          <li class="nav-item"><a class="nav-link text-dark" href="services.html">Services</a></li>
-          <li class="nav-item"><a class="nav-link text-dark" href="courses.html">Courses</a></li>
-          <li class="nav-item">
-            <a class="btn btn-academic ms-lg-2 px-4 rounded-pill" href="student.html"><i class="bi bi-person-fill me-1"></i> Student Login</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="index.html" id="link-home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html" id="link-about">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html" id="link-services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="courses.html" id="link-courses">Courses</a></li>
+          <li class="nav-item"><a class="nav-link active" href="student.html" id="link-student">Student Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin.html" id="link-admin">Admin Login</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Main Portal Layout -->
-  <main class="container py-5 my-3" style="min-height: 70vh;">
-    <div class="row justify-content-center">
-      <div class="col-lg-8 col-xl-7">
-        
-        <!-- Welcome Card Wrapper -->
-        <div class="portal-card-academic p-4 p-md-5">
-          <div class="text-center mb-4">
-            <div class="text-primary fs-1 mb-2" style="color: var(--student-blue-primary) !important;"><i class="bi bi-person-badge"></i></div>
-            <h2 class="fw-bold text-dark">Welcome to your Gateway</h2>
-            <p class="text-muted small">Login to access courses materials or register a new student account below.</p>
-          </div>
-
-          <!-- Tabs Pills Controls -->
-          <ul class="nav nav-pills nav-pills-academic justify-content-center mb-4 gap-2" id="portalTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active px-4 py-2" id="login-tab-btn" data-bs-toggle="pill" data-bs-target="#login-panel" type="button" role="tab" aria-selected="true"><i class="bi bi-shield-lock me-1"></i> Student Login</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link px-4 py-2" id="register-tab-btn" data-bs-toggle="pill" data-bs-target="#register-panel" type="button" role="tab" aria-selected="false"><i class="bi bi-pencil-square me-1"></i> Student Registration</button>
-            </li>
-          </ul>
-
-          <!-- Global Dynamic Helpers Alerts -->
-          <div class="alert alert-danger d-none" id="portal-error-alert" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="portal-err-msg">An error occurred. Please try again.</span>
-          </div>
-          <div class="alert alert-success d-none" id="portal-success-alert" role="alert">
-            <i class="bi bi-patch-check-fill me-2"></i> <span id="portal-success-msg">Action processed successfully.</span>
-          </div>
-
-          <!-- Content Panels -->
-          <div class="tab-content" id="portalTabsContent">
-            
-            <!-- 1. ACCOUNT LOGIN PANEL -->
-            <div class="tab-pane fade show active" id="login-panel" role="tabpanel" aria-labelledby="login-tab-btn">
-              <form id="login-form">
-                <div class="mb-3">
-                  <label for="login-email" class="form-label">Email Address</label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-white text-muted"><i class="bi bi-envelope"></i></span>
-                    <input type="email" class="form-control" id="login-email" required placeholder="student@example.com">
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <label for="login-password" class="form-label">Password</label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-white text-muted"><i class="bi bi-key"></i></span>
-                    <input type="password" class="form-control" id="login-password" required placeholder="Enter password">
-                  </div>
-                </div>
-                
-                <div class="text-end mb-4 small">
-                  <a href="#" class="text-primary text-decoration-none" id="forgot-password-link">Forgot Password?</a>
-                </div>
-
-                <div class="text-end">
-                  <button type="submit" class="btn btn-academic w-100 py-2.5 rounded-3" id="login-submit-btn"><i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway</button>
-                </div>
-              </form>
+  <!-- Main Student Gateway Section -->
+  <section class="py-5 bg-light" id="student-gateway">
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+          <div class="card-premium p-4 p-md-5 bg-white text-center">
+            <div class="mb-4">
+              <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                <i class="bi bi-mortarboard" style="font-size: 1.8rem;"></i>
+              </div>
+              <h2 class="fw-bold font-display text-dark">Student Portal</h2>
+              <p class="text-muted small">Sign in to access your virtual workstations, learning paths, and course materials.</p>
             </div>
 
-            <!-- 2. STUDENT REGISTRATION PANEL -->
-            <div class="tab-pane fade" id="register-panel" role="tabpanel" aria-labelledby="register-tab-btn">
-              <form id="register-form">
-                <div class="row g-3">
-                  <!-- Name -->
-                  <div class="col-md-6">
-                    <label for="reg-fullname" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="reg-fullname" required placeholder="John Chukwudi Bello">
-                  </div>
-                  <!-- Email -->
-                  <div class="col-md-6">
-                    <label for="reg-email" class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="reg-email" required placeholder="john@example.com">
-                  </div>
-                  <!-- Phone -->
-                  <div class="col-md-6">
-                    <label for="reg-phone" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="reg-phone" required placeholder="e.g. +234 80 1234 5678">
-                  </div>
-                  <!-- Gender -->
-                  <div class="col-md-6">
-                    <label for="reg-gender" class="form-label">Gender Selection</label>
-                    <select class="form-select" id="reg-gender" required>
-                      <option value="" disabled selected>Choose gender...</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other / Private</option>
-                    </select>
-                  </div>
-                  <!-- Dob -->
-                  <div class="col-md-6">
-                    <label for="reg-dob" class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control" id="reg-dob" required>
-                  </div>
-                  <!-- State of origin -->
-                  <div class="col-md-6">
-                    <label for="reg-state" class="form-label">State of Origin</label>
-                    <input type="text" class="form-control" id="reg-state" required placeholder="e.g. FCT Abuja, Oyo, Kano">
-                  </div>
-                  <!-- Course Selecting Dynamic -->
-                  <div class="col-md-12">
-                    <label for="reg-course" class="form-label">Select Learning Course Track</label>
-                    <select class="form-select text-dark" id="reg-course" required>
-                      <option value="" disabled selected>Choose the vocational track...</option>
-                      <option value="Frontend Web Development">Frontend Web Development (₦120,000 / 12 Weeks)</option>
-                      <option value="Graphic Design">Graphic Design (Canva Pro + Photoshop) (₦80,000 / 8 Weeks)</option>
-                      <option value="UI/UX Design">UI/UX Figma Design Prototyping (₦100,000 / 10 Weeks)</option>
-                      <option value="Digital Skills & Freelancing">Digital Skills &amp; Gigs Freelancing (₦60,000 / 6 Weeks)</option>
-                    </select>
-                  </div>
-                  <!-- Address -->
-                  <div class="col-md-12">
-                    <label for="reg-address" class="form-label">Residential Address</label>
-                    <textarea class="form-control" id="reg-address" rows="2" required placeholder="Enter primary contact or residential home details..."></textarea>
-                  </div>
-                  <!-- Choice of Password -->
-                  <div class="col-md-12">
-                    <label for="reg-password" class="form-label">Create Login Password</label>
+            <!-- Tab Toggles -->
+            <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-3" id="studentTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active py-2 font-display" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-content" type="button" role="tab" aria-controls="login-content" aria-selected="true">
+                  <i class="bi bi-shield-lock me-1"></i> Sign In
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link py-2 font-display" id="register-tab" data-bs-toggle="pill" data-bs-target="#register-content" type="button" role="tab" aria-controls="register-content" aria-selected="false">
+                  <i class="bi bi-pencil-square me-1"></i> Register
+                </button>
+              </li>
+            </ul>
+
+            <!-- Tab Contents -->
+            <div class="tab-content text-start" id="studentTabsContent">
+              <!-- Sign In Tab -->
+              <div class="tab-pane fade show active" id="login-content" role="tabpanel" aria-labelledby="login-tab">
+                <form id="student-login-form">
+                  <div class="mb-3">
+                    <label for="login-email" class="form-label font-display fw-semibold text-dark small">Email Address</label>
                     <div class="input-group">
-                      <span class="input-group-text bg-white text-muted"><i class="bi bi-key-fill"></i></span>
-                      <input type="password" class="form-control" id="reg-password" required minlength="6" placeholder="Choose secure password (min 6 characters)">
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                      <input type="email" class="form-control border-start-0" id="login-email" placeholder="name@domain.com" required>
                     </div>
                   </div>
-                </div>
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                      <label for="login-password" class="form-label font-display fw-semibold text-dark small">Password</label>
+                      <a href="#" id="forgot-password-link" class="small text-decoration-none text-primary fw-medium">Forgot?</a>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                      <input type="password" class="form-control border-start-0" id="login-password" placeholder="••••••••" required>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary-custom w-full mt-2 font-display py-2" id="login-submit-btn">
+                    <i class="bi bi-door-open me-2"></i> Access Portal
+                  </button>
+                </form>
+              </div>
 
-                <div class="mt-4 pt-3 border-top d-flex gap-2 flex-wrap align-items-center justify-content-between">
-                  <span class="small text-muted mb-0">Initial status is listed as <span class="badge bg-warning text-dark">Pending Review</span></span>
-                  <button type="submit" class="btn btn-academic px-4 py-2 rounded-3" id="reg-submit-btn"><i class="bi bi-person-fill-add me-1"></i> Register Student Account</button>
-                </div>
-              </form>
+              <!-- Register Tab -->
+              <div class="tab-pane fade" id="register-content" role="tabpanel" aria-labelledby="register-tab">
+                <form id="student-register-form">
+                  <div class="mb-3">
+                    <label for="reg-name" class="form-label font-display fw-semibold text-dark small">Full Name</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
+                      <input type="text" class="form-control border-start-0" id="reg-name" placeholder="John Doe" required>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="reg-email" class="form-label font-display fw-semibold text-dark small">Email Address</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                      <input type="email" class="form-control border-start-0" id="reg-email" placeholder="name@domain.com" required>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="reg-course" class="form-label font-display fw-semibold text-dark small">Course Track Selection</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-laptop text-muted"></i></span>
+                      <select class="form-select border-start-0" id="reg-course" required>
+                        <option value="" disabled selected>Select your vocational pathway...</option>
+                        <option value="Full-Stack Software Engineering">Full-Stack Software Engineering (6 Months)</option>
+                        <option value="Graphics Design & Branding">Graphics Design & Branding (3 Months)</option>
+                        <option value="Data Analytics & Visualization">Data Analytics & Visualization (4 Months)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="reg-password" class="form-label font-display fw-semibold text-dark small">Password (Min. 6 Characters)</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                      <input type="password" class="form-control border-start-0" id="reg-password" placeholder="••••••••" minlength="6" required>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary-custom w-full mt-2 font-display py-2" id="reg-submit-btn">
+                    <i class="bi bi-person-plus me-2"></i> Register Account
+                  </button>
+                </form>
+              </div>
             </div>
 
+            <!-- Client-side notification alert framework (Phase 1 placeholders) -->
+            <div id="portal-alert-success" class="alert alert-success d-none mt-4 text-start small border-0 shadow-sm" role="alert">
+              <div class="d-flex">
+                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-1 alert-title font-display">Action Successful</h6>
+                  <p class="mb-0 alert-message">Thank you! Your submission was recorded successfully. Portal logic is enabled for Phase 1 testing.</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="portal-alert-error" class="alert alert-danger d-none mt-4 text-start small border-0 shadow-sm" role="alert">
+              <div class="d-flex">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-1 alert-error-title font-display">An Error Occurred</h6>
+                  <p class="mb-0 alert-error-message">Unable to process your request. Please verify details and retry.</p>
+                </div>
+              </div>
+            </div>
+            
           </div>
         </div>
-
       </div>
     </div>
-  </main>
+  </section>
 
-  <!-- Professional Footer with Admin Gateway Portal Link -->
-  <footer class="footer-academic py-5 mt-auto">
-    <div class="container text-center text-md-start">
-      <div class="row g-4">
-        <div class="col-md-6">
-          <h5 class="text-white fw-bold mb-3"><i class="bi bi-mortarboard-fill text-primary me-2"></i>EJaytech Concepts</h5>
-          <p class="small text-muted" style="max-width: 400px;">
-            Enabling vocational excellence, modern visual branding patterns, and certified coding pathways in Garki, Abuja.
+  <!-- Complete Premium Footer -->
+  <footer class="footer-custom" id="main-footer" style="background-color: #0F172A; border-top: 1px solid #1E293B;">
+    <div class="container py-5">
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-12 text-start">
+          <div class="d-flex align-items-center mb-4">
+            <img src="assets/images/logo.jpg" alt="EJaytech Concepts Logo" class="me-2" style="height: 48px; width: 48px; object-fit: contain; border-radius: 50%;">
+            <div>
+              <h5 class="mb-0 fw-bold text-white">EJaytech Concepts</h5>
+              <span class="small text-muted font-monospace" style="font-size: 0.68rem; display: block;">INNOVATE &bull; CREATE &bull; ELEVATE</span>
+            </div>
+          </div>
+          <p class="mb-4 text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+            We fuse professional technology software configurations, premium graphics branding schemes, and government-approved vocational course workflows to launch the next digital creators.
           </p>
+          <div class="d-flex gap-3 text-white fs-5" id="social-handles">
+            <a href="https://facebook.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="https://x.com/ejaytech_c" target="_blank" class="text-muted hover-whiteLink" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://linkedin.com/company/ejaytech-concepts" target="_blank" class="text-muted hover-whiteLink" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="https://instagram.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
         </div>
-        <div class="col-md-3">
-          <h6 class="text-white fw-semibold mb-3">Links</h6>
-          <ul class="list-unstyled p-0">
-            <li><a href="index.html" class="small">Home</a></li>
-            <li><a href="about.html" class="small">About us</a></li>
-            <li><a href="courses.html" class="small">Syllabi Catalog</a></li>
+        
+        <div class="col-lg-2 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Quick Links</h5>
+          <ul class="list-unstyled d-grid gap-2 p-0">
+            <li><a href="index.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Home</a></li>
+            <li><a href="about.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> About Us</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Services</a></li>
+            <li><a href="courses.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Courses</a></li>
           </ul>
         </div>
-        <div class="col-md-3 text-md-end">
-          <h6 class="text-white fw-semibold mb-3">Staff</h6>
-          <ul class="list-unstyled p-0">
-            <!-- Small, professional footer link to Admin Portal as required by Requirement 3 -->
-            <li><a href="admin.html" class="small text-decoration-none text-muted hover-link"><i class="bi bi-shield-lock-fill me-1"></i> Staff Portal</a></li>
+
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Services</h5>
+          <ul class="list-unstyled d-grid gap-2 p-0" style="font-size: 0.9rem;">
+            <li><a href="services.html" class="text-muted text-decoration-none">Software Development</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Web Development</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Cybersecurity Setups</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Network Engineering</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Contact Info</h5>
+          <ul class="list-unstyled d-grid gap-3 p-0" style="font-size: 0.9rem;">
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-geo-alt-fill text-primary"></i>
+              <span>EJaytech Concepts, Abuja, Nigeria.</span>
+            </li>
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-telephone-fill text-primary"></i>
+              <a href="tel:+2347033719342" class="text-muted text-decoration-none">+2347033719342</a>
+            </li>
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-envelope-fill text-primary"></i>
+              <a href="mailto:ejaytechconcepts@gmail.com" class="text-muted text-decoration-none">ejaytechconcepts@gmail.com</a>
+            </li>
           </ul>
         </div>
       </div>
-      <div class="border-top border-secondary mt-4 pt-3 text-center small text-muted">
-        &copy; <span id="current-year">2026</span> EJaytech Concepts. All rights reserved.
+      
+      <div class="border-top border-secondary mt-5 pt-4 text-center">
+        <p class="mb-0 small text-muted">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- App Custom Logic Modules -->
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/student-auth.js"></script>
+  <!-- Back-to-top button -->
+  <button type="button" class="btn-back-to-top" id="btn-back-to-top" aria-label="Back to top">
+    <i class="bi bi-arrow-up"></i>
+  </button>
 
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="assets/js/main.js"></script>
 
   <script type="module">
-    import { loginStudentAccount, registerStudentAccount, resetStudentPassword } from "./js/student-auth.js";
-    import { auth } from "./js/firebase-config.js";
-
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-
-    // Reset register form when switching away from register tab
-    const registerTabBtn = document.getElementById('register-tab-btn');
-    if (registerTabBtn) {
-      registerTabBtn.addEventListener('hide.bs.tab', () => {
-        document.getElementById("register-form").reset();
-      });
-    }
-
-    // Check if user has ?apply= in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const applyCourse = urlParams.get('apply');
-    if (applyCourse) {
-      console.log(`Auto focusing registration form for selected course: ${applyCourse}`);
-      const registerTab = new bootstrap.Tab(document.getElementById('register-tab-btn'));
-      registerTab.show();
-      
-      const courseDropdown = document.getElementById('reg-course');
-      for (let i = 0; i < courseDropdown.options.length; i++) {
-        if (courseDropdown.options[i].value === applyCourse || courseDropdown.options[i].text.includes(applyCourse)) {
-          courseDropdown.selectedIndex = i;
-          break;
+    // Handle parsing the apply query param to auto-select course
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const applyCourse = urlParams.get('apply');
+      if (applyCourse) {
+        // Toggle to register tab
+        const registerTabBtn = document.getElementById('register-tab');
+        if (registerTabBtn) {
+          const tab = new bootstrap.Tab(registerTabBtn);
+          tab.show();
+        }
+        // Auto select dropdown
+        const courseDropdown = document.getElementById('reg-course');
+        if (courseDropdown) {
+          for (let i = 0; i < courseDropdown.options.length; i++) {
+            if (courseDropdown.options[i].value === applyCourse || courseDropdown.options[i].text.includes(applyCourse)) {
+              courseDropdown.selectedIndex = i;
+              break;
+            }
+          }
         }
       }
-    }
-
-    // Auto router if user is active already
-    auth.onAuthStateChanged(async (user) => {
-      const isStudentSession = sessionStorage.getItem("student_logged_in") === "true";
-      if (user && isStudentSession) {
-        window.location.href = "student-dashboard.html";
-      }
     });
 
-    const errorAlert = document.getElementById("portal-error-alert");
-    const successAlert = document.getElementById("portal-success-alert");
-    const errMsg = document.getElementById("portal-err-msg");
-    const successMsg = document.getElementById("portal-success-msg");
+    // Form Handlers (Local Simulation for Phase 1)
+    const successAlert = document.getElementById("portal-alert-success");
+    const errorAlert = document.getElementById("portal-alert-error");
 
-    function displayError(txt) {
-      successAlert.classList.add("d-none");
-      errorAlert.classList.remove("d-none");
-      errMsg.textContent = txt;
-      window.scrollTo(0, 0);
+    function displayNotification(isSuccess, title, message) {
+      if (isSuccess) {
+        successAlert.querySelector(".alert-title").textContent = title;
+        successAlert.querySelector(".alert-message").textContent = message;
+        successAlert.classList.remove("d-none");
+        errorAlert.classList.add("d-none");
+        setTimeout(() => successAlert.classList.add("d-none"), 6000);
+      } else {
+        errorAlert.querySelector(".alert-error-title").textContent = title;
+        errorAlert.querySelector(".alert-error-message").textContent = message;
+        errorAlert.classList.remove("d-none");
+        successAlert.classList.add("d-none");
+        setTimeout(() => errorAlert.classList.add("d-none"), 6000);
+      }
     }
 
-    function displaySuccess(txt) {
-      errorAlert.classList.add("d-none");
-      successAlert.classList.remove("d-none");
-      successMsg.textContent = txt;
-      window.scrollTo(0, 0);
-    }
-
-    // Login Submission
-    document.getElementById("login-form").addEventListener("submit", async (e) => {
+    // Login Form Handler
+    document.getElementById("student-login-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("login-email").value;
-      const pass = document.getElementById("login-password").value;
       const btn = document.getElementById("login-submit-btn");
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
 
-      try {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Authenticating...';
-        
-        const result = await loginStudentAccount(email, pass);
-        displaySuccess("Access granted! Entering classroom dashboard...");
-        
-        setTimeout(() => {
-          window.location.href = "student-dashboard.html";
-        }, 1200);
-
-      } catch (err) {
-        console.error(err);
+      setTimeout(() => {
         btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Log In Gateway';
-        displayError(err.message || "Invalid credentials. Please verify and try again.");
-      }
+        btn.innerHTML = '<i class="bi bi-door-open me-2"></i> Access Portal';
+        
+        displayNotification(true, "Login Simulated", `Successfully processed login request for ${email}. Portal routing will be connected in Phase 2/3.`);
+        document.getElementById("student-login-form").reset();
+      }, 1200);
     });
 
-    // Registration Submission
-    document.getElementById("register-form").addEventListener("submit", async (e) => {
+    // Register Form Handler
+    document.getElementById("student-register-form").addEventListener("submit", (e) => {
       e.preventDefault();
-      const fullname = document.getElementById("reg-fullname").value;
-      const email = document.getElementById("reg-email").value;
-      const phone = document.getElementById("reg-phone").value;
-      const gender = document.getElementById("reg-gender").value;
-      const dob = document.getElementById("reg-dob").value;
-      const state = document.getElementById("reg-state").value;
+      const name = document.getElementById("reg-name").value;
       const course = document.getElementById("reg-course").value;
-      const address = document.getElementById("reg-address").value;
-      const password = document.getElementById("reg-password").value;
       const btn = document.getElementById("reg-submit-btn");
 
-      try {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing registration...';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing registration...';
 
-        const record = await registerStudentAccount({
-          fullname, email, phone, gender, dob, state, address, course, password
-        });
-
-        displaySuccess(`Registration complete under student code ID: ${record.studentId}! Your profile is pending administrative approval. Redirecting...`);
-        document.getElementById("register-form").reset();
-
-        setTimeout(() => {
-          window.location.href = "student-dashboard.html";
-        }, 2500);
-
-      } catch (err) {
-        console.error(err);
+      setTimeout(() => {
         btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-person-fill-add me-1"></i> Register Student Account';
-        
-        if (err.code === "auth/email-already-in-use" || (err.message && err.message.includes("already registered"))) {
-          displayError("An account with this email already exists. Please log in instead.");
-          setTimeout(() => {
-            const loginTab = new bootstrap.Tab(document.getElementById('login-tab-btn'));
-            loginTab.show();
-            document.getElementById("login-email").value = email;
-          }, 2000);
-        } else {
-          displayError(err.message || "Registration failed. Ensure password length is 6+ or email is unique.");
-        }
-      }
+        btn.innerHTML = '<i class="bi bi-person-plus me-2"></i> Register Account';
+
+        displayNotification(true, "Registration Simulated", `Welcome ${name}! Your registration interest for "${course}" has been locally recorded. Active database systems will deploy in subsequent phases.`);
+        document.getElementById("student-register-form").reset();
+      }, 1500);
     });
 
-    // Forgot password link
-    document.getElementById("forgot-password-link").addEventListener("click", async (e) => {
+    // Forgot Password Link Handler
+    document.getElementById("forgot-password-link").addEventListener("click", (e) => {
       e.preventDefault();
-      const email = document.getElementById("login-email").value;
-      if (!email) {
-        alert("Please enter your email address in the input field first.");
+      const emailInput = document.getElementById("login-email").value;
+      if (!emailInput) {
+        displayNotification(false, "Email Required", "Please type your email address into the Email field first, then click 'Forgot?'.");
         return;
       }
-      try {
-        await resetStudentPassword(email);
-        alert(`Password reset instructions have been dispatched to: ${email}`);
-      } catch (err) {
-        alert("Reset error: " + err.message);
-      }
+      displayNotification(true, "Reset Sent", `A password reset link has been simulated for ${emailInput}.`);
     });
   </script>
 </body>

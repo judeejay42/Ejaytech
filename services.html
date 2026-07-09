@@ -4,14 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Services - EJaytech Concepts</title>
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet" id="bootstrap-icons">
-  <!-- Custom Core CSS -->
-  <link href="css/style.css" rel="stylesheet" id="custom-style">
-  <link href="css/responsive.css" rel="stylesheet" id="custom-responsive">
-  <script type="module" src="js/app.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
 
@@ -19,10 +21,10 @@
   <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
-        <div class="me-2 text-primary" style="font-size: 1.8rem;"><i class="bi bi-cpu-fill"></i></div>
+        <img src="assets/images/logo.jpg" alt="EJaytech Concepts Logo" class="me-2" style="height: 48px; width: 48px; object-fit: contain; border-radius: 50%;">
         <div>
-          <span class="brand-logo">EJaytech Concepts</span>
-          <span class="brand-tagline">Innovating Ideas, Delivering Solutions</span>
+          <span class="brand-logo fs-4 text-dark fw-bold">EJaytech Concepts</span>
+          <span class="brand-tagline text-muted font-monospace" style="font-size: 0.68rem; display: block; letter-spacing: 0.05em; text-transform: uppercase;">Innovate &bull; Create &bull; Elevate</span>
         </div>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,11 +34,10 @@
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
           <li class="nav-item"><a class="nav-link" href="index.html" id="link-home">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="about.html" id="link-about">About Us</a></li>
-          <li class="nav-item"><a class="nav-link active" href="services.html" id="link-services">Our Services</a></li>
+          <li class="nav-item"><a class="nav-link active" href="services.html" id="link-services">Services</a></li>
           <li class="nav-item"><a class="nav-link" href="courses.html" id="link-courses">Courses</a></li>
-          <li class="nav-item">
-            <a class="btn btn-primary-custom ms-lg-2" href="student.html" id="nav-portal-btn"><i class="bi bi-door-open-fill me-1"></i> Student Portal</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="student.html" id="link-student">Student Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin.html" id="link-admin">Admin Login</a></li>
         </ul>
       </div>
     </div>
@@ -205,19 +206,19 @@
   </section>
 
   <!-- Complete Premium Footer -->
-  <footer class="footer-custom" id="main-footer">
-    <div class="container">
+  <footer class="footer-custom" id="main-footer" style="background-color: #0F172A; border-top: 1px solid #1E293B;">
+    <div class="container py-5">
       <div class="row g-5">
-        <div class="col-lg-5 col-md-12 text-start">
+        <div class="col-lg-4 col-md-12 text-start">
           <div class="d-flex align-items-center mb-4">
-            <div class="me-2 text-primary" style="font-size: 2rem;"><i class="bi bi-cpu-fill"></i></div>
+            <img src="assets/images/logo.jpg" alt="EJaytech Concepts Logo" class="me-2" style="height: 48px; width: 48px; object-fit: contain; border-radius: 50%;">
             <div>
-              <h5 class="mb-0 fw-bold text-white font-display">EJaytech Concepts</h5>
-              <span class="small text-muted font-mono" style="font-size: 0.75rem;">INNOVATING IDEAS, DELIVERING SOLUTIONS</span>
+              <h5 class="mb-0 fw-bold text-white">EJaytech Concepts</h5>
+              <span class="small text-muted font-monospace" style="font-size: 0.68rem; display: block;">INNOVATE &bull; CREATE &bull; ELEVATE</span>
             </div>
           </div>
-          <p class="mb-4" style="font-size: 0.93rem; max-width: 400px;">
-            At EJaytech Concepts, we fuse professional technology configurations with world-class curriculum skills transfers to launch the next digital creators.
+          <p class="mb-4 text-muted" style="font-size: 0.92rem; line-height: 1.6;">
+            We fuse professional technology software configurations, premium graphics branding schemes, and government-approved vocational course workflows to launch the next digital creators.
           </p>
           <div class="d-flex gap-3 text-white fs-5" id="social-handles">
             <a href="https://facebook.com/ejaytechconcepts" target="_blank" class="text-muted hover-whiteLink" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
@@ -227,51 +228,59 @@
           </div>
         </div>
         
-        <div class="col-lg-3 col-md-6 text-start">
-          <h5 class="fw-bold font-display text-white mb-4">Functional Pages</h5>
-          <ul class="list-unstyled d-grid gap-2 text-start p-0">
-            <li><a href="index.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Home Entry</a></li>
-            <li><a href="about.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Who We Are (Contact)</a></li>
-            <li><a href="services.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Core Services</a></li>
-            <li><a href="courses.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Vocational Schedules</a></li>
-            <li><a href="student.html" class="hover-whiteLink"><i class="bi bi-chevron-right small me-1"></i> Student Portal</a></li>
+        <div class="col-lg-2 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Quick Links</h5>
+          <ul class="list-unstyled d-grid gap-2 p-0">
+            <li><a href="index.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Home</a></li>
+            <li><a href="about.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> About Us</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Services</a></li>
+            <li><a href="courses.html" class="text-muted text-decoration-none"><i class="bi bi-chevron-right small me-1"></i> Courses</a></li>
           </ul>
         </div>
 
-        <div class="col-lg-4 col-md-6 text-start">
-          <h5 class="fw-bold font-display text-white mb-4">Physical Head Office</h5>
-          <ul class="list-unstyled d-grid gap-3 text-start p-0">
-            <li class="d-flex gap-3">
-              <i class="bi bi-geo-alt-fill text-primary mt-1"></i>
-              <span class="settings-address">04 Akande Oke Street, Eleweran, Abeokuta, Nigeria.</span>
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Services</h5>
+          <ul class="list-unstyled d-grid gap-2 p-0" style="font-size: 0.9rem;">
+            <li><a href="services.html" class="text-muted text-decoration-none">Software Development</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Web Development</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Cybersecurity Setups</a></li>
+            <li><a href="services.html" class="text-muted text-decoration-none">Network Engineering</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4" style="font-size: 1.1rem;">Contact Info</h5>
+          <ul class="list-unstyled d-grid gap-3 p-0" style="font-size: 0.9rem;">
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-geo-alt-fill text-primary"></i>
+              <span>EJaytech Concepts, Abuja, Nigeria.</span>
             </li>
-            <li class="d-flex gap-3">
-              <i class="bi bi-telephone-fill text-primary mt-1"></i>
-              <a href="tel:07033719342" class="text-white text-decoration-none settings-phone">+234 (0) 703 371 9342</a>
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-telephone-fill text-primary"></i>
+              <a href="tel:+2347033719342" class="text-muted text-decoration-none">+2347033719342</a>
             </li>
-            <li class="d-flex gap-3">
-              <i class="bi bi-envelope-fill text-primary mt-1"></i>
-              <a href="mailto:ejaytechconcepts@gmail.com" class="text-white text-decoration-none settings-email">ejaytechconcepts@gmail.com</a>
+            <li class="d-flex gap-2 text-muted">
+              <i class="bi bi-envelope-fill text-primary"></i>
+              <a href="mailto:ejaytechconcepts@gmail.com" class="text-muted text-decoration-none">ejaytechconcepts@gmail.com</a>
             </li>
           </ul>
         </div>
       </div>
       
       <div class="border-top border-secondary mt-5 pt-4 text-center">
-        <p class="mb-0 small" style="opacity: 0.7;">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved. Designed for Static &amp; GitHub Pages Deployments.</p>
+        <p class="mb-0 small text-muted">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- App Custom Logic Modules -->
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="auth.js"></script>
+  <!-- Back-to-top button -->
+  <button type="button" class="btn-back-to-top" id="btn-back-to-top" aria-label="Back to top">
+    <i class="bi bi-arrow-up"></i>
+  </button>
 
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script type="module">
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  </script>
+  <!-- Custom JS -->
+  <script src="assets/js/main.js"></script>
 </body>
 </html>
