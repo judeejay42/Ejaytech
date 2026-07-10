@@ -52,6 +52,21 @@ h1, h2, h3, h4, h5, h6, .font-display {
   transition: all 0.3s ease;
 }
 
+.navbar-custom .navbar-brand img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-custom .navbar-brand img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
 .navbar-brand .brand-logo {
   font-weight: 700;
   color: var(--color-primary);
