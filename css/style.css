@@ -419,3 +419,29 @@ form label {
 .img-zoom-hover:hover img {
   transform: scale(1.05);
 }
+
+/* Dedicated Logo Placeholder Styling */
+.site-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+
+.logo-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  transition: all 0.2s ease;
+}
+
+/* Specific small sizing for dashboard navbars/sidebars to ensure premium proportion */
+#admin-nav .logo-img,
+#dash-nav .logo-img {
+  width: 40px;
+  height: 40px;
+}
+
