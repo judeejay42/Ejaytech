@@ -22,11 +22,19 @@
     }
     
     .admin-sidebar {
-      width: var(--sidebar-width);
-      min-height: calc(100vh - 72px);
+      width: 100%;
+      min-height: auto;
       background-color: #1e293b;
       color: #f8fafc;
       transition: all 0.3s ease;
+    }
+    
+    @media (min-width: 992px) {
+      .admin-sidebar {
+        width: var(--sidebar-width);
+        min-height: calc(100vh - 72px);
+        flex-shrink: 0;
+      }
     }
 
     .stat-card {
