@@ -86,18 +86,49 @@ h1, h2, h3, h4, h5, h6, .font-display {
   transition: all 0.3s ease;
 }
 
-.navbar-custom .navbar-brand img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  border-radius: 50%;
+.navbar-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.navbar-custom .navbar-brand img,
+.navbar-logo-img,
+.brand-logo-img {
+  width: 56px !important;
+  height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  display: block !important;
+  margin: 0 !important;
+  transform: none !important;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
   transition: all 0.2s ease;
 }
 
 @media (max-width: 991.98px) {
-  .navbar-custom .navbar-brand img {
-    width: 40px !important;
-    height: 40px !important;
+  .navbar-custom .navbar-brand img,
+  .navbar-logo-img,
+  .brand-logo-img {
+    width: 50px !important;
+    height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .navbar-custom .navbar-brand img,
+  .navbar-logo-img,
+  .brand-logo-img {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
   }
 }
 
@@ -483,19 +514,20 @@ form label {
 
 /* Logo proper spacing, alignment and subtle glow */
 .footer-logo-img {
-  width: 52px;
-  height: 52px;
-  object-fit: contain;
-  border-radius: 50%;
+  width: 56px !important;
+  height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
   display: block;
   filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.45));
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: none !important;
   transition: all 0.3s ease;
 }
 
 .footer-logo-img:hover {
   filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.8));
-  transform: rotate(5deg) scale(1.05);
 }
 
 /* Circular social icons with glass background and hover effects */
