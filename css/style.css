@@ -512,7 +512,7 @@ form label {
   transform-origin: bottom left;
 }
 
-/* Logo proper spacing, alignment and subtle glow */
+/* Logo proper spacing and alignment */
 .footer-logo-img {
   width: 56px !important;
   height: 56px !important;
@@ -521,13 +521,7 @@ form label {
   object-fit: contain !important;
   border-radius: 0 !important;
   display: block;
-  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.45));
   border: none !important;
-  transition: all 0.3s ease;
-}
-
-.footer-logo-img:hover {
-  filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.8));
 }
 
 /* Circular social icons with glass background and hover effects */
@@ -774,10 +768,10 @@ form label {
 }
 
 .logo-img{
-    width:48px;
-    height:48px;
+    width:56px;
+    height:56px;
     object-fit:contain;
-    border-radius:50%;
+    border-radius:0;
     display:block;
 }
 
