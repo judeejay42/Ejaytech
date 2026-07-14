@@ -178,14 +178,15 @@
   <!-- Admin Nav Header -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-3 border-bottom border-secondary" id="admin-nav" style="background-color: #0f171c !important;">
     <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="index.html">
-        <img src="assets/images/logo-512.png"
+      <a class="navbar-brand d-flex align-items-center gap-2 flex-nowrap" href="index.html">
+        <img src="/assets/images/logo-512.png"
              alt="EJaytech Concepts Logo"
-             class="navbar-logo-img"
+             class="navbar-logo-img flex-shrink-0"
+             style="width: 44px; height: 44px; max-width: 44px; max-height: 44px; object-fit: contain;"
              referrerPolicy="no-referrer">
-        <div>
-          <span class="fw-bold text-white font-display">EJAYTECH CORE OPERATIONS</span>
-          <span class="small d-block text-muted" style="font-size: 0.72rem;">Central Administrative Registry Console</span>
+        <div class="brand-text-wrapper" style="min-width: 0;">
+          <span class="fw-bold text-white font-display d-block" style="font-size: calc(0.85rem + 0.25vw); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">EJAYTECH CORE OPERATIONS</span>
+          <span class="small d-block text-muted" style="font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Central Administrative Registry Console</span>
         </div>
       </a>
       <div class="d-flex align-items-center gap-3">
@@ -1159,10 +1160,7 @@
   <!-- Interactive Dashboard Administration Script Logic -->
   <script type="module">
     import { firebaseAuth, db } from "/js/firebase-config.js";
-    import { protectAdminDashboard, logoutAdmin } from "/js/admin-auth.js";
-
-    // Deep enforce administrative session verification
-    protectAdminDashboard();
+    import { logoutAdmin } from "/js/admin-auth.js";
 
     // Bind logout internationally to the Sign Out button
     window.logoutSession = logoutAdmin;
@@ -1207,28 +1205,117 @@
       });
     }
 
-    // Direct dashboard initialization with protective verification checks
-    (async function() {
-      const isLocalSession = sessionStorage.getItem("admin_logged_in") === "true";
-      if (!isLocalSession) {
+    // Flag to prevent multiple initialization runs
+    let isInitialized = false;
+
+    // Safety timeout to prevent infinite spinner
+    const authTimeout = setTimeout(() => {
+      if (!isInitialized) {
+        console.error("Administrative session authorization timed out.");
+        const loadingText = document.querySelector("#admin-loading-screen p");
+        if (loadingText) {
+          loadingText.innerHTML = `<span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Authorization Timeout.</span><br><span class="small text-muted">Verify your network connection and administrator status.</span><br><a href="admin.html" class="btn btn-outline-primary btn-sm mt-3"><i class="bi bi-box-arrow-in-right"></i> Return to Login</a>`;
+        }
+        const loadingSpinner = document.querySelector("#admin-loading-screen .spinner-border");
+        if (loadingSpinner) {
+          loadingSpinner.classList.add("d-none");
+        }
+      }
+    }, 10000); // generous 10 second timeout
+
+    // Subscribe to live Firebase auth state for deep verification before rendering
+    const authUnsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
+      if (user) {
+        console.log("Firebase Auth state resolved. User detected:", user.email);
+      } else {
+        console.log("Firebase Auth state resolved. No user detected.");
+      }
+
+      if (!user) {
+        console.warn("Unauthorized administrative session. Redirecting to login...");
+        sessionStorage.removeItem("admin_logged_in");
+        sessionStorage.removeItem("admin_uid");
+        clearTimeout(authTimeout);
+        authUnsubscribe();
         window.location.href = "admin.html";
         return;
       }
 
-      // Ensure loading state is reset
-      const loadingScreen = document.getElementById("admin-loading-screen");
-      const activeGrid = document.getElementById("active-admin-grid");
-      
-      if (loadingScreen) {
-        loadingScreen.classList.add("d-none");
-      }
-      if (activeGrid) {
-        activeGrid.classList.remove("d-none");
-      }
+      try {
+        console.log("Verifying administrator privileges for UID:", user.uid);
+        // Attempt to load administrative record with timeout
+        const adminDoc = await withTimeout(
+          db.collection("administrators").doc(user.uid).get(),
+          8000,
+          "Database check timed out."
+        );
 
-      // Set default sidebar text
-      document.getElementById("admin-sidebar-username").textContent = "Chief Director Admin";
-      document.getElementById("admin-sidebar-email").textContent = "admin@ejaytech-concepts.local";
+        if (!adminDoc.exists || adminDoc.data().role !== "admin" || adminDoc.data().active !== true) {
+          console.warn("Privilege check failed: Document not found or role/status invalid.");
+          clearTimeout(authTimeout);
+          authUnsubscribe();
+          await firebaseAuth.signOut();
+          sessionStorage.removeItem("admin_logged_in");
+          sessionStorage.removeItem("admin_uid");
+          window.location.href = "admin.html";
+          return;
+        }
+
+        console.log("Privilege verification passed.");
+        clearTimeout(authTimeout);
+        authUnsubscribe(); // Clean up observer to prevent duplicate trigger loops
+
+        if (isInitialized) return;
+        isInitialized = true;
+
+        // Hide loading screen and display dashboard grid
+        const loadingScreen = document.getElementById("admin-loading-screen");
+        const activeGrid = document.getElementById("active-admin-grid");
+        if (loadingScreen) {
+          loadingScreen.classList.add("d-none");
+        }
+        if (activeGrid) {
+          activeGrid.classList.remove("d-none");
+        }
+
+        // Initialize dashboard content and bind systems
+        await initializeDashboardData(user);
+
+      } catch (error) {
+        console.error("Administrative gate authorization check failed:", error);
+        
+        // Show helpful error message on loading container
+        const loadingText = document.querySelector("#admin-loading-screen p");
+        if (loadingText) {
+          loadingText.innerHTML = `<span class="text-danger fw-bold"><i class="bi bi-shield-slash-fill"></i> Access Authorization Failed.</span><br><span class="small text-muted">${error.message || "An unexpected error occurred during validation."}</span><br><a href="admin.html" class="btn btn-outline-danger btn-sm mt-3"><i class="bi bi-shield-lock-fill"></i> Back to Gateway</a>`;
+        }
+        const loadingSpinner = document.querySelector("#admin-loading-screen .spinner-border");
+        if (loadingSpinner) {
+          loadingSpinner.classList.add("d-none");
+        }
+
+        // If explicitly permission denied, sign out and clean local session
+        if (error.code === "permission-denied" || (error.message && error.message.includes("permission-denied"))) {
+          await firebaseAuth.signOut();
+          sessionStorage.removeItem("admin_logged_in");
+          sessionStorage.removeItem("admin_uid");
+          setTimeout(() => {
+            window.location.href = "admin.html";
+          }, 3500);
+        }
+      }
+    });
+
+    // Central dashboard initialization block
+    async function initializeDashboardData(user) {
+      // Map administrator display username & email in UI
+      const displayUsername = user.displayName || "Chief Executive Admin";
+      const displayEmail = user.email || "ejaytechadmin@gmail.com";
+      
+      const elUsername = document.getElementById("admin-sidebar-username");
+      const elEmail = document.getElementById("admin-sidebar-email");
+      if (elUsername) elUsername.textContent = displayUsername;
+      if (elEmail) elEmail.textContent = displayEmail;
 
       try {
         bootstrapEditModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
@@ -1249,11 +1336,12 @@
         console.error("Theme toggle error:", themeErr);
       }
 
+      // Fetch static system collections
       await refreshAllAdminDashboardData();
       await loadSettingsFormValues();
 
-      // Setup real-time snapshot listener on the users collection
-      console.log("Establishing real-time student snapshot listener...");
+      // Establish live student database stream
+      console.log("Establishing real-time student registry snapshot listener...");
       try {
         studentUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
           console.log("Real-time snapshot update triggered on 'users' collection.");
@@ -1300,7 +1388,7 @@
         studentsMasterList = [];
         updateUIWithFreshStudentData();
       }
-    })();
+    }
 
     // Retrieval functions for new collections
     async function getServicesList() {
