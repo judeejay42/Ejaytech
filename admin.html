@@ -318,36 +318,30 @@
       const rememberMe = document.getElementById("admin-remember").checked;
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating Command Core...';
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating with Firebase Auth...';
       successAlert.classList.add("d-none");
       errorAlert.classList.add("d-none");
 
       try {
-        // 1. Authenticate with the secure server-side endpoint first
-        const response = await fetch("/api/admin/authenticate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ email, password })
-        });
-
-        const authResult = await response.json();
-
-        if (!response.ok || !authResult.success) {
-          throw new Error(authResult.message || "Invalid administrator credentials.");
+        // Enforce admin-only email check before attempting auth if desired
+        if (email.toLowerCase() !== "ejaytechadmin@gmail.com") {
+          throw new Error("Access denied. Invalid administrator email.");
         }
 
-        // 2. Perform actual client-side Firebase Authentication
+        // Perform actual client-side Firebase Authentication
         let userCredential;
         try {
           userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password);
         } catch (fbError) {
           console.log("Firebase direct sign-in failed, checking auto-seed conditions:", fbError.code);
-          // If the user does not exist in Firebase Auth database yet (e.g., initial setup),
-          // securely auto-create the Firebase Auth user on first successful server authentication.
-          if (fbError.code === "auth/user-not-found" || fbError.code === "auth/invalid-credential" || fbError.code === "auth/cannot-find-user") {
-            userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
+          // If the admin user does not exist in Firebase Auth yet (e.g. first login on a fresh DB),
+          // securely auto-create the Firebase Auth user.
+          if (fbError.code === "auth/user-not-found" || fbError.code === "auth/invalid-credential" || fbError.code === "auth/cannot-find-user" || fbError.code === "auth/email-already-in-use") {
+            try {
+              userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
+            } catch (createError) {
+              throw fbError;
+            }
           } else {
             throw fbError;
           }

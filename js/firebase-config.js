@@ -1,6 +1,6 @@
 /**
  * EJaytech Concepts - Real Firebase Database & Authentication Layer
- * Connected to live Firebase project: ejaytech-de88d using Firebase Modular SDK
+ * Connected to live Firebase project: ejaytech-concepts using Firebase Modular SDK
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -40,13 +40,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyDo-pOH9qR6dd-kDBFikkr2ohpZKK7EzGc",
-  authDomain: "ejaytech-de88d.firebaseapp.com",
-  projectId: "ejaytech-de88d",
-  storageBucket: "ejaytech-de88d.firebasestorage.app",
-  messagingSenderId: "35030264525",
-  appId: "1:35030264525:web:bd020efd61b7c7f2935784",
-  measurementId: "G-VK8YT2BE53"
+  apiKey: "AIzaSyDQsHkDn_P4lyX5YnyTYKJGQumhIG6wESI",
+  authDomain: "ejaytech-concepts.firebaseapp.com",
+  projectId: "ejaytech-concepts",
+  storageBucket: "ejaytech-concepts.firebasestorage.app",
+  messagingSenderId: "802065299790",
+  appId: "1:802065299790:web:ea66d5ed63d3e1639e461f"
 };
 
 // Initialize Firebase App
