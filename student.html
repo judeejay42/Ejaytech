@@ -107,39 +107,92 @@
               <!-- Register Tab -->
               <div class="tab-pane fade" id="register-content" role="tabpanel" aria-labelledby="register-tab">
                 <form id="student-register-form">
-                  <div class="mb-3">
-                    <label for="reg-name" class="form-label font-display fw-semibold text-dark small">Full Name</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
-                      <input type="text" class="form-control border-start-0" id="reg-name" placeholder="John Doe" required>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-name" class="form-label font-display fw-semibold text-dark small">Full Name</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0" id="reg-name" placeholder="John Doe" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-email" class="form-label font-display fw-semibold text-dark small">Email Address</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                        <input type="email" class="form-control border-start-0" id="reg-email" placeholder="name@domain.com" required>
+                      </div>
                     </div>
                   </div>
-                  <div class="mb-3">
-                    <label for="reg-email" class="form-label font-display fw-semibold text-dark small">Email Address</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                      <input type="email" class="form-control border-start-0" id="reg-email" placeholder="name@domain.com" required>
+                  
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-phone" class="form-label font-display fw-semibold text-dark small">Phone Number</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-telephone text-muted"></i></span>
+                        <input type="tel" class="form-control border-start-0" id="reg-phone" placeholder="e.g. 08143210987" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-gender" class="form-label font-display fw-semibold text-dark small">Gender</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-gender-ambiguous text-muted"></i></span>
+                        <select class="form-select border-start-0" id="reg-gender" required>
+                          <option value="" disabled selected>Select gender...</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                  <div class="mb-3">
-                    <label for="reg-course" class="form-label font-display fw-semibold text-dark small">Course Track Selection</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-laptop text-muted"></i></span>
-                      <select class="form-select border-start-0" id="reg-course" required>
-                        <option value="" disabled selected>Select your vocational pathway...</option>
-                        <option value="Full-Stack Software Engineering">Full-Stack Software Engineering (6 Months)</option>
-                        <option value="Graphics Design & Branding">Graphics Design & Branding (3 Months)</option>
-                        <option value="Data Analytics & Visualization">Data Analytics & Visualization (4 Months)</option>
-                      </select>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-dob" class="form-label font-display fw-semibold text-dark small">Date of Birth</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-muted"></i></span>
+                        <input type="date" class="form-control border-start-0" id="reg-dob" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-state" class="form-label font-display fw-semibold text-dark small">State of Origin</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-geo text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0" id="reg-state" placeholder="e.g. Ogun" required>
+                      </div>
                     </div>
                   </div>
+
                   <div class="mb-3">
-                    <label for="reg-password" class="form-label font-display fw-semibold text-dark small">Password (Min. 6 Characters)</label>
+                    <label for="reg-address" class="form-label font-display fw-semibold text-dark small">Contact Address</label>
                     <div class="input-group">
-                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                      <input type="password" class="form-control border-start-0" id="reg-password" placeholder="••••••••" minlength="6" required>
+                      <span class="input-group-text bg-white border-end-0"><i class="bi bi-house text-muted"></i></span>
+                      <input type="text" class="form-control border-start-0" id="reg-address" placeholder="e.g. 12 Segun Osoba Way, Abeokuta" required>
                     </div>
                   </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-course" class="form-label font-display fw-semibold text-dark small">Course Track Selection</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-laptop text-muted"></i></span>
+                        <select class="form-select border-start-0" id="reg-course" required>
+                          <option value="" disabled selected>Select pathway...</option>
+                          <option value="Software Engineering">Software Engineering (6 Months)</option>
+                          <option value="Graphic Design">Graphic Design (3 Months)</option>
+                          <option value="Cybersecurity Basics">Cybersecurity Basics (4 Months)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="reg-password" class="form-label font-display fw-semibold text-dark small">Password (Min. 6 Characters)</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                        <input type="password" class="form-control border-start-0" id="reg-password" placeholder="••••••••" minlength="6" required>
+                      </div>
+                    </div>
+                  </div>
+
                   <button type="submit" class="btn btn-primary-custom w-full mt-2 font-display py-2" id="reg-submit-btn">
                     <i class="bi bi-person-plus me-2"></i> Register Account
                   </button>
@@ -284,6 +337,8 @@
   <script src="js/main.js"></script>
 
   <script type="module">
+    import { db } from "./js/firebase-config.js";
+
     // Handle parsing the apply query param to auto-select course
     document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -347,22 +402,78 @@
     });
 
     // Register Form Handler
-    document.getElementById("student-register-form").addEventListener("submit", (e) => {
+    document.getElementById("student-register-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("reg-name").value;
+      const email = document.getElementById("reg-email").value;
+      const phone = document.getElementById("reg-phone").value;
+      const gender = document.getElementById("reg-gender").value;
+      const dob = document.getElementById("reg-dob").value;
+      const state = document.getElementById("reg-state").value;
+      const address = document.getElementById("reg-address").value;
       const course = document.getElementById("reg-course").value;
+      const password = document.getElementById("reg-password").value;
       const btn = document.getElementById("reg-submit-btn");
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing registration...';
 
-      setTimeout(() => {
+      try {
+        const year = new Date().getFullYear();
+        const randNum = Math.floor(1000 + Math.random() * 9000);
+        const studentId = `EJ-${year}-${randNum}`;
+        const uid = "stud-" + Date.now() + Math.floor(Math.random() * 100);
+
+        const studentRecord = {
+          uid: uid,
+          id: uid,
+          studentId: studentId,
+          fullname: name,
+          fullName: name,
+          email: email.toLowerCase().trim(),
+          phone: phone,
+          gender: gender,
+          dob: dob,
+          state: state,
+          address: address,
+          course: course,
+          role: "student",
+          status: "pending",
+          approvalStatus: "pending",
+          createdAt: new Date().toISOString(),
+          bio: "Enthusiastic EJaytech Concepts student.",
+          lastDocumentSubmitted: "",
+          workflow: {
+            submitted: true,
+            pendingReview: "pending",
+            documentVerification: "pending",
+            paymentVerification: "pending",
+            adminApproval: "pending",
+            studentActivated: false
+          },
+          documents: {
+            passportPhoto: { status: "pending", fileUrl: "assets/images/placeholder_profile.png", feedback: "" },
+            idCard: { status: "pending", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" },
+            certificates: { status: "pending", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" },
+            supportingDocuments: { status: "pending", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" }
+          },
+          paymentHistory: []
+        };
+
+        // Write directly to the Firestore collection 'students'
+        await db.collection("students").add(studentRecord);
+
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-person-plus me-2"></i> Register Account';
 
-        displayNotification(true, "Registration Simulated", `Welcome ${name}! Your registration interest for "${course}" has been locally recorded. Active database systems will deploy in subsequent phases.`);
+        displayNotification(true, "Registration Successful", `Welcome ${name}! Your registration for "${course}" was successfully recorded on Firestore. Assigned ID: ${studentId}`);
         document.getElementById("student-register-form").reset();
-      }, 1500);
+      } catch (err) {
+        console.error("[Firestore Student Registration Failure] Error logged to console for debugging:", err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-person-plus me-2"></i> Register Account';
+        displayNotification(false, "Firestore Save Failed", `Failed to save to Firestore: ${err.message}. Please check browser console logs.`);
+      }
     });
 
     // Forgot Password Link Handler

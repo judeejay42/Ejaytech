@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Records - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS variables -->
+  <style>
+    :root {
+      --primary-navy: #0f172a;
+      --accent-blue: #2563eb;
+      --hover-blue: #1d4ed8;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --sidebar-width: 280px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Dark Mode Theme */
+    body.dark-mode {
+      --bg-light: #0f172a;
+      --text-main: #f8fafc;
+      --border-color: #334155;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    body.dark-mode .card,
+    body.dark-mode .top-navbar,
+    body.dark-mode .modal-content,
+    body.dark-mode .form-select,
+    body.dark-mode .form-control {
+      background-color: #1e293b !important;
+      color: #f8fafc !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark-mode .table-light {
+      background-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark-mode .table th,
+    body.dark-mode .table td {
+      border-color: #334155 !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark-mode .input-group-text {
+      background-color: #334155 !important;
+      color: #f8fafc !important;
+      border-color: #334155 !important;
+    }
+
+    /* Elegant Sidebar */
+    .sidebar-panel {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--primary-navy);
+      color: #f8fafc;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #334155;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .sidebar-menu {
+      padding: 16px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: #cbd5e1;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background-color: #1e293b;
+      color: #f8fafc;
+    }
+
+    .menu-item.active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    /* Main Workspace Layout */
+    .main-workspace {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+
+    .top-navbar {
+      height: 70px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: justify;
+      padding: 0 30px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .content-body {
+      padding: 30px;
+    }
+
+    /* Table & Card Cosmetics */
+    .card {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background-color: #ffffff;
+      overflow: hidden;
+    }
+
+    .table th {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .table th:hover {
+      background-color: var(--border-color);
+    }
+
+    .table td {
+      font-size: 0.9rem;
+    }
+
+    .badge-status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Touch Friendly elements */
+    .btn, .form-select, .form-control {
+      touch-action: manipulation;
+      min-height: 40px;
+    }
+
+    /* Mobile Responsive styles */
+    @media (max-width: 991px) {
+      .sidebar-panel {
+        left: -280px;
+      }
+      .sidebar-panel.show {
+        left: 0;
+      }
+      .main-workspace {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR PANEL -->
+  <div class="sidebar-panel" id="admin-sidebar">
+    <div class="sidebar-header d-flex align-items-center gap-3">
+      <img src="assets/images/logo-512.png" alt="EJaytech Logo" style="width: 40px; height: 40px; object-fit: contain;">
+      <div>
+        <h6 class="mb-0 fw-bold text-white tracking-tight">EJaytech Core</h6>
+        <span class="small text-muted" style="font-size: 0.65rem;">Registry Portal v3.0</span>
+      </div>
+    </div>
+    <div class="sidebar-menu">
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=dashboard'"><i class="bi bi-grid-fill"></i> Dashboard</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=registrations'"><i class="bi bi-file-earmark-person-fill"></i> Registrations</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=students'"><i class="bi bi-people-fill"></i> Student Directory</button>
+      <button class="menu-item active" onclick="window.location.reload()"><i class="bi bi-database-fill"></i> Student Records</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=payments'"><i class="bi bi-cash-stack"></i> Payments Audit</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=courses'"><i class="bi bi-journal-bookmark-fill"></i> Courses Catalog</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=reports'"><i class="bi bi-bar-chart-line-fill"></i> Reports &amp; Stats</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=notifications'"><i class="bi bi-bell-fill"></i> Notifications</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=audit'"><i class="bi bi-shield-lock-fill"></i> Audit Logs</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=admins'"><i class="bi bi-person-workspace"></i> Admins (RBAC)</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=settings'"><i class="bi bi-sliders"></i> Settings</button>
+      <button class="menu-item" onclick="window.location.href='admin-dashboard.html?pane=profile'"><i class="bi bi-person-fill-gear"></i> Personal Profile</button>
+    </div>
+    <div class="p-3 border-top border-secondary mt-auto">
+      <div class="d-flex align-items-center justify-content-between px-2 mb-3">
+        <span class="small text-muted font-mono"><i class="bi bi-moon-stars"></i> Dark Console</span>
+        <div class="form-check form-switch mb-0">
+          <input class="form-check-input" type="checkbox" id="dark-theme-toggle" onchange="toggleTheme(this.checked)">
+        </div>
+      </div>
+      <button onclick="handleLogout()" class="btn btn-outline-danger w-full btn-sm py-2"><i class="bi bi-box-arrow-right me-2"></i> Close Session</button>
+    </div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="main-workspace">
+    <!-- TOP NAVBAR -->
+    <div class="top-navbar d-flex justify-content-between align-items-center w-100">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none" onclick="toggleMobileSidebar()"><i class="bi bi-list"></i></button>
+        <span class="fw-semibold text-muted d-none d-md-block" id="workspace-title">Console / Student Records Database</span>
+      </div>
+      
+      <div class="d-flex align-items-center gap-3">
+        <!-- Operator role indicator -->
+        <div class="d-flex align-items-center gap-2 border-end pe-3">
+          <span class="small text-muted fw-bold font-mono"><i class="bi bi-shield-fill text-primary"></i> Operator Role:</span>
+          <select class="form-select form-select-sm border-primary" id="rbac-role-selector" style="width: 180px; font-weight: 600;" onchange="handleRoleSwitch(this.value)">
+            <option value="Super Admin">Super Admin</option>
+            <option value="Administrator">Administrator</option>
+            <option value="Finance Officer">Finance Officer</option>
+            <option value="Admissions Officer">Admissions Officer</option>
+            <option value="Instructor">Instructor</option>
+          </select>
+        </div>
+        
+        <!-- Profile Identity Badge -->
+        <div class="d-flex align-items-center gap-2">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70" id="top-navbar-avatar" alt="Admin" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">
+          <div class="d-none d-sm-block">
+            <h6 class="mb-0 fw-bold" id="top-navbar-name" style="font-size: 0.85rem;">Chief Director Admin</h6>
+            <span class="text-success small d-block font-mono" style="font-size: 0.65rem;"><i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> Active Session</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN WORKSPACE CONTENT BODY -->
+    <div class="content-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h4 class="fw-bold mb-1">Administrative Student Records</h4>
+          <p class="text-muted small mb-0">Dynamic administrative lookup pane backed by real-time Firestore synchronization.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <span class="badge bg-primary d-flex align-items-center px-3" id="live-time-badge" style="font-size: 0.85rem;"><i class="bi bi-clock me-1"></i> Checked: live</span>
+        </div>
+      </div>
+
+      <!-- SEARCH & FILTERS PANEL -->
+      <div class="card p-4 mb-4 shadow-sm">
+        <div class="row g-3">
+          <!-- Search input -->
+          <div class="col-lg-4 col-md-6">
+            <label class="form-label small fw-semibold text-muted">Lookup Query</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" id="search-input" placeholder="Search by name, ID, email, phone..." oninput="handleFilterAndRender()">
+            </div>
+          </div>
+          
+          <!-- Course Filter -->
+          <div class="col-lg-2 col-md-6">
+            <label class="form-label small fw-semibold text-muted">Course Track</label>
+            <select class="form-select" id="course-filter" onchange="handleFilterAndRender()">
+              <option value="">All Courses</option>
+              <option value="Software Engineering">Software Engineering</option>
+              <option value="Graphic Design">Graphic Design</option>
+              <option value="Cybersecurity Basics">Cybersecurity Basics</option>
+            </select>
+          </div>
+
+          <!-- Registration Status Filter -->
+          <div class="col-lg-2 col-md-6">
+            <label class="form-label small fw-semibold text-muted">Dossier Status</label>
+            <select class="form-select" id="status-filter" onchange="handleFilterAndRender()">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+
+          <!-- Payment Status Filter -->
+          <div class="col-lg-2 col-md-6">
+            <label class="form-label small fw-semibold text-muted">Payment Verification</label>
+            <select class="form-select" id="payment-filter" onchange="handleFilterAndRender()">
+              <option value="">All Payment States</option>
+              <option value="paid">Paid (Approved)</option>
+              <option value="pending">Pending Audit</option>
+              <option value="failed">Failed / Unpaid</option>
+            </select>
+          </div>
+
+          <!-- Actions -->
+          <div class="col-lg-2 col-md-6 d-flex align-items-end">
+            <button onclick="exportToCSV()" class="btn btn-outline-success w-100 py-2"><i class="bi bi-download me-1"></i> Export CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT RECORDS DATA TABLE CARD -->
+      <div class="card shadow-sm overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th onclick="handleSort('studentId')">Student ID <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                <th onclick="handleSort('fullName')">Full Name <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                <th onclick="handleSort('email')">Contact Details <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                <th onclick="handleSort('course')">Selected Pathway <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                <th>Payment Status</th>
+                <th>Admission Status</th>
+                <th onclick="handleSort('createdAt')">Registration Date <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                <th class="text-end" style="min-width: 180px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="student-records-tbody">
+              <tr>
+                <td colspan="8" class="text-center py-5">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="text-muted mt-2 mb-0">Synchronizing records with Firestore live database...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW RECORD MODAL -->
+  <div class="modal fade" id="viewRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold"><i class="bi bi-person-badge-fill text-primary"></i> Complete Dossier Transcript</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="view-record-modal-body">
+          <!-- Populated dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Transcript</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT RECORD MODAL -->
+  <div class="modal fade" id="editRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square text-warning"></i> Adjust Dossier Coordinates</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="edit-record-form">
+          <div class="modal-body">
+            <input type="hidden" id="edit-student-uid">
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="edit-fullname" class="form-label fw-semibold small">Full Name</label>
+                <input type="text" class="form-control" id="edit-fullname" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="edit-email" class="form-label fw-semibold small">Email Address</label>
+                <input type="email" class="form-control" id="edit-email" required>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="edit-phone" class="form-label fw-semibold small">Phone Number</label>
+                <input type="tel" class="form-control" id="edit-phone" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="edit-gender" class="form-label fw-semibold small">Gender</label>
+                <select class="form-select" id="edit-gender" required>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="edit-dob" class="form-label fw-semibold small">Date of Birth</label>
+                <input type="date" class="form-control" id="edit-dob" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="edit-state" class="form-label fw-semibold small">State of Origin</label>
+                <input type="text" class="form-control" id="edit-state" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="edit-address" class="form-label fw-semibold small">Home Address</label>
+              <input type="text" class="form-control" id="edit-address" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="edit-course" class="form-label fw-semibold small">Course Pathway</label>
+              <select class="form-select" id="edit-course" required>
+                <option value="Software Engineering">Software Engineering (6 Months)</option>
+                <option value="Graphic Design">Graphic Design (3 Months)</option>
+                <option value="Cybersecurity Basics">Cybersecurity Basics (4 Months)</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Save Coordinates</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Firebase & Admin Core Scripts -->
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { logAdminActivity } from "./admin.js";
+
+    let activeRole = "Super Admin";
+    let originalRecords = [];
+    let displayedRecords = [];
+    
+    // Sort configuration
+    let currentSortColumn = "createdAt";
+    let currentSortDirection = "desc";
+
+    // Modals
+    let viewModal = null;
+    let editModal = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      viewModal = new bootstrap.Modal(document.getElementById("viewRecordModal"));
+      editModal = new bootstrap.Modal(document.getElementById("editRecordModal"));
+
+      // Set live date/time badge
+      const today = new Date();
+      document.getElementById("live-time-badge").innerHTML = `<i class="bi bi-clock me-1"></i> Checked: ${today.toISOString().split('T')[0]}`;
+
+      // Initialize theme preference from localStorage
+      if (localStorage.getItem("admin_dark_mode") === "true") {
+        document.getElementById("dark-theme-toggle").checked = true;
+        toggleTheme(true);
+      }
+
+      // Load active session role from session storage
+      const cachedRole = sessionStorage.getItem("admin_active_role");
+      if (cachedRole) {
+        activeRole = cachedRole;
+        document.getElementById("rbac-role-selector").value = activeRole;
+      }
+
+      // Real-time synchronization with Firestore collection 'students'
+      db.collection("students").onSnapshot((snapshot) => {
+        console.log("[Firestore Sync] student-records.html got real-time update snapshot of size:", snapshot.size);
+        originalRecords = [];
+        snapshot.docs.forEach(doc => {
+          originalRecords.push(doc.data());
+        });
+        
+        handleFilterAndRender();
+      });
+
+      // Bind edit form handler
+      document.getElementById("edit-record-form").addEventListener("submit", handleEditFormSubmit);
+
+      // Expose operations to window for HTML triggers
+      window.toggleTheme = toggleTheme;
+      window.handleLogout = handleLogout;
+      window.handleRoleSwitch = handleRoleSwitch;
+      window.toggleMobileSidebar = toggleMobileSidebar;
+      window.handleFilterAndRender = handleFilterAndRender;
+      window.handleSort = handleSort;
+      window.viewDossier = viewDossier;
+      window.editDossier = editDossier;
+      window.approveDossier = approveDossier;
+      window.rejectDossier = rejectDossier;
+      window.deleteDossier = deleteDossier;
+      window.exportToCSV = exportToCSV;
+    });
+
+    // Theme Switcher
+    function toggleTheme(enabled) {
+      if (enabled) {
+        document.body.classList.add("dark-mode");
+        localStorage.setItem("admin_dark_mode", "true");
+      } else {
+        document.body.classList.remove("dark-mode");
+        localStorage.setItem("admin_dark_mode", "false");
+      }
+    }
+
+    // Close administrator session
+    function handleLogout() {
+      if (confirm("Are you sure you want to end this administrator core session?")) {
+        sessionStorage.removeItem("admin_logged_in");
+        sessionStorage.removeItem("admin_uid");
+        window.location.href = "admin.html";
+      }
+    }
+
+    // Handle Switch of role
+    function handleRoleSwitch(role) {
+      activeRole = role;
+      sessionStorage.setItem("admin_active_role", role);
+      logAdminActivity("RBAC Role Shifted", `Administrator shifted active working permissions role to: ${role}.`);
+      handleFilterAndRender();
+    }
+
+    // Toggle Sidebar on Mobile
+    function toggleMobileSidebar() {
+      document.getElementById("admin-sidebar").classList.toggle("show");
+    }
+
+    // Filtering & Sorting Controller
+    function handleFilterAndRender() {
+      const query = document.getElementById("search-input").value.toLowerCase().trim();
+      const selectedCourse = document.getElementById("course-filter").value;
+      const selectedStatus = document.getElementById("status-filter").value;
+      const selectedPayment = document.getElementById("payment-filter").value;
+
+      // Apply Filters
+      let filtered = originalRecords.filter(student => {
+        // Search query filter (matches Full Name, Student ID, Email, Phone, Course)
+        const matchesQuery = !query || 
+          (student.fullName && student.fullName.toLowerCase().includes(query)) ||
+          (student.studentId && student.studentId.toLowerCase().includes(query)) ||
+          (student.email && student.email.toLowerCase().includes(query)) ||
+          (student.phone && student.phone.toLowerCase().includes(query)) ||
+          (student.course && student.course.toLowerCase().includes(query));
+
+        // Course filter
+        const matchesCourse = !selectedCourse || 
+          (student.course && student.course.toLowerCase().includes(selectedCourse.toLowerCase()));
+
+        // Status filter
+        const matchesStatus = !selectedStatus || 
+          (student.status && student.status.toLowerCase() === selectedStatus.toLowerCase());
+
+        // Payment filter
+        let matchesPayment = true;
+        if (selectedPayment) {
+          const payState = student.workflow && student.workflow.paymentVerification ? student.workflow.paymentVerification : "pending";
+          if (selectedPayment === "paid") {
+            matchesPayment = (payState === "approved");
+          } else if (selectedPayment === "pending") {
+            matchesPayment = (payState === "pending");
+          } else if (selectedPayment === "failed") {
+            matchesPayment = (payState === "rejected" || !payState);
+          }
+        }
+
+        return matchesQuery && matchesCourse && matchesStatus && matchesPayment;
+      });
+
+      // Apply Sorting
+      filtered.sort((a, b) => {
+        let valA = a[currentSortColumn] || "";
+        let valB = b[currentSortColumn] || "";
+
+        if (typeof valA === "string") valA = valA.toLowerCase();
+        if (typeof valB === "string") valB = valB.toLowerCase();
+
+        if (valA < valB) return currentSortDirection === "asc" ? -1 : 1;
+        if (valA > valB) return currentSortDirection === "asc" ? 1 : -1;
+        return 0;
+      });
+
+      displayedRecords = filtered;
+      renderTable();
+    }
+
+    // Render Table Rows
+    function renderTable() {
+      const tbody = document.getElementById("student-records-tbody");
+      tbody.innerHTML = "";
+
+      if (displayedRecords.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <i class="bi bi-inbox text-muted" style="font-size: 2.5rem;"></i>
+              <p class="text-muted mt-2 mb-0">No student records match the active criteria.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      displayedRecords.forEach(student => {
+        // Format dates
+        const regDate = student.createdAt ? new Date(student.createdAt).toLocaleDateString("en-US", {
+          year: 'numeric', month: 'short', day: 'numeric'
+        }) : "N/A";
+
+        // Payment Badge Styling
+        const payState = student.workflow && student.workflow.paymentVerification ? student.workflow.paymentVerification : "pending";
+        let paymentBadge = "";
+        if (payState === "approved") {
+          paymentBadge = `<span class="badge-status bg-success-subtle text-success"><i class="bi bi-check-circle-fill"></i> Paid</span>`;
+        } else if (payState === "pending") {
+          paymentBadge = `<span class="badge-status bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i> Audit Pending</span>`;
+        } else {
+          paymentBadge = `<span class="badge-status bg-danger-subtle text-danger"><i class="bi bi-x-circle-fill"></i> Unpaid</span>`;
+        }
+
+        // Admission Status Badge Styling
+        const status = student.status ? student.status.toLowerCase() : "pending";
+        let statusBadge = "";
+        if (status === "approved") {
+          statusBadge = `<span class="badge bg-success">Approved</span>`;
+        } else if (status === "rejected") {
+          statusBadge = `<span class="badge bg-danger">Rejected</span>`;
+        } else if (status === "suspended") {
+          statusBadge = `<span class="badge bg-secondary">Suspended</span>`;
+        } else {
+          statusBadge = `<span class="badge bg-warning text-dark">Pending Review</span>`;
+        }
+
+        tbody.innerHTML += `
+          <tr id="row-${student.uid}">
+            <td class="font-mono fw-bold text-primary">${student.studentId || "N/A"}</td>
+            <td>
+              <div class="fw-semibold text-dark dark-text-white">${student.fullName || student.fullname || "N/A"}</div>
+              <span class="text-muted small font-mono">${student.gender || "Gender unspecified"} • DOB: ${student.dob || "N/A"}</span>
+            </td>
+            <td>
+              <div class="small"><i class="bi bi-envelope me-1"></i> ${student.email || "N/A"}</div>
+              <div class="small text-muted"><i class="bi bi-telephone me-1"></i> ${student.phone || "N/A"}</div>
+            </td>
+            <td>
+              <span class="badge bg-secondary-subtle text-dark fw-medium" style="font-size: 0.8rem;">${student.course || "N/A"}</span>
+            </td>
+            <td>${paymentBadge}</td>
+            <td>${statusBadge}</td>
+            <td class="small font-mono text-muted">${regDate}</td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-1">
+                <button onclick="viewDossier('${student.uid}')" class="btn btn-sm btn-outline-primary" title="View Transcript"><i class="bi bi-eye"></i></button>
+                <button onclick="editDossier('${student.uid}')" class="btn btn-sm btn-outline-warning" title="Edit Record"><i class="bi bi-pencil"></i></button>
+                <button onclick="approveDossier('${student.uid}')" class="btn btn-sm btn-outline-success" title="Approve Student"><i class="bi bi-check-lg"></i></button>
+                <button onclick="rejectDossier('${student.uid}')" class="btn btn-sm btn-outline-danger" title="Reject Dossier"><i class="bi bi-x-lg"></i></button>
+                <button onclick="deleteDossier('${student.uid}')" class="btn btn-sm btn-danger" title="Purge Student"><i class="bi bi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Sorting trigger
+    function handleSort(colName) {
+      if (currentSortColumn === colName) {
+        currentSortDirection = currentSortDirection === "asc" ? "desc" : "asc";
+      } else {
+        currentSortColumn = colName;
+        currentSortDirection = "asc";
+      }
+      handleFilterAndRender();
+    }
+
+    // VIEW DOSSIER TRANSCRIPT
+    function viewDossier(uid) {
+      const student = originalRecords.find(s => s.uid === uid);
+      if (!student) return;
+
+      const body = document.getElementById("view-record-modal-body");
+      body.innerHTML = `
+        <div class="row">
+          <div class="col-md-4 text-center border-end py-3">
+            <img src="${student.documents && student.documents.passportPhoto ? student.documents.passportPhoto.fileUrl : 'assets/images/placeholder_profile.png'}" alt="Passport" class="rounded-circle img-thumbnail mb-3" style="width: 130px; height: 130px; object-fit: cover;">
+            <h5 class="fw-bold text-dark dark-text-white mb-1">${student.fullName || student.fullname}</h5>
+            <span class="badge bg-primary font-mono mb-2">${student.studentId}</span>
+            <div class="text-muted small mb-3">State of Origin: ${student.state || "N/A"}</div>
+            
+            <div class="p-3 bg-light rounded text-start small dark-bg-dark">
+              <div class="mb-1"><strong>Status:</strong> ${student.status ? student.status.toUpperCase() : 'PENDING'}</div>
+              <div class="mb-1"><strong>Gender:</strong> ${student.gender || 'N/A'}</div>
+              <div class="mb-1"><strong>DOB:</strong> ${student.dob || 'N/A'}</div>
+              <div><strong>Address:</strong> ${student.address || 'N/A'}</div>
+            </div>
+          </div>
+          
+          <div class="col-md-8 py-2">
+            <h6 class="fw-bold text-uppercase text-primary font-mono border-bottom pb-2 mb-3">Enrolled Pathway</h6>
+            <div class="mb-4">
+              <span class="fs-5 fw-bold text-dark dark-text-white">${student.course}</span>
+              <p class="text-muted small mt-1">Registered: ${student.createdAt ? new Date(student.createdAt).toLocaleString() : 'N/A'}</p>
+            </div>
+
+            <h6 class="fw-bold text-uppercase text-primary font-mono border-bottom pb-2 mb-3">Admission Audit Workflow</h6>
+            <div class="row g-2 mb-4">
+              <div class="col-sm-6">
+                <div class="p-2 border rounded bg-light dark-bg-dark">
+                  <span class="small text-muted d-block">Registrations Dossier</span>
+                  <span class="fw-bold text-success"><i class="bi bi-check-circle-fill"></i> Submitted</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-2 border rounded bg-light dark-bg-dark">
+                  <span class="small text-muted d-block">Document Audit</span>
+                  <span class="fw-bold text-primary"><i class="bi bi-clock-history"></i> ${student.workflow && student.workflow.documentVerification ? student.workflow.documentVerification.toUpperCase() : 'PENDING'}</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-2 border rounded bg-light dark-bg-dark">
+                  <span class="small text-muted d-block">Payment Clearance</span>
+                  <span class="fw-bold text-primary"><i class="bi bi-clock-history"></i> ${student.workflow && student.workflow.paymentVerification ? student.workflow.paymentVerification.toUpperCase() : 'PENDING'}</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-2 border rounded bg-light dark-bg-dark">
+                  <span class="small text-muted d-block">Admin Authorization</span>
+                  <span class="fw-bold text-primary"><i class="bi bi-clock-history"></i> ${student.status ? student.status.toUpperCase() : 'PENDING'}</span>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-bold text-uppercase text-primary font-mono border-bottom pb-2 mb-2">Student Bio / Statement</h6>
+            <p class="small text-muted mb-0 italic">"${student.bio || 'No personal profile statement provided.'}"</p>
+          </div>
+        </div>
+      `;
+      viewModal.show();
+    }
+
+    // EDIT DOSSIER DETAILS
+    function editDossier(uid) {
+      const student = originalRecords.find(s => s.uid === uid);
+      if (!student) return;
+
+      document.getElementById("edit-student-uid").value = student.uid;
+      document.getElementById("edit-fullname").value = student.fullName || student.fullname || "";
+      document.getElementById("edit-email").value = student.email || "";
+      document.getElementById("edit-phone").value = student.phone || "";
+      document.getElementById("edit-gender").value = student.gender || "Male";
+      document.getElementById("edit-dob").value = student.dob || "";
+      document.getElementById("edit-state").value = student.state || "";
+      document.getElementById("edit-address").value = student.address || "";
+      document.getElementById("edit-course").value = student.course || "";
+
+      editModal.show();
+    }
+
+    // SAVE ADJUSTED DETAILS
+    async function handleEditFormSubmit(e) {
+      e.preventDefault();
+      
+      const uid = document.getElementById("edit-student-uid").value;
+      const fullName = document.getElementById("edit-fullname").value;
+      const email = document.getElementById("edit-email").value;
+      const phone = document.getElementById("edit-phone").value;
+      const gender = document.getElementById("edit-gender").value;
+      const dob = document.getElementById("edit-dob").value;
+      const state = document.getElementById("edit-state").value;
+      const address = document.getElementById("edit-address").value;
+      const course = document.getElementById("edit-course").value;
+
+      try {
+        await db.collection("students").doc(uid).update({
+          fullName,
+          fullname: fullName,
+          email: email.toLowerCase().trim(),
+          phone,
+          gender,
+          dob,
+          state,
+          address,
+          course
+        });
+
+        editModal.hide();
+        await logAdminActivity("Student Dossier Modified", `Adjusted personal records coordinates for registered student: "${fullName}".`);
+        alert("Student records updated successfully in Firestore!");
+      } catch (err) {
+        console.error("[Firestore Update Failure] Error details logged for debugging:", err);
+        alert("Failed to save changes in Firestore: " + err.message);
+      }
+    }
+
+    // APPROVE DOSSIER
+    async function approveDossier(uid) {
+      const student = originalRecords.find(s => s.uid === uid);
+      if (!student) return;
+
+      if (confirm(`Authorize registration and approve EJaytech Concepts admission for: ${student.fullName || student.fullname}?`)) {
+        try {
+          // Set registration status and workflow values to approved
+          await db.collection("students").doc(uid).update({
+            status: "approved",
+            approvalStatus: "approved",
+            workflow: {
+              submitted: true,
+              pendingReview: "approved",
+              documentVerification: "approved",
+              paymentVerification: "approved",
+              adminApproval: "approved",
+              studentActivated: true
+            }
+          });
+
+          await logAdminActivity("Registration Dossier Approved", `Formally cleared admissions checklist, payment, and documents for: "${student.fullName || student.fullname}".`);
+          alert(`Success: Student ${student.fullName || student.fullname} is now fully Approved and Activated!`);
+        } catch (err) {
+          console.error("[Firestore Approval Error]:", err);
+          alert("Firestore Error: Failed to approve registration dossier.");
+        }
+      }
+    }
+
+    // REJECT DOSSIER
+    async function rejectDossier(uid) {
+      const student = originalRecords.find(s => s.uid === uid);
+      if (!student) return;
+
+      if (confirm(`Reject and suspend EJaytech Concepts admission interest for: ${student.fullName || student.fullname}?`)) {
+        try {
+          await db.collection("students").doc(uid).update({
+            status: "rejected",
+            approvalStatus: "rejected",
+            workflow: {
+              submitted: true,
+              pendingReview: "rejected",
+              documentVerification: "rejected",
+              paymentVerification: "rejected",
+              adminApproval: "rejected",
+              studentActivated: false
+            }
+          });
+
+          await logAdminActivity("Dossier Rejected", `Suspended admission application dossier for: "${student.fullName || student.fullname}".`);
+          alert(`Status update: student ${student.fullName || student.fullname} registration is now Rejected.`);
+        } catch (err) {
+          console.error("[Firestore Rejection Error]:", err);
+          alert("Firestore Error: Failed to update dossier to rejected status.");
+        }
+      }
+    }
+
+    // DELETE DOSSIER
+    async function deleteDossier(uid) {
+      const student = originalRecords.find(s => s.uid === uid);
+      if (!student) return;
+
+      if (confirm(`CRITICAL WARNING: Permanently delete registration dossier for: ${student.fullName || student.fullname}? This operation cannot be undone.`)) {
+        try {
+          await db.collection("students").doc(uid).delete();
+          await logAdminActivity("Registration Deleted", `Purged student dossier records entirely: "${student.fullName || student.fullname}".`);
+          alert("Success: Student registration dossier deleted.");
+        } catch (err) {
+          console.error("[Firestore Deletion Error]:", err);
+          alert("Firestore Error: Failed to delete student dossier.");
+        }
+      }
+    }
+
+    // EXPORT TO CSV
+    function exportToCSV() {
+      if (displayedRecords.length === 0) {
+        alert("No student records available to export.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Student ID,Full Name,Email Address,Phone Number,Selected Course,Admission Status,Registration Date\n";
+
+      displayedRecords.forEach(s => {
+        const id = s.studentId || "";
+        const name = s.fullName || s.fullname || "";
+        const email = s.email || "";
+        const phone = s.phone || "";
+        const course = s.course || "";
+        const status = s.status || "pending";
+        const date = s.createdAt || "";
+
+        // Escape commas for raw CSV output
+        const row = [
+          `"${id.replace(/"/g, '""')}"`,
+          `"${name.replace(/"/g, '""')}"`,
+          `"${email.replace(/"/g, '""')}"`,
+          `"${phone.replace(/"/g, '""')}"`,
+          `"${course.replace(/"/g, '""')}"`,
+          `"${status.toUpperCase()}"`,
+          `"${date}"`
+        ].join(",");
+
+        csvContent += row + "\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `EJaytech_Student_Records_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

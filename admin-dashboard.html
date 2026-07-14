@@ -289,6 +289,7 @@
       <button class="menu-item active" onclick="showPane('dashboard')"><i class="bi bi-grid-fill"></i> Dashboard</button>
       <button class="menu-item" onclick="showPane('registrations')"><i class="bi bi-file-earmark-person-fill"></i> Registrations</button>
       <button class="menu-item" onclick="showPane('students')"><i class="bi bi-people-fill"></i> Student Directory</button>
+      <button class="menu-item" onclick="window.location.href='student-records.html'"><i class="bi bi-database-fill"></i> Student Records</button>
       <button class="menu-item" onclick="showPane('payments')"><i class="bi bi-cash-stack"></i> Payments Audit</button>
       <button class="menu-item" onclick="showPane('courses')"><i class="bi bi-journal-bookmark-fill"></i> Courses Catalog</button>
       <button class="menu-item" onclick="showPane('reports')"><i class="bi bi-bar-chart-line-fill"></i> Reports &amp; Stats</button>
@@ -1210,6 +1211,7 @@
 
   <!-- BUSINESS COGNITIVE CONTROL ENGINE (UI INTERACTIVITY LAYER) -->
   <script type="module">
+    import { db } from "./js/firebase-config.js";
     import { 
       getRegisteredStudentsList,
       getActivityLogsList,
@@ -1276,6 +1278,24 @@
 
       // Pull fresh data from localStorage database layer
       await syncAllDatabaseState();
+
+      // Hook up real-time Firebase Firestore synchronization
+      db.collection("students").onSnapshot((snapshot) => {
+        console.log("[Firestore Sync] Real-time students data synchronized.");
+        students = [];
+        snapshot.docs.forEach(doc => {
+          students.push(doc.data());
+        });
+        
+        // Re-render active view to show changes in real-time
+        if (activePane === "dashboard") {
+          renderDashboardOverview();
+        } else if (activePane === "registrations" && typeof renderRegistrationsTable === "function") {
+          renderRegistrationsTable();
+        } else if (activePane === "students" && typeof renderStudentsTable === "function") {
+          renderStudentsTable();
+        }
+      });
 
       // Check if we came from a specific URL path or query to show a sub-pane automatically
       const pathName = window.location.pathname;
