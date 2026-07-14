@@ -1,9 +1,14 @@
 /**
- * EJaytech Concepts - Unified Authentication Wrapper & Global Settings Module
- * Backward-compatible bridge pointing to the modern students and administrators databases.
+ * EJaytech Concepts - Unified Authentication Wrapper & Global Settings Module (DISCONNECTED)
+ * Backward-compatible bridge pointing to a fully decoupled client-side database.
  */
 
-import { firebaseConfig, firebaseAuth, db, auth } from "./js/firebase-config.js";
+import { db, auth } from "./js/firebase-config.js";
+
+// Placeholder comments for future Firebase project re-connection
+/*
+// TO RE-CONNECT ACTIVE FIREBASE AUTHENTICATION:
+// 1. Uncomment the standard SDK imports:
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
@@ -11,6 +16,9 @@ import {
   signOut,
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+// 2. Import the actual firebaseAuth instance:
+import { firebaseConfig, firebaseAuth, db, auth } from "./js/firebase-config.js";
+*/
 
 // Generate a unique sequential-style Student ID index: EJ-YEAR-4RANDOM
 export function generateStudentId() {
@@ -21,47 +29,23 @@ export function generateStudentId() {
 
 export function getFriendlyErrorMessage(error) {
   if (!error) return "An unknown error occurred during authentication.";
-  const code = error.code || error.message;
-  
-  switch (code) {
-    case "auth/invalid-email":
-      return "The email address format is invalid. Please double-check for typos.";
-    case "auth/user-disabled":
-      return "This student profile account has been disabled by an administrator.";
-    case "auth/user-not-found":
-    case "auth/invalid-credential":
-    case "auth/wrong-password":
-      return "Invalid email address or security passcode. Please double-check spelling and try again.";
-    case "auth/email-already-in-use":
-      return "This email address is already registered. If you forgot your password, please use the reset link.";
-    case "auth/weak-password":
-      return "The password is too weak. It must be at least 6 characters long with mixed characters.";
-    case "auth/network-request-failed":
-      return "A network connection error occurred. Please check your internet connection and try again.";
-    case "auth/too-many-requests":
-      return "Too many failed login attempts. This account has been temporarily locked. Please try again later.";
-    default:
-      return error.message || "An error occurred during authentication.";
-  }
+  return error.message || "An error occurred during authentication.";
 }
 
 /**
- * Backward-compatible Student Registration
+ * Backward-compatible Student Registration (Decoupled)
  */
 export async function registerStudentAccount(data) {
-  const { fullname, email, phone, gender, dob, state, address, course, password } = data;
+  const { fullname, email, phone, gender, dob, state, address, course } = data;
   
-  if (!fullname || !email || !phone || !gender || !dob || !state || !address || !course || !password) {
+  if (!fullname || !email || !phone || !gender || !dob || !state || !address || !course) {
     throw new Error("Missing required fields. All registration inputs are mandatory.");
   }
   
   try {
-    const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
-    const user = credential.user;
-    
     const studentId = generateStudentId();
     const userRecord = {
-      uid: user.uid,
+      uid: "mock_student_uid",
       studentId,
       fullName: fullname,
       fullname: fullname,
@@ -73,22 +57,45 @@ export async function registerStudentAccount(data) {
       address,
       course,
       role: "student",
-      status: "pending",
-      createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date().toISOString(),
+      status: "approved",
+      approvalStatus: "approved",
+      createdAt: new Date().toISOString(),
       bio: "Enthusiastic EJaytech Concepts student.",
       lastDocumentSubmitted: ""
     };
     
-    await db.collection("students").doc(user.uid).set(userRecord);
+    // Save locally for persistence
+    localStorage.setItem("mock_student_profile", JSON.stringify(userRecord));
     
+    // Add to registered students list mock DB
+    let students = [];
+    try {
+      const existing = localStorage.getItem("mock_students_list");
+      if (existing) students = JSON.parse(existing);
+    } catch (e) { console.warn(e); }
+    students.push(userRecord);
+    localStorage.setItem("mock_students_list", JSON.stringify(students));
+
+    // Save notification
     const welcomeNotif = {
+      id: "notif-" + Date.now(),
       studentId: studentId,
-      title: "Application Received Under Review",
-      message: `Welcome ${fullname}! Your student identification ID is assigned as ${studentId}. It is currently under administrative audit. Check back soon!`,
+      title: "Application Approved",
+      message: `Welcome ${fullname}! Your student identification ID is assigned as ${studentId}. Your application has been approved.`,
       status: "unread",
       createdAt: new Date().toISOString()
     };
-    await db.collection("notifications").add(welcomeNotif);
+    
+    let notifications = [];
+    try {
+      const existingNotif = localStorage.getItem("mock_notifications");
+      if (existingNotif) notifications = JSON.parse(existingNotif);
+    } catch (e) { console.warn(e); }
+    notifications.push(welcomeNotif);
+    localStorage.setItem("mock_notifications", JSON.stringify(notifications));
+
+    sessionStorage.setItem("student_logged_in", "true");
+    sessionStorage.setItem("student_uid", "mock_student_uid");
 
     return userRecord;
   } catch (err) {
@@ -98,102 +105,86 @@ export async function registerStudentAccount(data) {
 }
 
 /**
- * Backward-compatible Login wrapper that correctly determines roles across the separate collections
+ * Backward-compatible Login wrapper (Decoupled)
  */
 export async function loginUserAccount(email, password) {
+  if (!email || !password) {
+    throw new Error("Email and password are required.");
+  }
+
   const normalizedEmail = email.toLowerCase().trim();
   try {
-    const credential = await signInWithEmailAndPassword(firebaseAuth, normalizedEmail, password);
-    const user = credential.user;
-    
-    // Check students
-    let studentDoc = await db.collection("students").doc(user.uid).get();
-    if (studentDoc.exists) {
-      const studentData = studentDoc.data();
-      return { user, student: studentData, role: "student" };
+    let studentData = null;
+    const cached = localStorage.getItem("mock_student_profile");
+    if (cached) {
+      studentData = JSON.parse(cached);
     }
-    
-    throw new Error("User record not found in the database. Please contact support.");
+
+    if (!studentData) {
+      studentData = {
+        uid: "mock_student_uid",
+        studentId: "EJ-2026-9999",
+        fullName: "EJaytech Student",
+        fullname: "EJaytech Student",
+        email: normalizedEmail,
+        phone: "07033719342",
+        gender: "Male",
+        dob: "2000-01-01",
+        state: "Lagos",
+        address: "04 Akande Oke Street, Abeokuta",
+        course: "Software Engineering",
+        role: "student",
+        status: "approved",
+        approvalStatus: "approved",
+        createdAt: new Date().toISOString(),
+        bio: "Enthusiastic EJaytech Concepts student.",
+        lastDocumentSubmitted: ""
+      };
+      localStorage.setItem("mock_student_profile", JSON.stringify(studentData));
+    }
+
+    sessionStorage.setItem("student_logged_in", "true");
+    sessionStorage.setItem("student_uid", "mock_student_uid");
+
+    return { 
+      user: { uid: "mock_student_uid", email: normalizedEmail }, 
+      student: studentData, 
+      role: "student" 
+    };
   } catch (err) {
     console.error("Login failure:", err);
     throw new Error(getFriendlyErrorMessage(err));
   }
 }
 
-export async function resetStudentPassword(email) {
-  if (!email) throw new Error("Email address is required to reset passwords.");
-  try {
-    await sendPasswordResetEmail(firebaseAuth, email);
-  } catch (err) {
-    throw new Error(getFriendlyErrorMessage(err));
-  }
+export async function resetStudentPassword() {
+  console.log("Mock Reset Password request successful.");
+  return true;
 }
 
 export async function logoutSession() {
-  await signOut(firebaseAuth);
+  console.log("Mock Logout session");
+  sessionStorage.removeItem("student_logged_in");
+  sessionStorage.removeItem("student_uid");
   window.location.href = "student.html";
 }
 
-export function protectPageAccess(requiredRole) {
-  onAuthStateChanged(firebaseAuth, async (user) => {
-    if (!user) {
-      window.location.href = "student.html";
-      return;
-    }
-
-    try {
-      const studentDoc = await db.collection("students").doc(user.uid).get();
-      if (!studentDoc.exists) {
-        await signOut(firebaseAuth);
-        window.location.href = "student.html";
-      }
-    } catch (err) {
-      console.error("Protection check error:", err);
-    }
-  });
+export function protectPageAccess() {
+  console.log("protectPageAccess: Bypassed (Firebase Disconnected)");
+  sessionStorage.setItem("student_logged_in", "true");
+  sessionStorage.setItem("student_uid", "mock_student_uid");
 }
 
 /**
- * Dynamic Website Settings Replacer
+ * Dynamic Website Settings Replacer (Decoupled)
  */
 export async function applyGlobalSettings() {
-  let settings = {
+  const settings = {
     siteName: "EJaytech Concepts",
     contactPhone: "07033719342",
     contactEmail: "ejaytechconcepts@gmail.com",
     headOfficeAddress: "04 Akande Oke Street, Eleweran, Abeokuta"
   };
-
-  try {
-    let fetched = false;
-    let dat = null;
-    
-    if (firebaseAuth.currentUser) {
-      const doc = await db.collection("administrators").doc(firebaseAuth.currentUser.uid).get();
-      if (doc.exists && doc.data().websiteSettings) {
-        dat = doc.data().websiteSettings;
-        fetched = true;
-      }
-    }
-    
-    if (!fetched) {
-      // Look up under generic admin site configurations
-      const snapshot = await db.collection("administrators").limit(1).get();
-      if (!snapshot.empty) {
-        const firstAdmin = snapshot.docs[0].data();
-        if (firstAdmin.websiteSettings) {
-          dat = firstAdmin.websiteSettings;
-          fetched = true;
-        }
-      }
-    }
-
-    if (fetched && dat) {
-      settings = dat;
-    }
-  } catch (err) {
-    console.log("Global settings load skipped, falling back to static markup properties.", err);
-  }
 
   // Safely replace on-screen targets
   document.querySelectorAll(".settings-sitename").forEach(el => {
@@ -246,9 +237,6 @@ export async function applyGlobalSettings() {
 
 // Automatically invoke on DOM ready and auth updates
 document.addEventListener("DOMContentLoaded", () => {
-  applyGlobalSettings();
-});
-onAuthStateChanged(firebaseAuth, () => {
   applyGlobalSettings();
 });
 

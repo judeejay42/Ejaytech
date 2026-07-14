@@ -246,12 +246,9 @@
   <script src="js/main.js"></script>
 
   <script type="module">
-    import { firebaseAuth, db } from "./js/firebase-config.js";
-    import { 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword 
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { redirectIfSessionActive } from "./js/admin-auth.js";
+    import { db, auth } from "./js/firebase-config.js";
+    import { loginAdmin, redirectIfSessionActive } from "./js/admin-auth.js";
+    import { logAdminActivity } from "./admin.js";
 
     // Restore remember-me state if present on page load
     if (localStorage.getItem("admin_logged_in") === "true") {
@@ -298,15 +295,7 @@
         return;
       }
 
-      try {
-        const { auth } = await import("./js/firebase-config.js");
-        await auth.sendPasswordResetEmail(email);
-        alert("Password reset instructions have been dispatched to " + email);
-      } catch (err) {
-        errorAlertMsg.textContent = "Failed to send reset link: " + err.message;
-        errorAlert.classList.remove("d-none");
-        successAlert.classList.add("d-none");
-      }
+      alert("Mock Reset: Password reset instructions have been simulated for " + email);
     });
 
     // Form Submission Handler
@@ -318,7 +307,7 @@
       const rememberMe = document.getElementById("admin-remember").checked;
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating with Firebase Auth...';
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating Console Session...';
       successAlert.classList.add("d-none");
       errorAlert.classList.add("d-none");
 
@@ -328,61 +317,12 @@
           throw new Error("Access denied. Invalid administrator email.");
         }
 
-        // Perform actual client-side Firebase Authentication
-        let userCredential;
-        try {
-          userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password);
-        } catch (fbError) {
-          console.log("Firebase direct sign-in failed, checking auto-seed conditions:", fbError.code);
-          // If the admin user does not exist in Firebase Auth yet (e.g. first login on a fresh DB),
-          // securely auto-create the Firebase Auth user.
-          if (fbError.code === "auth/user-not-found" || fbError.code === "auth/invalid-credential" || fbError.code === "auth/cannot-find-user" || fbError.code === "auth/email-already-in-use") {
-            try {
-              userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
-            } catch (createError) {
-              throw fbError;
-            }
-          } else {
-            throw fbError;
-          }
-        }
-
-        const user = userCredential.user;
-
-        // 3. Ensure administrator Firestore document exists
-        const adminDocRef = db.collection("administrators").doc(user.uid);
-        const adminDoc = await adminDocRef.get();
-        if (!adminDoc.exists) {
-          await adminDocRef.set({
-            username: "ejaytechadmin",
-            email: "ejaytechadmin@gmail.com",
-            role: "admin",
-            active: true,
-            createdAt: new Date().toISOString()
-          });
-        }
-
-        // 4. Ensure user profile Firestore document exists for broader system compatibility
-        const userDocRef = db.collection("users").doc(user.uid);
-        const userDoc = await userDocRef.get();
-        if (!userDoc.exists) {
-          await userDocRef.set({
-            fullname: "Chief Director Admin",
-            username: "ejaytechadmin",
-            email: "ejaytechadmin@gmail.com",
-            role: "admin",
-            active: true,
-            createdAt: new Date().toISOString()
-          });
-        }
-
-        // 5. Establish secure session states
-        sessionStorage.setItem("admin_logged_in", "true");
-        sessionStorage.setItem("admin_uid", user.uid);
+        // Perform local/offline admin authentication
+        const result = await loginAdmin(email, password);
 
         if (rememberMe) {
           localStorage.setItem("admin_logged_in", "true");
-          localStorage.setItem("admin_uid", user.uid);
+          localStorage.setItem("admin_uid", result.user.uid);
         } else {
           localStorage.removeItem("admin_logged_in");
           localStorage.removeItem("admin_uid");
@@ -392,20 +332,14 @@
         successAlert.classList.remove("d-none");
         errorAlert.classList.add("d-none");
 
-        // Log successful activity in Firestore
+        // Log successful activity locally
         try {
-          const serverTimestamp = window.firebaseServerTimestamp 
-            ? window.firebaseServerTimestamp() 
-            : new Date().toISOString();
-          await db.collection("activity_logs").add({
-            message: `Admin ejaytechadmin@gmail.com successfully authenticated central console session.`,
-            createdAt: serverTimestamp
-          });
+          await logAdminActivity(`Admin ejaytechadmin@gmail.com successfully authenticated central console session.`);
         } catch (logErr) {
           console.warn("Could not write authentication log:", logErr);
         }
 
-        // 6. Redirect to Admin Command Core Dashboard
+        // Redirect to Admin Command Core Dashboard
         setTimeout(() => {
           window.location.href = "admin-dashboard.html";
         }, 1500);

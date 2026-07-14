@@ -1,8 +1,16 @@
 /**
- * EJaytech Concepts - Real Firebase Database & Authentication Layer
- * Connected to live Firebase project: ejaytech-concepts using Firebase Modular SDK
+ * EJaytech Concepts - Firebase Configuration & Initialization Layer (DISCONNECTED)
+ * 
+ * =========================================================================
+ * PLACEHOLDER CONFIGURATION:
+ * This project is currently disconnected from any active Firebase backend.
+ * To connect a new Firebase project, follow the instructions in the comments below.
+ * =========================================================================
  */
 
+/*
+// TO RE-CONNECT A FRESH FIREBASE PROJECT IN THE FUTURE:
+// 1. Uncomment the following standard SDK imports:
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getAuth, 
@@ -38,279 +46,191 @@ import {
   uploadBytes, 
   getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+*/
 
+// TODO: Replace with your actual Firebase Configuration credentials
 export const firebaseConfig = {
-  apiKey: "AIzaSyDQsHkDn_P4lyX5YnyTYKJGQumhIG6wESI",
-  authDomain: "ejaytech-concepts.firebaseapp.com",
-  projectId: "ejaytech-concepts",
-  storageBucket: "ejaytech-concepts.firebasestorage.app",
-  messagingSenderId: "802065299790",
-  appId: "1:802065299790:web:ea66d5ed63d3e1639e461f"
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_AUTH_DOMAIN_HERE",
+  projectId: "YOUR_PROJECT_ID_HERE",
+  storageBucket: "YOUR_STORAGE_BUCKET_HERE",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: "YOUR_APP_ID_HERE"
 };
 
-// Initialize Firebase App
-const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
-const firebaseAuth = getAuth(app);
-const storageInstance = getStorage(app);
+// Disconnected Firebase service instance placeholders
+const app = null;
+const firestore = null;
+const firebaseAuth = null;
+const storageInstance = null;
 
-// Custom Compatibility Classes for Firestore
+/**
+ * =========================================================================
+ * NO-OP / MOCK OFFLINE WORKSPACE WRAPPERS
+ * To prevent client-side script crashes across other sections of the portal.
+ * =========================================================================
+ */
+
 class DocRefWrapper {
   constructor(firestoreInstance, path) {
-    this.firestoreInstance = firestoreInstance;
     this.path = path;
   }
-
   get id() {
     const parts = this.path.split("/");
     return parts[parts.length - 1];
   }
-
   get ref() {
     return this;
   }
-
   async get() {
-    const d = doc(this.firestoreInstance, this.path);
-    const snap = await getDoc(d);
     return {
-      exists: snap.exists(),
-      id: snap.id,
+      exists: false,
+      id: this.id,
       ref: this,
-      data: () => snap.data()
+      data: () => ({})
     };
   }
-
-  async set(data) {
-    const d = doc(this.firestoreInstance, this.path);
-    await setDoc(d, data);
-  }
-
-  async update(data) {
-    const d = doc(this.firestoreInstance, this.path);
-    await updateDoc(d, data);
-  }
-
-  async delete() {
-    const d = doc(this.firestoreInstance, this.path);
-    await deleteDoc(d);
-  }
+  async set() { return true; }
+  async update() { return true; }
+  async delete() { return true; }
 }
 
 class QueryWrapper {
-  constructor(firestoreInstance, colPath, constraints = []) {
-    this.firestoreInstance = firestoreInstance;
+  constructor(firestoreInstance, colPath) {
     this.colPath = colPath;
-    this.constraints = constraints;
   }
-
-  where(field, op, value) {
-    return new QueryWrapper(this.firestoreInstance, this.colPath, [...this.constraints, where(field, op, value)]);
-  }
-
-  orderBy(field, dir) {
-    return new QueryWrapper(this.firestoreInstance, this.colPath, [...this.constraints, orderBy(field, dir)]);
-  }
-
-  limit(n) {
-    return new QueryWrapper(this.firestoreInstance, this.colPath, [...this.constraints, limit(n)]);
-  }
-
+  where() { return this; }
+  orderBy() { return this; }
+  limit() { return this; }
   async get() {
-    const colRef = collection(this.firestoreInstance, this.colPath);
-    let q;
-    if (this.constraints.length > 0) {
-      q = query(colRef, ...this.constraints);
-    } else {
-      q = colRef;
-    }
-    const snap = await getDocs(q);
-    const docs = snap.docs.map(d => ({
-      id: d.id,
-      ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
-      data: () => d.data()
-    }));
     return {
-      docs,
-      empty: docs.length === 0,
-      forEach: (callback) => docs.forEach(callback),
-      size: docs.length
+      docs: [],
+      empty: true,
+      forEach: () => {},
+      size: 0
     };
   }
-
   onSnapshot(callback) {
-    const colRef = collection(this.firestoreInstance, this.colPath);
-    let q;
-    if (this.constraints.length > 0) {
-      q = query(colRef, ...this.constraints);
-    } else {
-      q = colRef;
-    }
-    return onSnapshot(q, (snap) => {
-      const docs = snap.docs.map(d => ({
-        id: d.id,
-        ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
-        data: () => d.data()
-      }));
-      callback({
-        docs,
-        empty: docs.length === 0,
-        forEach: (cb) => docs.forEach(cb),
-        size: docs.length
-      });
+    callback({
+      docs: [],
+      empty: true,
+      forEach: () => {},
+      size: 0
     });
+    return () => {}; // No-op unsubscribe
   }
 }
 
 class CollectionWrapper {
   constructor(firestoreInstance, colPath) {
-    this.firestoreInstance = firestoreInstance;
     this.colPath = colPath;
   }
-
   doc(docId) {
-    if (!docId) {
-      const newDocRef = doc(collection(this.firestoreInstance, this.colPath));
-      return new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${newDocRef.id}`);
-    }
-    return new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${docId}`);
+    return new DocRefWrapper(null, `${this.colPath}/${docId || "new_id"}`);
   }
-
-  async add(data) {
-    const colRef = collection(this.firestoreInstance, this.colPath);
-    const res = await addDoc(colRef, data);
+  async add() {
     return {
-      id: res.id,
-      ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${res.id}`)
+      id: "mock_id",
+      ref: new DocRefWrapper(null, `${this.colPath}/mock_id`)
     };
   }
-
   async get() {
-    const colRef = collection(this.firestoreInstance, this.colPath);
-    const snap = await getDocs(colRef);
-    const docs = snap.docs.map(d => ({
-      id: d.id,
-      ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
-      data: () => d.data()
-    }));
     return {
-      docs,
-      empty: docs.length === 0,
-      forEach: (callback) => docs.forEach(callback),
-      size: docs.length
+      docs: [],
+      empty: true,
+      forEach: () => {},
+      size: 0
     };
   }
-
   onSnapshot(callback) {
-    const colRef = collection(this.firestoreInstance, this.colPath);
-    return onSnapshot(colRef, (snap) => {
-      const docs = snap.docs.map(d => ({
-        id: d.id,
-        ref: new DocRefWrapper(this.firestoreInstance, `${this.colPath}/${d.id}`),
-        data: () => d.data()
-      }));
-      callback({
-        docs,
-        empty: docs.length === 0,
-        forEach: (cb) => docs.forEach(cb),
-        size: docs.length
-      });
+    callback({
+      docs: [],
+      empty: true,
+      forEach: () => {},
+      size: 0
     });
+    return () => {};
   }
-
-  where(field, op, value) {
-    return new QueryWrapper(this.firestoreInstance, this.colPath, [where(field, op, value)]);
-  }
-
-  orderBy(field, dir) {
-    return new QueryWrapper(this.firestoreInstance, this.colPath, [orderBy(field, dir)]);
-  }
-
-  limit(n) {
-    return new QueryWrapper(this.firestoreInstance, this.colPath, [limit(n)]);
-  }
+  where() { return new QueryWrapper(null, this.colPath); }
+  orderBy() { return new QueryWrapper(null, this.colPath); }
+  limit() { return new QueryWrapper(null, this.colPath); }
 }
 
 class DbWrapper {
-  constructor(firestoreInstance) {
-    this.firestoreInstance = firestoreInstance;
-  }
-
   collection(colName) {
-    return new CollectionWrapper(this.firestoreInstance, colName);
+    return new CollectionWrapper(null, colName);
   }
-
   doc(docPath) {
-    return new DocRefWrapper(this.firestoreInstance, docPath);
+    return new DocRefWrapper(null, docPath);
   }
 }
 
-// Custom Compatibility Classes for Storage
 class StorageRefWrapper {
-  constructor(storageInst, path = "") {
-    this.storageInst = storageInst;
-    this.path = path;
-  }
-
+  constructor(path) { this.path = path; }
   child(childPath) {
-    return new StorageRefWrapper(this.storageInst, this.path ? `${this.path}/${childPath}` : childPath);
+    return new StorageRefWrapper(this.path ? `${this.path}/${childPath}` : childPath);
   }
-
-  async put(fileObj) {
-    const storageRef = ref(this.storageInst, this.path);
-    await uploadBytes(storageRef, fileObj);
-    const storageRefForUrl = storageRef;
+  async put() {
     return {
       ref: {
-        async getDownloadURL() {
-          return await getDownloadURL(storageRefForUrl);
-        }
+        async getDownloadURL() { return ""; }
       }
     };
   }
 }
 
 class StorageWrapper {
-  constructor(storageInst) {
-    this.storageInst = storageInst;
-  }
-
   ref(path = "") {
-    return new StorageRefWrapper(this.storageInst, path);
+    return new StorageRefWrapper(path);
   }
 }
 
-// Expose instances globally
-const db = new DbWrapper(firestore);
+// Instantiate offline dummy interfaces
+const db = new DbWrapper();
 const auth = {
   get currentUser() {
-    return firebaseAuth.currentUser;
+    return {
+      uid: "mock_user_uid",
+      email: "ejaytechadmin@gmail.com",
+      displayName: "Chief Director Admin"
+    };
   },
-  async signInWithEmailAndPassword(email, password) {
-    return await signInWithEmailAndPassword(firebaseAuth, email, password);
+  async signInWithEmailAndPassword() {
+    return { user: { uid: "mock_user_uid", email: "ejaytechadmin@gmail.com" } };
   },
-  async createUserWithEmailAndPassword(email, password) {
-    return await createUserWithEmailAndPassword(firebaseAuth, email, password);
+  async createUserWithEmailAndPassword() {
+    return { user: { uid: "mock_user_uid", email: "ejaytechadmin@gmail.com" } };
   },
   async signOut() {
-    return await signOut(firebaseAuth);
+    return true;
   },
   onAuthStateChanged(callback) {
-    return onAuthStateChanged(firebaseAuth, callback);
+    // Trigger onAuthStateChanged callback synchronously with mock admin user so UI bypasses loading
+    callback({
+      uid: "mock_user_uid",
+      email: "ejaytechadmin@gmail.com",
+      displayName: "Chief Director Admin"
+    });
+    return () => {};
   },
-  async sendPasswordResetEmail(email) {
-    return await sendPasswordResetEmail(firebaseAuth, email);
+  async sendPasswordResetEmail() {
+    return true;
   }
 };
-const storage = new StorageWrapper(storageInstance);
+const storage = new StorageWrapper();
 
+// Attach stub wrappers globally to the window
 window.db = db;
 window.auth = auth;
 window.storage = storage;
-window.isRealFirebase = true;
-window.firebaseServerTimestamp = serverTimestamp;
+window.isRealFirebase = false;
+window.firebaseServerTimestamp = () => new Date().toISOString();
 
-// Expose SDK functions for ES Module scripts that need them
+// Empty compatible module exports
+const updatePassword = async () => {};
+const reauthenticateWithCredential = async () => {};
+const EmailAuthProvider = {};
+
 export {
   app,
   firestore,

@@ -300,29 +300,17 @@
   <script type="module">
     import { db, auth } from "./js/firebase-config.js";
     import { protectStudentPage as protectPageAccess } from "./js/student-auth.js";
+    import { getStudentProfile } from "./student.js";
 
-    // Enforce student session protection
+    // Enforce student session protection (Bypassed / Mocked)
     protectPageAccess();
 
     let currentStudentData = null;
-    let studentUnsubscribe = null;
-    let notificationsUnsubscribe = null;
-
-    let loadTimeout = null;
-    let loadedSuccessfully = false;
-
-    function clearLoadTimeout() {
-      if (loadTimeout) {
-        clearTimeout(loadTimeout);
-        loadTimeout = null;
-      }
-    }
 
     /**
      * Show UI state for search failures, server errors, authentication anomalies, or connection timeouts
      */
     function showErrorState(title, message, includeContactButton = true) {
-      // Ensure current spinner and core layouts are hidden
       document.getElementById("dash-loading-screen").classList.add("d-none");
       document.getElementById("active-dashboard-grid").classList.add("d-none");
       
@@ -351,87 +339,19 @@
       }
     }
 
-    auth.onAuthStateChanged(async (user) => {
-      const authEmail = user ? user.email : "none";
-      const authUid = user ? user.uid : "none";
-      console.log(`[Authentication Status] Changed. UID: ${authUid} | Email: ${authEmail}`);
+    // Disconnected / Offline Direct Initialization
+    document.addEventListener("DOMContentLoaded", async () => {
+      console.log("[Portal Initialization] Running in disconnected local database mode.");
+      
+      const studentUid = sessionStorage.getItem("student_uid") || "mock_student_uid";
+      document.getElementById("user-display-email").textContent = "student@ejaytech-concepts.local";
 
-      if (user) {
-        document.getElementById("user-display-email").textContent = user.email;
-        
-        // Reset tracking states for this connection session
-        loadedSuccessfully = false;
-        clearLoadTimeout();
-
-        // Safety limit trigger - Never allow infinite loading. After 10s show error options.
-        loadTimeout = setTimeout(() => {
-          if (!loadedSuccessfully) {
-            console.error(`[Loading Failure] Registration profile retrieval timed out after 10 seconds for UID: ${user.uid}`);
-            showErrorState(
-              "Connection Timeout",
-              "Unable to load student profile. Please refresh or contact support."
-            );
-          }
-        }, 10000);
-
-        // Unsubscribe any legacy listener blocks to avoid dual renders
-        if (studentUnsubscribe) studentUnsubscribe();
-        if (notificationsUnsubscribe) notificationsUnsubscribe();
-
-        // Determine whether to use users or students collection
-        let activeCollection = "users";
-        try {
-          const checkDoc = await db.collection("users").doc(user.uid).get();
-          if (!checkDoc.exists) {
-            const checkStudentDoc = await db.collection("students").doc(user.uid).get();
-            if (checkStudentDoc.exists) {
-              activeCollection = "students";
-            }
-          }
-        } catch (checkErr) {
-          console.warn("Could not determine student collection, defaulting to users:", checkErr);
-        }
-
-        console.log(`[Firestore Query] Initiating student profile lookup matching UID: ${user.uid} in collection: ${activeCollection}`);
-
-        // Establish real-time observer of student doc in Firestore matching Auth UID
-        studentUnsubscribe = db.collection(activeCollection).doc(user.uid).onSnapshot(async (doc) => {
-          try {
-            console.log(`[Firestore Query Result] Status updated. Doc ID: ${doc.id} | Exists: ${doc.exists}`);
-
-            if (doc.exists) {
-              const data = doc.data();
-              currentStudentData = data;
-              loadedSuccessfully = true;
-              clearLoadTimeout();
-
-              // Clear past error wrappers if any were showing
-              const errorScreen = document.getElementById("dash-error-screen");
-              if (errorScreen) errorScreen.classList.add("d-none");
-
-              await renderStudentDashboardWithData(data, user.uid);
-            } else {
-              console.warn(`[Loading Failure] Profile lookup returned empty (no document) for UID: ${user.uid}`);
-              loadedSuccessfully = true;
-              clearLoadTimeout();
-              showErrorState("Student Profile Not Found", "Student profile not found.", true);
-            }
-          } catch (handlerErr) {
-            console.error(`[Loading Failure] Error rendering workspace layout:`, handlerErr);
-            loadedSuccessfully = true;
-            clearLoadTimeout();
-            showErrorState("Renderer Setup Error", "Could not assemble student dashboard layouts: " + handlerErr.message, true);
-          }
-        }, (err) => {
-          console.error(`[Loading Failure] Firestore event streaming triggered unauthorized or connection error:`, err);
-          loadedSuccessfully = true;
-          clearLoadTimeout();
-          showErrorState("Database Authorization Error", err.message, true);
-        });
-      } else {
-        clearLoadTimeout();
-        if (studentUnsubscribe) { studentUnsubscribe(); studentUnsubscribe = null; }
-        if (notificationsUnsubscribe) { notificationsUnsubscribe(); notificationsUnsubscribe = null; }
+      try {
+        const data = await getStudentProfile(studentUid);
+        await renderStudentDashboardWithData(data, studentUid);
+      } catch (err) {
+        console.error("[Portal Initialization Error]", err);
+        showErrorState("Renderer Setup Error", "Could not assemble student dashboard layouts: " + err.message, true);
       }
     });
 
