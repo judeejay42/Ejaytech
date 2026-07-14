@@ -57,6 +57,17 @@ pages.forEach(page => {
   });
 });
 
+// Map student directory and registrations pages to serve the admin dashboard
+const adminSubPages = ['students', 'registrations'];
+adminSubPages.forEach(page => {
+  app.get(`/${page}`, (req, res) => {
+    res.sendFile(path.join(staticPath, 'admin-dashboard.html'));
+  });
+  app.get(`/${page}.html`, (req, res) => {
+    res.sendFile(path.join(staticPath, 'admin-dashboard.html'));
+  });
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`EJaytech Concepts development server running at http://0.0.0.0:${PORT}`);
 });

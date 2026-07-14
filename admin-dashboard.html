@@ -124,11 +124,22 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      cursor: pointer;
+      touch-action: manipulation;
+      min-height: 44px;
     }
 
-    .dashboard-stat-card:hover {
+    .dashboard-stat-card:hover,
+    .dashboard-stat-card:focus-visible {
       transform: translateY(-3px);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      outline: 2px solid var(--bs-primary);
+      outline-offset: 2px;
+    }
+
+    .dashboard-stat-card:active {
+      transform: translateY(-1px);
+      background-color: rgba(0, 0, 0, 0.03) !important;
     }
 
     .stat-icon {
@@ -154,6 +165,10 @@
       background-color: #1e293b !important;
       border-color: #334155 !important;
       color: #f1f5f9 !important;
+    }
+
+    body.dark-mode .dashboard-stat-card:active {
+      background-color: #334155 !important;
     }
 
     body.dark-mode .form-control,
@@ -341,52 +356,52 @@
         <!-- Metric Cards -->
         <div class="row g-3 mb-4">
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="dashboard-stat-card">
+            <a href="students.html" class="dashboard-stat-card text-decoration-none text-reset" style="display: flex;">
               <div>
                 <h3 class="fw-bold mb-1" id="m-total-students">0</h3>
                 <span class="text-muted small fw-semibold">Total Students</span>
               </div>
               <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
-            </div>
+            </a>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="dashboard-stat-card">
+            <a href="registrations.html?status=pending" class="dashboard-stat-card text-decoration-none text-reset" style="display: flex;">
               <div>
                 <h3 class="fw-bold mb-1 text-warning" id="m-pending-reg">0</h3>
                 <span class="text-muted small fw-semibold">Pending Review</span>
               </div>
               <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div>
-            </div>
+            </a>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="dashboard-stat-card">
+            <a href="registrations.html?status=approved" class="dashboard-stat-card text-decoration-none text-reset" style="display: flex;">
               <div>
                 <h3 class="fw-bold mb-1 text-success" id="m-approved-reg">0</h3>
                 <span class="text-muted small fw-semibold">Approved admissions</span>
               </div>
               <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div>
-            </div>
+            </a>
           </div>
           <div class="col-xl-3 col-md-6 col-12">
-            <div class="dashboard-stat-card">
+            <a href="registrations.html?status=rejected" class="dashboard-stat-card text-decoration-none text-reset" style="display: flex;">
               <div>
                 <h3 class="fw-bold mb-1 text-danger" id="m-rejected-reg">0</h3>
                 <span class="text-muted small fw-semibold">Rejected dossiers</span>
               </div>
               <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-x-circle"></i></div>
-            </div>
+            </a>
           </div>
         </div>
 
         <div class="row g-3 mb-4">
           <div class="col-xl-4 col-md-6 col-12">
-            <div class="dashboard-stat-card">
+            <a href="courses.html" class="dashboard-stat-card text-decoration-none text-reset" style="display: flex;">
               <div>
                 <h3 class="fw-bold mb-1" id="m-total-courses">0</h3>
                 <span class="text-muted small fw-semibold">Total Catalog Courses</span>
               </div>
               <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-journal-text"></i></div>
-            </div>
+            </a>
           </div>
           <div class="col-xl-4 col-md-6 col-12">
             <div class="dashboard-stat-card">
@@ -1261,9 +1276,59 @@
 
       // Pull fresh data from localStorage database layer
       await syncAllDatabaseState();
+
+      // Check if we came from a specific URL path or query to show a sub-pane automatically
+      const pathName = window.location.pathname;
+      const urlParams = new URLSearchParams(window.location.search);
+      const statusParam = urlParams.get('status');
+
+      if (pathName.includes('students') || urlParams.get('pane') === 'students') {
+        activePane = 'students';
+      } else if (pathName.includes('registrations') || urlParams.get('pane') === 'registrations') {
+        activePane = 'registrations';
+        if (statusParam) {
+          const filterDropdown = document.getElementById("reg-status-filter");
+          if (filterDropdown) {
+            filterDropdown.value = statusParam;
+          }
+        }
+      }
       
       // Render Initial View
       showPane(activePane);
+
+      // Intercept clicks on the dashboard statistic cards to prevent full page reload and switch panes smoothly
+      document.querySelectorAll('.dashboard-stat-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const anchor = card.closest('a');
+          if (anchor) {
+            const href = anchor.getAttribute('href');
+            if (href && !href.includes('courses.html')) {
+              e.preventDefault(); // Prevent full page reload
+              
+              if (href.includes('students.html')) {
+                showPane('students');
+              } else if (href.includes('registrations.html')) {
+                const urlParams = new URLSearchParams(href.split('?')[1] || '');
+                const statusParam = urlParams.get('status');
+                if (statusParam) {
+                  const filterDropdown = document.getElementById("reg-status-filter");
+                  if (filterDropdown) {
+                    filterDropdown.value = statusParam;
+                    // Trigger table refresh/filter
+                    if (window.renderRegistrationsTable) {
+                      window.renderRegistrationsTable();
+                    } else {
+                      filterDropdown.dispatchEvent(new Event('change'));
+                    }
+                  }
+                }
+                showPane('registrations');
+              }
+            }
+          }
+        });
+      });
 
       // Bind functions globally for HTML triggers
       window.showPane = showPane;
