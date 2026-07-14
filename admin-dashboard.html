@@ -227,13 +227,28 @@
         <!-- Sidebar Navigation Tabs Pill Selector -->
         <div class="d-flex flex-column gap-1" id="admin-sidebar-tabs">
           <button class="admin-tab-btn active" onclick="switchAdminWorkspacePane('analytics')">
-            <i class="bi bi-speedometer2"></i> Executive Overview
+            <i class="bi bi-speedometer2"></i> Dashboard Overview
           </button>
           <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('registry')">
-            <i class="bi bi-people-fill"></i> Student Registry
+            <i class="bi bi-people-fill"></i> User Management
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('services')">
+            <i class="bi bi-briefcase-fill"></i> Manage Services
           </button>
           <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('courses')">
             <i class="bi bi-journal-album"></i> Manage Courses
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('blog')">
+            <i class="bi bi-file-text-fill"></i> Manage Blog Posts
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('gallery')">
+            <i class="bi bi-images"></i> Manage Gallery
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('testimonials')">
+            <i class="bi bi-chat-left-quote-fill"></i> Manage Testimonials
+          </button>
+          <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('contacts')">
+            <i class="bi bi-envelope-open-fill"></i> Contact Messages
           </button>
           <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('materials')">
             <i class="bi bi-file-earmark-arrow-up-fill"></i> Lecture Library
@@ -242,7 +257,7 @@
             <i class="bi bi-megaphone-fill"></i> Dispatch &amp; Notice
           </button>
           <button class="admin-tab-btn" onclick="switchAdminWorkspacePane('settings')">
-            <i class="bi bi-sliders"></i> Brand &amp; Accounts
+            <i class="bi bi-sliders"></i> Website Settings
           </button>
         </div>
 
@@ -676,6 +691,334 @@
           </div>
         </div>
 
+        <!-- PANE 3.5: MANAGE SERVICES -->
+        <div class="admin-workspace-pane d-none" id="pane-services">
+          <div class="row g-4">
+            
+            <!-- Service Editor (Left) -->
+            <div class="col-xl-4 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1" id="service-form-title-h5"><i class="bi bi-briefcase text-primary me-1"></i> Add Service Core</h5>
+                <p class="text-muted small mb-4">Create or modify premium vocational and technical services offered by EJaytech Concepts.</p>
+                
+                <form id="service-editor-form" onsubmit="handleServiceFormSubmit(event)">
+                  <input type="hidden" id="service-form-id">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="s-title-input" class="form-label small fw-semibold text-dark">Service Title</label>
+                      <input type="text" class="form-control form-control-sm" id="s-title-input" required placeholder="e.g. Enterprise Network Engineering">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-icon-input" class="form-label small fw-semibold text-dark">Bootstrap Icon Class</label>
+                      <input type="text" class="form-control form-control-sm" id="s-icon-input" required placeholder="e.g. bi-cpu-fill">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-price-input" class="form-label small fw-semibold text-dark">Estimated Cost / Price Range</label>
+                      <input type="text" class="form-control form-control-sm" id="s-price-input" placeholder="e.g. Contact for Quote / ₦150,000+">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="s-desc-input" class="form-label small fw-semibold text-dark">Detailed Description</label>
+                      <textarea class="form-control form-control-sm" id="s-desc-input" rows="3" required placeholder="Describe service scope, deliverables, SLA terms ..."></textarea>
+                    </div>
+                    <div class="col-12 text-start">
+                      <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="s-active-input" checked>
+                        <label class="form-check-label small text-dark fw-semibold" for="s-active-input">Active / Visible on Main Website</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                    <button type="button" class="btn btn-secondary btn-sm d-none" id="service-form-cancel-btn" onclick="resetServiceForm()"><i class="bi bi-x"></i> Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm ms-auto" id="service-submit-btn"><i class="bi bi-check-circle-fill"></i> Save Service</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Active Services Catalog List (Right) -->
+            <div class="col-xl-8 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-gear-wide-connected text-primary me-1"></i> Active Services Catalog</h5>
+                    <p class="text-muted small mb-0">Manage services displayed dynamically on the public pages.</p>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle border-top">
+                    <thead class="table-light text-uppercase font-display" style="font-size: 0.75rem;">
+                      <tr>
+                        <th>Service Details</th>
+                        <th>Icon class</th>
+                        <th>Cost/Pricing</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="services-table-rows" class="small text-dark font-sans">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 3.6: MANAGE BLOG POSTS -->
+        <div class="admin-workspace-pane d-none" id="pane-blog">
+          <div class="row g-4">
+            
+            <!-- Blog Composer/Editor (Left) -->
+            <div class="col-xl-5 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1" id="blog-form-title-h5"><i class="bi bi-journal-text text-primary me-1"></i> Compose Blog Post</h5>
+                <p class="text-muted small mb-4">Write, edit, and publish technology insights, tutorials, and corporate announcements.</p>
+                
+                <form id="blog-editor-form" onsubmit="handleBlogFormSubmit(event)">
+                  <input type="hidden" id="blog-form-id">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="b-title-input" class="form-label small fw-semibold text-dark">Blog Title</label>
+                      <input type="text" class="form-control form-control-sm" id="b-title-input" required placeholder="e.g. The Future of Cyber Security in Nigeria">
+                    </div>
+                    <div class="col-sm-6 text-start">
+                      <label for="b-author-input" class="form-label small fw-semibold text-dark">Author Name</label>
+                      <input type="text" class="form-control form-control-sm" id="b-author-input" required placeholder="e.g. Elijah Yahuza">
+                    </div>
+                    <div class="col-sm-6 text-start">
+                      <label for="b-category-input" class="form-label small fw-semibold text-dark">Category</label>
+                      <input type="text" class="form-control form-control-sm" id="b-category-input" required placeholder="e.g. Technology Trends">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="b-summary-input" class="form-label small fw-semibold text-dark">Short Summary / Excerpt</label>
+                      <input type="text" class="form-control form-control-sm" id="b-summary-input" required placeholder="A brief hook sentence summarizing the entire post ...">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="b-content-input" class="form-label small fw-semibold text-dark">Blog Body Content</label>
+                      <textarea class="form-control form-control-sm" id="b-content-input" rows="8" required placeholder="Write rich, informative blog details here ..."></textarea>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="b-image-input" class="form-label small fw-semibold text-dark">Featured Image URL (Optional)</label>
+                      <input type="text" class="form-control form-control-sm" id="b-image-input" placeholder="e.g. https://images.unsplash.com/photo-...">
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                    <button type="button" class="btn btn-secondary btn-sm d-none" id="blog-form-cancel-btn" onclick="resetBlogForm()"><i class="bi bi-x"></i> Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm ms-auto" id="blog-submit-btn"><i class="bi bi-send-check-fill"></i> Publish Article</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Published Blog Articles Table (Right) -->
+            <div class="col-xl-7 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-newspaper text-primary me-1"></i> Published Blog Registry</h5>
+                    <p class="text-muted small mb-0">Edit or revoke articles displayed on EJaytech Concepts news tracks.</p>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle border-top">
+                    <thead class="table-light text-uppercase font-display" style="font-size: 0.75rem;">
+                      <tr>
+                        <th>Article details</th>
+                        <th>Category</th>
+                        <th>Author</th>
+                        <th>Date Published</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="blog-table-rows" class="small text-dark font-sans">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 3.7: MANAGE GALLERY -->
+        <div class="admin-workspace-pane d-none" id="pane-gallery">
+          <div class="row g-4">
+            
+            <!-- Gallery Adder (Left) -->
+            <div class="col-xl-4 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-image-fill text-primary me-1"></i> Add Gallery Showcase</h5>
+                <p class="text-muted small mb-4">Populate the EJaytech Concepts interactive company gallery with images, student hackathons, or project deliveries.</p>
+                
+                <form id="gallery-editor-form" onsubmit="handleGalleryFormSubmit(event)">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="g-title-input" class="form-label small fw-semibold text-dark">Image Title</label>
+                      <input type="text" class="form-control form-control-sm" id="g-title-input" required placeholder="e.g. Abuja Hackathon 2026 Winner Team">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="g-category-input" class="form-label small fw-semibold text-dark">Gallery Tag / Category</label>
+                      <select class="form-select form-select-sm" id="g-category-input" required>
+                        <option value="Training">Training &amp; Classes</option>
+                        <option value="Hackathon">Hackathon events</option>
+                        <option value="Projects">Client Project Deliveries</option>
+                        <option value="Abuja Hub">Abuja Hub center</option>
+                      </select>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="g-image-input" class="form-label small fw-semibold text-dark">Image URL</label>
+                      <input type="text" class="form-control form-control-sm" id="g-image-input" required placeholder="e.g. https://images.unsplash.com/photo-...">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="g-desc-input" class="form-label small fw-semibold text-dark">Caption Description</label>
+                      <textarea class="form-control form-control-sm" id="g-desc-input" rows="3" required placeholder="Provide a brief context or caption details for visitors ..."></textarea>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                    <button type="submit" class="btn btn-primary btn-sm ms-auto w-100" id="gallery-submit-btn"><i class="bi bi-cloud-upload-fill"></i> Upload Showcase Item</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Showcase Images Grid (Right) -->
+            <div class="col-xl-8 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-images text-primary me-1"></i> Interactive Showcase Grid</h5>
+                    <p class="text-muted small mb-0">Revoke or delete media objects populated across the landing pages.</p>
+                  </div>
+                </div>
+
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3" id="gallery-grid-items">
+                  <!-- Loaded dynamically -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 3.8: MANAGE TESTIMONIALS -->
+        <div class="admin-workspace-pane d-none" id="pane-testimonials">
+          <div class="row g-4">
+            
+            <!-- Testimonial Editor (Left) -->
+            <div class="col-xl-4 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <h5 class="fw-bold text-dark font-display mb-1" id="testimonial-form-title-h5"><i class="bi bi-chat-heart-fill text-primary me-1"></i> Log Client Feedback</h5>
+                <p class="text-muted small mb-4">Incorporate real testimonials from student scholars and corporate business clients.</p>
+                
+                <form id="testimonial-editor-form" onsubmit="handleTestimonialFormSubmit(event)">
+                  <input type="hidden" id="testimonial-form-id">
+                  <div class="row g-3">
+                    <div class="col-12 text-start">
+                      <label for="t-name-input" class="form-label small fw-semibold text-dark">Client / Student Name</label>
+                      <input type="text" class="form-control form-control-sm" id="t-name-input" required placeholder="e.g. Amina Mohammed">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="t-role-input" class="form-label small fw-semibold text-dark">Course / Sub-Industry Position</label>
+                      <input type="text" class="form-control form-control-sm" id="t-role-input" required placeholder="e.g. Software Alumnus, Cyber Consultant">
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="t-rating-input" class="form-label small fw-semibold text-dark">Star Rating score</label>
+                      <select class="form-select form-select-sm" id="t-rating-input" required>
+                        <option value="5">★★★★★ (5 Stars)</option>
+                        <option value="4">★★★★☆ (4 Stars)</option>
+                        <option value="3">★★★☆☆ (3 Stars)</option>
+                      </select>
+                    </div>
+                    <div class="col-12 text-start">
+                      <label for="t-quote-input" class="form-label small fw-semibold text-dark">Feedback Testimonial Quote</label>
+                      <textarea class="form-control form-control-sm" id="t-quote-input" rows="4" required placeholder="Write exact review comments detailing their training experience ..."></textarea>
+                    </div>
+                    <div class="col-12 text-start">
+                      <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="t-approved-input" checked>
+                        <label class="form-check-label small text-dark fw-semibold" for="t-approved-input">Approve / Show on Main Pages</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                    <button type="button" class="btn btn-secondary btn-sm d-none" id="testimonial-form-cancel-btn" onclick="resetTestimonialForm()"><i class="bi bi-x"></i> Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm ms-auto" id="testimonial-submit-btn"><i class="bi bi-chat-quote-fill"></i> Save Feedback</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Feedback List (Right) -->
+            <div class="col-xl-8 col-12">
+              <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-chat-left-text-fill text-primary me-1"></i> Registered Testimonials</h5>
+                    <p class="text-muted small mb-0">Audit client testimonials shown on index marketing rows.</p>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle border-top">
+                    <thead class="table-light text-uppercase font-display" style="font-size: 0.75rem;">
+                      <tr>
+                        <th>Client Details</th>
+                        <th>Feedback Quote</th>
+                        <th>Stars</th>
+                        <th>Approved</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="testimonials-table-rows" class="small text-dark font-sans">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 3.9: CONTACT MESSAGES INBOX -->
+        <div class="admin-workspace-pane d-none" id="pane-contacts">
+          <div class="card p-4 rounded-3 border bg-white shadow-sm h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h5 class="fw-bold text-dark font-display mb-1"><i class="bi bi-envelope-open-fill text-primary me-1"></i> Customer Contact Message Inbox</h5>
+                <p class="text-muted small mb-0">Review contact inquiries submitted from index support forms. Respond via active details.</p>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle border-top">
+                <thead class="table-light text-uppercase font-display" style="font-size: 0.75rem;">
+                  <tr>
+                    <th>Sender Identity</th>
+                    <th>Inquiry Subject</th>
+                    <th>Full Message Text</th>
+                    <th>Date Received</th>
+                    <th>Status Flag</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="contacts-table-rows" class="small text-dark font-sans">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- PANE 6: BRANDING WEBSITE COORDINATES & SYSTEM SETTINGS -->
         <div class="admin-workspace-pane d-none" id="pane-settings">
           <div class="row g-4">
@@ -828,12 +1171,20 @@
     let coursesMasterList = [];
     let materialsMasterList = [];
     let announcementsMasterList = [];
+    let servicesMasterList = [];
+    let blogsMasterList = [];
+    let galleryMasterList = [];
+    let testimonialsMasterList = [];
+    let contactsMasterList = [];
     
     let bootstrapEditModal = null;
     let bootstrapDrilldownModal = null;
 
     let editingCourseId = null;
     let editingAnnId = null;
+    let editingServiceId = null;
+    let editingBlogId = null;
+    let editingTestimonialId = null;
 
     let studentUnsubscribe = null;
 
@@ -951,6 +1302,85 @@
       }
     })();
 
+    // Retrieval functions for new collections
+    async function getServicesList() {
+      try {
+        const snap = await db.collection("services").get();
+        const list = [];
+        snap.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        return list;
+      } catch (err) {
+        console.warn("getServicesList error:", err);
+        return [];
+      }
+    }
+
+    async function getBlogsList() {
+      try {
+        const snap = await db.collection("blogs").get();
+        const list = [];
+        snap.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        return list.sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return (timeB || 0) - (timeA || 0);
+        });
+      } catch (err) {
+        console.warn("getBlogsList error:", err);
+        return [];
+      }
+    }
+
+    async function getGalleryList() {
+      try {
+        const snap = await db.collection("gallery").get();
+        const list = [];
+        snap.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        return list;
+      } catch (err) {
+        console.warn("getGalleryList error:", err);
+        return [];
+      }
+    }
+
+    async function getTestimonialsList() {
+      try {
+        const snap = await db.collection("testimonials").get();
+        const list = [];
+        snap.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        return list;
+      } catch (err) {
+        console.warn("getTestimonialsList error:", err);
+        return [];
+      }
+    }
+
+    async function getContactsList() {
+      try {
+        const snap = await db.collection("contacts").get();
+        const list = [];
+        snap.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        return list.sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return (timeB || 0) - (timeA || 0);
+        });
+      } catch (err) {
+        console.warn("getContactsList error:", err);
+        return [];
+      }
+    }
+
     /**
      * Complete operational refresh loader (forces a full static reload of non-student collections)
      */
@@ -960,6 +1390,11 @@
         coursesMasterList = await getCoursesList() || [];
         materialsMasterList = await getMaterialsList() || [];
         announcementsMasterList = await getAnnouncementsList() || [];
+        servicesMasterList = await getServicesList() || [];
+        blogsMasterList = await getBlogsList() || [];
+        galleryMasterList = await getGalleryList() || [];
+        testimonialsMasterList = await getTestimonialsList() || [];
+        contactsMasterList = await getContactsList() || [];
 
         await updateUIWithFreshStudentData();
         console.log("Dashboard refreshed successfully.");
@@ -987,6 +1422,11 @@
         await renderCourseCatalogListing(coursesMasterList);
         await renderMaterialsCatalogListing(materialsMasterList);
         await renderAnnouncementsCatalogListing(announcementsMasterList);
+        await renderServicesCatalogListing(servicesMasterList);
+        await renderBlogCatalogListing(blogsMasterList);
+        await renderGalleryCatalogListing(galleryMasterList);
+        await renderTestimonialsCatalogListing(testimonialsMasterList);
+        await renderContactsCatalogListing(contactsMasterList);
         await renderActivityLogsListing();
 
         // Populate course dropdown selectors in other panels
@@ -1765,6 +2205,480 @@
         alert("Failed to clear logs: " + err.message);
       }
     }
+
+
+    }
+
+
+    /**
+     * =========================================================
+     * CUSTOM CRUD OPERATIONS FOR NEW MANAGEMENT MODULES
+     * =========================================================
+     */
+
+    // --- 1. MANAGE SERVICES ---
+    async function renderServicesCatalogListing(services) {
+      const tbody = document.getElementById("services-table-rows");
+      if (!tbody) return;
+      if (services.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No services cataloged in database. Use form to insert.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      services.forEach(s => {
+        const isActive = s.active !== false;
+        html += `
+          <tr>
+            <td>
+              <strong class="text-dark d-block"><i class="bi ${s.icon || 'bi-gear-fill'} text-primary me-2"></i>${s.title}</strong>
+              <span class="text-muted small d-block" style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.description || ''}</span>
+            </td>
+            <td><code>${s.icon || ''}</code></td>
+            <td><span class="fw-semibold text-success">${s.priceRange || 'Contact for quote'}</span></td>
+            <td>
+              <span class="badge ${isActive ? 'bg-success' : 'bg-secondary'} text-white">${isActive ? 'Active' : 'Draft'}</span>
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <button class="btn btn-outline-secondary btn-sm p-1 px-2" onclick="editServiceFormTrigger('${s.id}')" title="Edit Service"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-outline-danger btn-sm p-1 px-2" onclick="deleteServiceCatalog('${s.id}')" title="Delete Permanent"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    async function handleServiceFormSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById("s-title-input").value.trim();
+      const icon = document.getElementById("s-icon-input").value.trim();
+      const priceRange = document.getElementById("s-price-input").value.trim();
+      const description = document.getElementById("s-desc-input").value.trim();
+      const active = document.getElementById("s-active-input").checked;
+
+      const subBtn = document.getElementById("service-submit-btn");
+
+      try {
+        subBtn.disabled = true;
+        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
+
+        const data = { title, icon, priceRange, description, active, updatedAt: new Date().toISOString() };
+
+        if (editingServiceId) {
+          await db.collection("services").doc(editingServiceId).set(data, { merge: true });
+          alert(`Success! "${title}" service has been updated.`);
+        } else {
+          data.createdAt = new Date().toISOString();
+          await db.collection("services").add(data);
+          alert(`Success! "${title}" service has been successfully created.`);
+        }
+
+        resetServiceForm();
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to save service: " + err.message);
+      } finally {
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Save Service';
+      }
+    }
+
+    function editServiceFormTrigger(id) {
+      const service = servicesMasterList.find(s => s.id === id);
+      if (!service) return;
+
+      editingServiceId = id;
+      document.getElementById("s-title-input").value = service.title || "";
+      document.getElementById("s-icon-input").value = service.icon || "";
+      document.getElementById("s-price-input").value = service.priceRange || "";
+      document.getElementById("s-desc-input").value = service.description || "";
+      document.getElementById("s-active-input").checked = service.active !== false;
+
+      document.getElementById("service-form-title-h5").innerHTML = '<i class="bi bi-pencil-square text-primary me-1"></i> Edit Service Core';
+      document.getElementById("service-form-cancel-btn").classList.remove("d-none");
+    }
+
+    async function deleteServiceCatalog(id) {
+      if (!confirm("Are you sure you want to permanently delete this service catalog item? This action is irreversible.")) return;
+      try {
+        await db.collection("services").doc(id).delete();
+        alert("Service deleted successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to delete service: " + err.message);
+      }
+    }
+
+    function resetServiceForm() {
+      editingServiceId = null;
+      document.getElementById("service-editor-form").reset();
+      document.getElementById("service-form-title-h5").innerHTML = '<i class="bi bi-briefcase text-primary me-1"></i> Add Service Core';
+      document.getElementById("service-form-cancel-btn").classList.add("d-none");
+    }
+
+
+    // --- 2. MANAGE BLOG POSTS ---
+    async function renderBlogCatalogListing(blogs) {
+      const tbody = document.getElementById("blog-table-rows");
+      if (!tbody) return;
+      if (blogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No articles published yet. Publish thoughts.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      blogs.forEach(b => {
+        const dateStr = b.createdAt ? new Date(b.createdAt).toLocaleDateString() : "";
+        html += `
+          <tr>
+            <td>
+              <strong class="text-dark d-block">${b.title}</strong>
+              <span class="text-muted small d-block" style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${b.summary || ''}</span>
+            </td>
+            <td><span class="badge bg-light text-dark border">${b.category || 'Tech'}</span></td>
+            <td><span class="text-muted font-sans">${b.author || 'Admin'}</span></td>
+            <td><span class="font-mono text-muted" style="font-size: 0.8rem;">${dateStr}</span></td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <button class="btn btn-outline-secondary btn-sm p-1 px-2" onclick="editBlogFormTrigger('${b.id}')" title="Edit Article"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-outline-danger btn-sm p-1 px-2" onclick="deleteBlogCatalog('${b.id}')" title="Delete Permanent"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    async function handleBlogFormSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById("b-title-input").value.trim();
+      const author = document.getElementById("b-author-input").value.trim();
+      const category = document.getElementById("b-category-input").value.trim();
+      const summary = document.getElementById("b-summary-input").value.trim();
+      const content = document.getElementById("b-content-input").value.trim();
+      const imageUrl = document.getElementById("b-image-input").value.trim();
+
+      const subBtn = document.getElementById("blog-submit-btn");
+
+      try {
+        subBtn.disabled = true;
+        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Publishing...';
+
+        const data = { title, author, category, summary, content, imageUrl, updatedAt: new Date().toISOString() };
+
+        if (editingBlogId) {
+          await db.collection("blogs").doc(editingBlogId).set(data, { merge: true });
+          alert(`Success! "${title}" updated.`);
+        } else {
+          data.createdAt = new Date().toISOString();
+          await db.collection("blogs").add(data);
+          alert(`Success! "${title}" published.`);
+        }
+
+        resetBlogForm();
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to save blog post: " + err.message);
+      } finally {
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-send-check-fill"></i> Publish Article';
+      }
+    }
+
+    function editBlogFormTrigger(id) {
+      const blog = blogsMasterList.find(b => b.id === id);
+      if (!blog) return;
+
+      editingBlogId = id;
+      document.getElementById("b-title-input").value = blog.title || "";
+      document.getElementById("b-author-input").value = blog.author || "";
+      document.getElementById("b-category-input").value = blog.category || "";
+      document.getElementById("b-summary-input").value = blog.summary || "";
+      document.getElementById("b-content-input").value = blog.content || "";
+      document.getElementById("b-image-input").value = blog.imageUrl || "";
+
+      document.getElementById("blog-form-title-h5").innerHTML = '<i class="bi bi-pencil-square text-primary me-1"></i> Edit Blog Post';
+      document.getElementById("blog-form-cancel-btn").classList.remove("d-none");
+    }
+
+    async function deleteBlogCatalog(id) {
+      if (!confirm("Are you sure you want to permanently delete this blog post?")) return;
+      try {
+        await db.collection("blogs").doc(id).delete();
+        alert("Blog article deleted successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to delete blog article: " + err.message);
+      }
+    }
+
+    function resetBlogForm() {
+      editingBlogId = null;
+      document.getElementById("blog-editor-form").reset();
+      document.getElementById("blog-form-title-h5").innerHTML = '<i class="bi bi-journal-text text-primary me-1"></i> Compose Blog Post';
+      document.getElementById("blog-form-cancel-btn").classList.add("d-none");
+    }
+
+
+    // --- 3. MANAGE GALLERY ---
+    async function renderGalleryCatalogListing(galleryItems) {
+      const container = document.getElementById("gallery-grid-items");
+      if (!container) return;
+      if (galleryItems.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center text-muted py-5">No gallery images uploaded. Populate grid.</div>`;
+        return;
+      }
+
+      let html = "";
+      galleryItems.forEach(g => {
+        html += `
+          <div class="col">
+            <div class="card h-100 border shadow-sm rounded-3 overflow-hidden position-relative group">
+              <img src="${g.imageUrl}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="${g.title}" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300'">
+              <div class="card-body p-3 text-start">
+                <span class="badge bg-primary-subtle text-primary border small mb-2 d-inline-block" style="font-size: 0.65rem;">${g.category || 'Training'}</span>
+                <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.85rem;">${g.title}</h6>
+                <p class="text-muted small mb-0" style="font-size: 0.75rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;">${g.description || ''}</p>
+              </div>
+              <div class="card-footer bg-light p-2 text-end border-top-0 d-flex justify-content-between align-items-center">
+                <span class="font-mono text-muted small" style="font-size: 0.65rem;">ID: ${g.id.substring(0, 5)}</span>
+                <button class="btn btn-outline-danger btn-sm p-1 px-2 py-0" style="font-size: 0.72rem;" onclick="deleteGalleryItem('${g.id}')"><i class="bi bi-trash-fill"></i> Delete</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    async function handleGalleryFormSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById("g-title-input").value.trim();
+      const category = document.getElementById("g-category-input").value;
+      const imageUrl = document.getElementById("g-image-input").value.trim();
+      const description = document.getElementById("g-desc-input").value.trim();
+
+      const subBtn = document.getElementById("gallery-submit-btn");
+
+      try {
+        subBtn.disabled = true;
+        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Uploading...';
+
+        const data = { title, category, imageUrl, description, createdAt: new Date().toISOString() };
+        await db.collection("gallery").add(data);
+
+        alert(`Success! "${title}" uploaded to gallery.`);
+        document.getElementById("gallery-editor-form").reset();
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to save gallery item: " + err.message);
+      } finally {
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-cloud-upload-fill"></i> Upload Showcase Item';
+      }
+    }
+
+    async function deleteGalleryItem(id) {
+      if (!confirm("Are you sure you want to permanently delete this gallery item?")) return;
+      try {
+        await db.collection("gallery").doc(id).delete();
+        alert("Gallery item deleted successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to delete gallery item: " + err.message);
+      }
+    }
+
+
+    // --- 4. MANAGE TESTIMONIALS ---
+    async function renderTestimonialsCatalogListing(testimonials) {
+      const tbody = document.getElementById("testimonials-table-rows");
+      if (!tbody) return;
+      if (testimonials.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No reviews recorded. Add testimonials.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      testimonials.forEach(t => {
+        const approved = t.approved !== false;
+        let ratingStars = "★".repeat(Number(t.rating || 5)) + "☆".repeat(5 - Number(t.rating || 5));
+        html += `
+          <tr>
+            <td>
+              <strong class="text-dark d-block">${t.name}</strong>
+              <span class="text-muted small d-block">${t.role || ''}</span>
+            </td>
+            <td><em class="text-muted" style="font-size: 0.8rem; display: block; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">"${t.quote}"</em></td>
+            <td><span class="text-warning fw-bold font-sans">${ratingStars}</span></td>
+            <td>
+              <span class="badge ${approved ? 'bg-success' : 'bg-warning'} text-white">${approved ? 'Approved' : 'Pending Review'}</span>
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <button class="btn btn-outline-secondary btn-sm p-1 px-2" onclick="editTestimonialFormTrigger('${t.id}')" title="Edit Testimonial"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-outline-danger btn-sm p-1 px-2" onclick="deleteTestimonialCatalog('${t.id}')" title="Delete Permanent"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    async function handleTestimonialFormSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("t-name-input").value.trim();
+      const role = document.getElementById("t-role-input").value.trim();
+      const rating = document.getElementById("t-rating-input").value;
+      const quote = document.getElementById("t-quote-input").value.trim();
+      const approved = document.getElementById("t-approved-input").checked;
+
+      const subBtn = document.getElementById("testimonial-submit-btn");
+
+      try {
+        subBtn.disabled = true;
+        subBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
+
+        const data = { name, role, rating, quote, approved, updatedAt: new Date().toISOString() };
+
+        if (editingTestimonialId) {
+          await db.collection("testimonials").doc(editingTestimonialId).set(data, { merge: true });
+          alert(`Success! "${name}" testimonial updated.`);
+        } else {
+          data.createdAt = new Date().toISOString();
+          await db.collection("testimonials").add(data);
+          alert(`Success! "${name}" testimonial saved.`);
+        }
+
+        resetTestimonialForm();
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to save testimonial: " + err.message);
+      } finally {
+        subBtn.disabled = false;
+        subBtn.innerHTML = '<i class="bi bi-chat-quote-fill"></i> Save Feedback';
+      }
+    }
+
+    function editTestimonialFormTrigger(id) {
+      const t = testimonialsMasterList.find(x => x.id === id);
+      if (!t) return;
+
+      editingTestimonialId = id;
+      document.getElementById("t-name-input").value = t.name || "";
+      document.getElementById("t-role-input").value = t.role || "";
+      document.getElementById("t-rating-input").value = t.rating || "5";
+      document.getElementById("t-quote-input").value = t.quote || "";
+      document.getElementById("t-approved-input").checked = t.approved !== false;
+
+      document.getElementById("testimonial-form-title-h5").innerHTML = '<i class="bi bi-pencil-square text-primary me-1"></i> Edit Client Feedback';
+      document.getElementById("testimonial-form-cancel-btn").classList.remove("d-none");
+    }
+
+    async function deleteTestimonialCatalog(id) {
+      if (!confirm("Are you sure you want to permanently delete this testimonial review? Action cannot be undone.")) return;
+      try {
+        await db.collection("testimonials").doc(id).delete();
+        alert("Testimonial review deleted successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to delete testimonial: " + err.message);
+      }
+    }
+
+    function resetTestimonialForm() {
+      editingTestimonialId = null;
+      document.getElementById("testimonial-editor-form").reset();
+      document.getElementById("testimonial-form-title-h5").innerHTML = '<i class="bi bi-chat-heart-fill text-primary me-1"></i> Log Client Feedback';
+      document.getElementById("testimonial-form-cancel-btn").classList.add("d-none");
+    }
+
+
+    // --- 5. CONTACT MESSAGES ---
+    async function renderContactsCatalogListing(contacts) {
+      const tbody = document.getElementById("contacts-table-rows");
+      if (!tbody) return;
+      if (contacts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Inbox empty. No customer inquiries logged yet.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      contacts.forEach(c => {
+        const isRead = c.status === "read";
+        const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString() + " " + new Date(c.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
+        html += `
+          <tr class="${isRead ? 'opacity-75' : 'fw-bold bg-light-subtle'}">
+            <td>
+              <strong class="text-dark d-block">${c.name || 'Anonymous'}</strong>
+              <span class="text-muted small d-block"><i class="bi bi-envelope me-1"></i>${c.email || ''}</span>
+              <span class="text-muted small d-block"><i class="bi bi-telephone me-1"></i>${c.phone || ''}</span>
+            </td>
+            <td><span class="badge bg-light text-primary border">${c.subject || 'Inquiry'}</span></td>
+            <td><p class="text-muted small mb-0 font-sans" style="max-width: 320px; white-space: normal; line-height: 1.4;">${c.message || ''}</p></td>
+            <td><span class="font-mono text-muted small" style="font-size: 0.78rem;">${dateStr}</span></td>
+            <td>
+              <span class="badge ${isRead ? 'bg-secondary' : 'bg-primary'} text-white">${isRead ? 'Read' : 'New Inbox'}</span>
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                ${!isRead ? `<button class="btn btn-outline-success btn-sm p-1 px-2" onclick="markContactAsRead('${c.id}')" title="Mark as Read"><i class="bi bi-envelope-open-fill"></i></button>` : ''}
+                <button class="btn btn-outline-danger btn-sm p-1 px-2" onclick="deleteContact('${c.id}')" title="Delete Inquiry"><i class="bi bi-trash-fill"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    async function markContactAsRead(id) {
+      try {
+        await db.collection("contacts").doc(id).set({ status: "read" }, { merge: true });
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed updating message status: " + err.message);
+      }
+    }
+
+    async function deleteContact(id) {
+      if (!confirm("Are you sure you want to permanently delete this customer inquiry?")) return;
+      try {
+        await db.collection("contacts").doc(id).delete();
+        alert("Contact message purged successfully.");
+        await refreshAllAdminDashboardData();
+      } catch (err) {
+        alert("Failed to delete message: " + err.message);
+      }
+    }
+
+    // Expose all custom operations globally to window so inline triggers resolve safely in ES Module context
+    window.switchAdminWorkspacePane = switchAdminWorkspacePane;
+    window.handleServiceFormSubmit = handleServiceFormSubmit;
+    window.editServiceFormTrigger = editServiceFormTrigger;
+    window.deleteServiceCatalog = deleteServiceCatalog;
+    window.resetServiceForm = resetServiceForm;
+
+    window.handleBlogFormSubmit = handleBlogFormSubmit;
+    window.editBlogFormTrigger = editBlogFormTrigger;
+    window.deleteBlogCatalog = deleteBlogCatalog;
+    window.resetBlogForm = resetBlogForm;
+
+    window.handleGalleryFormSubmit = handleGalleryFormSubmit;
+    window.deleteGalleryItem = deleteGalleryItem;
+
+    window.handleTestimonialFormSubmit = handleTestimonialFormSubmit;
+    window.editTestimonialFormTrigger = editTestimonialFormTrigger;
+    window.deleteTestimonialCatalog = deleteTestimonialCatalog;
+    window.resetTestimonialForm = resetTestimonialForm;
+
+    window.markContactAsRead = markContactAsRead;
+    window.deleteContact = deleteContact;
 
 
     /**
