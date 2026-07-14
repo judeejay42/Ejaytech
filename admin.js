@@ -532,9 +532,13 @@ export async function createSystemAnnouncement(title, message, studentId) {
  * Fetch generic public website settings profile
  */
 export async function getAdminProfile(uid) {
-  const docRef = await db.collection("settings").doc("website").get();
-  if (docRef.exists) {
-    return docRef.data();
+  try {
+    const docRef = await db.collection("settings").doc("website").get();
+    if (docRef.exists) {
+      return docRef.data();
+    }
+  } catch (err) {
+    console.error("getAdminProfile error:", err);
   }
   return {
     fullName: "Chief Director Admin",
@@ -555,7 +559,12 @@ export async function getAdminProfile(uid) {
  * Update generic public website settings profile
  */
 export async function updateAdminProfile(uid, data) {
-  await db.collection("settings").doc("website").set(data, { merge: true });
+  try {
+    await db.collection("settings").doc("website").set(data, { merge: true });
+  } catch (err) {
+    console.error("updateAdminProfile error:", err);
+    throw err;
+  }
 }
 
 // Expose functions globally to window

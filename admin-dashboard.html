@@ -1208,7 +1208,7 @@
     // Flag to prevent multiple initialization runs
     let isInitialized = false;
 
-    // Safety timeout to prevent infinite spinner
+    // Safety timeout to prevent infinite spinner (8 seconds maximum protection)
     const authTimeout = setTimeout(() => {
       if (!isInitialized) {
         console.error("Administrative session authorization timed out.");
@@ -1220,55 +1220,25 @@
         if (loadingSpinner) {
           loadingSpinner.classList.add("d-none");
         }
+        // Safely redirect to admin login
+        setTimeout(() => {
+          window.location.href = "admin.html";
+        }, 2000);
       }
-    }, 10000); // generous 10 second timeout
+    }, 8000); 
 
     // Subscribe to live Firebase auth state for deep verification before rendering
     const authUnsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
       if (user) {
         console.log("Firebase Auth state resolved. User detected:", user.email);
-      } else {
-        console.log("Firebase Auth state resolved. No user detected.");
-      }
-
-      if (!user) {
-        console.warn("Unauthorized administrative session. Redirecting to login...");
-        sessionStorage.removeItem("admin_logged_in");
-        sessionStorage.removeItem("admin_uid");
+        
+        // Clear safety timeout immediately on authentication resolution
         clearTimeout(authTimeout);
-        authUnsubscribe();
-        window.location.href = "admin.html";
-        return;
-      }
-
-      try {
-        console.log("Verifying administrator privileges for UID:", user.uid);
-        // Attempt to load administrative record with timeout
-        const adminDoc = await withTimeout(
-          db.collection("administrators").doc(user.uid).get(),
-          8000,
-          "Database check timed out."
-        );
-
-        if (!adminDoc.exists || adminDoc.data().role !== "admin" || adminDoc.data().active !== true) {
-          console.warn("Privilege check failed: Document not found or role/status invalid.");
-          clearTimeout(authTimeout);
-          authUnsubscribe();
-          await firebaseAuth.signOut();
-          sessionStorage.removeItem("admin_logged_in");
-          sessionStorage.removeItem("admin_uid");
-          window.location.href = "admin.html";
-          return;
-        }
-
-        console.log("Privilege verification passed.");
-        clearTimeout(authTimeout);
-        authUnsubscribe(); // Clean up observer to prevent duplicate trigger loops
 
         if (isInitialized) return;
         isInitialized = true;
 
-        // Hide loading screen and display dashboard grid
+        // Immediately hide loading screen and render the dashboard grid
         const loadingScreen = document.getElementById("admin-loading-screen");
         const activeGrid = document.getElementById("active-admin-grid");
         if (loadingScreen) {
@@ -1278,31 +1248,71 @@
           activeGrid.classList.remove("d-none");
         }
 
-        // Initialize dashboard content and bind systems
-        await initializeDashboardData(user);
+        // Map initial sidebar attributes to render details instantly
+        const displayUsername = user.displayName || "Chief Executive Admin";
+        const displayEmail = user.email || "ejaytechadmin@gmail.com";
+        const elUsername = document.getElementById("admin-sidebar-username");
+        const elEmail = document.getElementById("admin-sidebar-email");
+        if (elUsername) elUsername.textContent = displayUsername;
+        if (elEmail) elEmail.textContent = displayEmail;
 
-      } catch (error) {
-        console.error("Administrative gate authorization check failed:", error);
-        
-        // Show helpful error message on loading container
-        const loadingText = document.querySelector("#admin-loading-screen p");
-        if (loadingText) {
-          loadingText.innerHTML = `<span class="text-danger fw-bold"><i class="bi bi-shield-slash-fill"></i> Access Authorization Failed.</span><br><span class="small text-muted">${error.message || "An unexpected error occurred during validation."}</span><br><a href="admin.html" class="btn btn-outline-danger btn-sm mt-3"><i class="bi bi-shield-lock-fill"></i> Back to Gateway</a>`;
-        }
-        const loadingSpinner = document.querySelector("#admin-loading-screen .spinner-border");
-        if (loadingSpinner) {
-          loadingSpinner.classList.add("d-none");
-        }
+        // Clean up observer to prevent duplicate trigger loops
+        authUnsubscribe();
 
-        // If explicitly permission denied, sign out and clean local session
-        if (error.code === "permission-denied" || (error.message && error.message.includes("permission-denied"))) {
-          await firebaseAuth.signOut();
-          sessionStorage.removeItem("admin_logged_in");
-          sessionStorage.removeItem("admin_uid");
-          setTimeout(() => {
-            window.location.href = "admin.html";
-          }, 3500);
-        }
+        // Load Firestore and privilege checks asynchronously in the background
+        (async () => {
+          try {
+            console.log("Verifying administrator privileges asynchronously for UID:", user.uid);
+            // Verify administration record with an 8-second timeout
+            const adminDoc = await withTimeout(
+              db.collection("administrators").doc(user.uid).get(),
+              8000,
+              "Privilege verification check timed out."
+            );
+
+            if (!adminDoc.exists || adminDoc.data().role !== "admin" || adminDoc.data().active !== true) {
+              console.warn("Privilege check failed: Document not found or role/status invalid.");
+              throw new Error("Privilege check failed. Administrative permissions required.");
+            }
+
+            console.log("Privilege verification passed.");
+
+            // Asynchronously initialize content and bind active sub-systems
+            await initializeDashboardData(user);
+
+          } catch (error) {
+            console.error("Administrative gate authorization check failed:", error);
+            
+            // Log out user and clear storage
+            try {
+              await firebaseAuth.signOut();
+            } catch (signOutErr) {
+              console.warn("Sign out during auth failure failed:", signOutErr);
+            }
+            sessionStorage.removeItem("admin_logged_in");
+            sessionStorage.removeItem("admin_uid");
+
+            // Display a secure notification banner
+            const errorBanner = document.createElement("div");
+            errorBanner.className = "alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-4 shadow-lg z-3 text-center";
+            errorBanner.style.zIndex = "9999";
+            errorBanner.innerHTML = `<h5 class="alert-heading font-display fw-bold mb-1"><i class="bi bi-shield-lock-fill"></i> Gateway Gatekeeper</h5><p class="mb-0 small">${error.message || "An unexpected error occurred during administrative session validation."} Redirecting to login...</p>`;
+            document.body.appendChild(errorBanner);
+
+            setTimeout(() => {
+              window.location.href = "admin.html";
+            }, 3000);
+          }
+        })();
+
+      } else {
+        console.log("Firebase Auth state resolved. No user detected.");
+        console.warn("Unauthorized administrative session. Redirecting to login...");
+        sessionStorage.removeItem("admin_logged_in");
+        sessionStorage.removeItem("admin_uid");
+        clearTimeout(authTimeout);
+        authUnsubscribe();
+        window.location.href = "admin.html";
       }
     });
 
@@ -1473,21 +1483,86 @@
      * Complete operational refresh loader (forces a full static reload of non-student collections)
      */
     async function refreshAllAdminDashboardData() {
+      console.log("Refreshing static dashboard collections...");
+      
+      // Load each collection asynchronously with try-catch and 8s timeout protection
       try {
-        console.log("Refreshing static dashboard collections...");
-        coursesMasterList = await getCoursesList() || [];
-        materialsMasterList = await getMaterialsList() || [];
-        announcementsMasterList = await getAnnouncementsList() || [];
-        servicesMasterList = await getServicesList() || [];
-        blogsMasterList = await getBlogsList() || [];
-        galleryMasterList = await getGalleryList() || [];
-        testimonialsMasterList = await getTestimonialsList() || [];
-        contactsMasterList = await getContactsList() || [];
+        coursesMasterList = await withTimeout(getCoursesList(), 8000, "Courses fetch timed out.").catch(err => {
+          console.error("Courses fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        coursesMasterList = [];
+      }
 
+      try {
+        materialsMasterList = await withTimeout(getMaterialsList(), 8000, "Materials fetch timed out.").catch(err => {
+          console.error("Materials fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        materialsMasterList = [];
+      }
+
+      try {
+        announcementsMasterList = await withTimeout(getAnnouncementsList(), 8000, "Announcements fetch timed out.").catch(err => {
+          console.error("Announcements fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        announcementsMasterList = [];
+      }
+
+      try {
+        servicesMasterList = await withTimeout(getServicesList(), 8000, "Services fetch timed out.").catch(err => {
+          console.error("Services fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        servicesMasterList = [];
+      }
+
+      try {
+        blogsMasterList = await withTimeout(getBlogsList(), 8000, "Blogs fetch timed out.").catch(err => {
+          console.error("Blogs fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        blogsMasterList = [];
+      }
+
+      try {
+        galleryMasterList = await withTimeout(getGalleryList(), 8000, "Gallery fetch timed out.").catch(err => {
+          console.error("Gallery fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        galleryMasterList = [];
+      }
+
+      try {
+        testimonialsMasterList = await withTimeout(getTestimonialsList(), 8000, "Testimonials fetch timed out.").catch(err => {
+          console.error("Testimonials fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        testimonialsMasterList = [];
+      }
+
+      try {
+        contactsMasterList = await withTimeout(getContactsList(), 8000, "Contacts fetch timed out.").catch(err => {
+          console.error("Contacts fetch error:", err);
+          return [];
+        }) || [];
+      } catch (e) {
+        contactsMasterList = [];
+      }
+
+      try {
         await updateUIWithFreshStudentData();
         console.log("Dashboard refreshed successfully.");
       } catch (err) {
-        console.error("General Refresh Error: ", err);
+        console.error("UI update after refresh error: ", err);
       }
     }
 
