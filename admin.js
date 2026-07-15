@@ -408,10 +408,20 @@ export function seedAdminMockDatabase() {
     };
     localStorage.setItem("mock_admin_profile", JSON.stringify(defaultProfile));
   }
+
+  // 8. Seed Centres Registry
+  if (!localStorage.getItem("mock_centres")) {
+    const defaultCentres = [
+      { id: "abk", name: "ABK Centre", email: "abk@ejaytech.com", prefix: "ABK", location: "Abeokuta, Ogun State", status: "enabled", isArchived: false, dateCreated: "2026-01-10" },
+      { id: "ibadan", name: "Ibadan Centre", email: "ibadan@ejaytech.com", prefix: "IBA", location: "Ibadan, Oyo State", status: "enabled", isArchived: false, dateCreated: "2026-02-15" },
+      { id: "abuja", name: "Abuja Centre", email: "abuja@ejaytech.com", prefix: "ABJ", location: "Abuja, FCT", status: "enabled", isArchived: false, dateCreated: "2026-03-05" }
+    ];
+    localStorage.setItem("mock_centres", JSON.stringify(defaultCentres));
+  }
 }
 
 // --- SYSTEM AUDIT LOGGER ---
-export async function logAdminActivity(action, message = "") {
+export async function logAdminActivity(action, message = "", centreId = "central", device = "") {
   try {
     const logsStr = localStorage.getItem("mock_activity_logs") || "[]";
     const logs = JSON.parse(logsStr);
@@ -429,6 +439,20 @@ export async function logAdminActivity(action, message = "") {
     // Build random valid Nigerian IP block
     const randomIP = `197.210.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}`;
 
+    // Detect device
+    let devStr = device;
+    if (!devStr && typeof navigator !== "undefined") {
+      const ua = navigator.userAgent;
+      if (ua.includes("Windows")) devStr = "Windows (PC)";
+      else if (ua.includes("Macintosh")) devStr = "macOS (Apple)";
+      else if (ua.includes("Linux")) devStr = "Linux (PC)";
+      else if (ua.includes("iPhone") || ua.includes("iPad")) devStr = "iOS Device";
+      else if (ua.includes("Android")) devStr = "Android Device";
+      else devStr = "Web Browser";
+    } else if (!devStr) {
+      devStr = "Desktop Server Node";
+    }
+
     const newLog = {
       id: "log-" + Date.now() + Math.floor(Math.random() * 1000),
       adminName: activeAdmin.name,
@@ -437,7 +461,9 @@ export async function logAdminActivity(action, message = "") {
       message: message || `${activeAdmin.name} performed action: ${action}`,
       date: dateStr,
       time: timeStr,
-      ip: randomIP
+      ip: randomIP,
+      centreId: centreId,
+      device: devStr
     };
 
     logs.unshift(newLog);
