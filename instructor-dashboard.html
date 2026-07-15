@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Portal - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-navy: #0f172a;
+      --accent-teal: #0891b2; /* Cyan tone for Instructor to distinguish from other portals */
+      --hover-teal: #06b6d4;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #334155;
+      --sidebar-width: 280px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* Elegant Sidebar */
+    .sidebar-panel {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--primary-navy);
+      color: #f8fafc;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #334155;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #334155;
+      background-color: #020617;
+    }
+
+    .sidebar-menu {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem 0.75rem;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      color: #f8fafc;
+    }
+
+    .menu-item.active {
+      background-color: var(--accent-teal) !important;
+      color: #ffffff !important;
+    }
+
+    /* Main Workspace */
+    .main-workspace {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    .top-navbar {
+      height: 72px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .workspace-content {
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    .class-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.25s ease;
+    }
+    .class-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar-panel {
+        transform: translateX(-100%);
+      }
+      .sidebar-panel.show {
+        transform: translateX(0);
+      }
+      .main-workspace {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar-panel" id="instructorSidebar">
+    <div class="sidebar-header d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2">
+        <img src="/assets/images/logo-512.png" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
+        <div>
+          <span class="fw-bold d-block text-white" style="font-size: 0.95rem; letter-spacing: 0.03em;">EJaytech</span>
+          <span class="text-info d-block text-uppercase fw-semibold" id="sidebar-centre-badge" style="font-size: 0.65rem; letter-spacing: 0.05em;">Instructor Desk</span>
+        </div>
+      </div>
+      <button class="btn btn-dark d-lg-none p-1" onclick="toggleSidebar()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="sidebar-menu">
+      <span class="text-uppercase text-muted d-block px-3 mb-2 fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Academic Core</span>
+      <button onclick="switchTab('overview')" class="menu-item active" id="menu-overview">
+        <i class="bi bi-speedometer2"></i> Dashboard Overview
+      </button>
+      <button onclick="switchTab('students')" class="menu-item" id="menu-students">
+        <i class="bi bi-people-fill"></i> Assigned Students
+      </button>
+      <button onclick="switchTab('attendance')" class="menu-item" id="menu-attendance">
+        <i class="bi bi-calendar-check-fill"></i> Attendance Registers
+      </button>
+      <button onclick="switchTab('grading')" class="menu-item" id="menu-grading">
+        <i class="bi bi-mortarboard-fill"></i> Gradebook / Results
+      </button>
+      <button onclick="switchTab('announcements')" class="menu-item" id="menu-announcements">
+        <i class="bi bi-megaphone-fill"></i> Announcements
+      </button>
+    </div>
+
+    <div class="p-3 border-top border-secondary mt-auto bg-dark">
+      <div class="d-flex align-items-center gap-3">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=70" alt="Avatar" class="rounded-circle bg-white p-1" style="width: 42px; height: 42px; object-fit: cover;">
+        <div class="overflow-hidden">
+          <span class="fw-semibold text-white d-block text-truncate small" id="sidebar-inst-name">Instructor</span>
+          <span class="text-muted d-block text-truncate" style="font-size: 0.72rem;" id="sidebar-inst-email">instructor@ejaytech.com</span>
+        </div>
+      </div>
+      <button onclick="logoutInstructor()" class="btn btn-outline-danger btn-sm w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
+        <i class="bi bi-box-arrow-left"></i> End Portal Session
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main class="main-workspace">
+    
+    <!-- Top Nav -->
+    <header class="top-navbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <h5 class="fw-bold text-dark font-display mb-0" id="navbar-inst-badge">Assigned Class Hub</h5>
+      </div>
+      <span class="badge bg-teal-subtle text-info border border-info px-3 py-1 text-uppercase fw-semibold" id="campus-badge" style="font-size: 0.7rem;">ABK Campus</span>
+    </header>
+
+    <!-- Content Workspace -->
+    <section class="workspace-content">
+      
+      <!-- TAB 1: OVERVIEW -->
+      <div id="tab-overview" class="tab-pane-custom">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Academic Dashboard Overview</h4>
+            <p class="text-muted small">Manage schedules, register attendance, and log exam scores for your assigned students.</p>
+          </div>
+          <span class="badge bg-dark px-3 py-2" id="live-time-badge">Live Clock</span>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-lg-4 col-md-6">
+            <div class="class-card">
+              <h6 class="text-muted small fw-semibold text-uppercase mb-2">My Enrolled Students</h6>
+              <h2 class="fw-bold text-dark mb-0" id="stat-students">0</h2>
+              <span class="text-muted small" style="font-size: 0.75rem;">Assigned to my course tracks</span>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="class-card">
+              <h6 class="text-muted small fw-semibold text-uppercase mb-2">Lectures Registered</h6>
+              <h2 class="fw-bold text-dark mb-0" id="stat-attendance-sessions">0</h2>
+              <span class="text-muted small" style="font-size: 0.75rem;">In local attendance archives</span>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="class-card">
+              <h6 class="text-muted small fw-semibold text-uppercase mb-2">Announcements Published</h6>
+              <h2 class="fw-bold text-dark mb-0" id="stat-notices">0</h2>
+              <span class="text-muted small" style="font-size: 0.75rem;">Dispatched to student timelines</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timetable section -->
+        <div class="card border border-light-subtle rounded-4 bg-white p-4 shadow-sm mb-4">
+          <h5 class="fw-bold font-display mb-3 text-dark"><i class="bi bi-clock-fill text-warning me-2"></i>Weekly Campus Lecture Timetable</h5>
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Course Track</th>
+                  <th>Day</th>
+                  <th>Time Slot</th>
+                  <th>Room / Lab Location</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Software Engineering</strong></td>
+                  <td>Mondays & Wednesdays</td>
+                  <td>10:00 AM - 12:30 PM</td>
+                  <td>Computer Lab Alpha (First Floor)</td>
+                  <td><span class="badge bg-success">Scheduled</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Graphic Design</strong></td>
+                  <td>Tuesdays & Thursdays</td>
+                  <td>01:00 PM - 03:00 PM</td>
+                  <td>Creative Studio Beta</td>
+                  <td><span class="badge bg-success">Scheduled</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Cybersecurity Basics</strong></td>
+                  <td>Fridays</td>
+                  <td>09:00 AM - 01:00 PM</td>
+                  <td>Network Security Lab Omega</td>
+                  <td><span class="badge bg-success">Scheduled</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ASSIGNED STUDENTS -->
+      <div id="tab-students" class="tab-pane-custom d-none">
+        <h4 class="fw-bold text-dark font-display mb-1">Enrolled Class Dossiers</h4>
+        <p class="text-muted small mb-4">Complete registry of active students assigned to your classes at this campus.</p>
+
+        <div class="card border border-light-subtle bg-white rounded-4 shadow-sm p-4">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Student ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Phone Number</th>
+                  <th>Course track</th>
+                  <th>Gender</th>
+                  <th>Overall Rating</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ATTENDANCE REGISTERS -->
+      <div id="tab-attendance" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Class Attendance Registers</h4>
+            <p class="text-muted small">Log daily lecture attendance, verify presence coordinates, and trace compliance margins.</p>
+          </div>
+          <button onclick="showLogAttendanceModal()" class="btn btn-info text-white fw-semibold px-4" style="background-color: var(--accent-teal);">
+            <i class="bi bi-calendar-plus me-1"></i> Log Lecture Attendance
+          </button>
+        </div>
+
+        <div class="card border border-light-subtle bg-white rounded-4 shadow-sm p-4">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Date</th>
+                  <th>Course track</th>
+                  <th>Total Present</th>
+                  <th>Total Absent</th>
+                  <th>Topic Discussed</th>
+                  <th>Audited By</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-tbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: GRADING -->
+      <div id="tab-grading" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Gradebook & Examination Logs</h4>
+            <p class="text-muted small">Input and upload continuous assessment tests, exam performance logs, and local certifications.</p>
+          </div>
+          <button onclick="showGradeInputModal()" class="btn btn-info text-white fw-semibold px-4" style="background-color: var(--accent-teal);">
+            <i class="bi bi-journal-plus me-1"></i> Record Exam Scores
+          </button>
+        </div>
+
+        <div class="card border border-light-subtle bg-white rounded-4 shadow-sm p-4">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Student ID</th>
+                  <th>Student Name</th>
+                  <th>Course Track</th>
+                  <th>Test Score (30%)</th>
+                  <th>Exam Score (70%)</th>
+                  <th>Total (100%)</th>
+                  <th>Grade Evaluation</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="grading-tbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: ANNOUNCEMENTS -->
+      <div id="tab-announcements" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Announcements & Notices Board</h4>
+            <p class="text-muted small">Publish class announcements, assignment briefs, timetable adjustments, or projects deadlines.</p>
+          </div>
+          <button onclick="showAnnouncementModal()" class="btn btn-info text-white fw-semibold px-4" style="background-color: var(--accent-teal);">
+            <i class="bi bi-megaphone me-1"></i> Dispatch Notice
+          </button>
+        </div>
+
+        <div class="row g-4" id="notices-container">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- --- MODALS --- -->
+
+  <!-- Modal: Log Lecture Attendance -->
+  <div class="modal fade" id="attendanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <form id="attendance-form">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title font-display fw-bold">Log Lecture Attendance</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label for="att-date" class="form-label small fw-semibold">Session Date</label>
+              <input type="date" class="form-control" id="att-date" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="att-course" class="form-label small fw-semibold">Select Course Track</label>
+              <select class="form-select" id="att-course" required>
+                <!-- Loaded dynamically -->
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="att-topic" class="form-label small fw-semibold">Topic Discussed / Practical Conducted</label>
+              <input type="text" class="form-control" id="att-topic" placeholder="e.g. Introduction to CSS Grid System" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold d-block">Mark Student Attendance</label>
+              <div class="p-3 border rounded-3 bg-light" id="att-students-list-container" style="max-height: 200px; overflow-y: auto;">
+                <!-- Populated with checkboxes -->
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-info text-white" style="background-color: var(--accent-teal);">Save Attendance Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Record Exam Scores -->
+  <div class="modal fade" id="gradingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <form id="grading-form">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title font-display fw-bold">Record Student Exam Scores</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label for="grade-student" class="form-label small fw-semibold">Select Student</label>
+              <select class="form-select" id="grade-student" required>
+                <!-- Loaded dynamically -->
+              </select>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="grade-test" class="form-label small fw-semibold">Test Score (Max 30)</label>
+                <input type="number" class="form-control" id="grade-test" min="0" max="30" required>
+              </div>
+              <div class="col">
+                <label for="grade-exam" class="form-label small fw-semibold">Exam Score (Max 70)</label>
+                <input type="number" class="form-control" id="grade-exam" min="0" max="70" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="grade-remarks" class="form-label small fw-semibold">Academic Instructor Remarks</label>
+              <input type="text" class="form-control" id="grade-remarks" placeholder="e.g. Exceptional analytical competence" required>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-info text-white" style="background-color: var(--accent-teal);">Log Results Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Dispatch Notice -->
+  <div class="modal fade" id="noticeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <form id="notice-form">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title font-display fw-bold">Dispatch Academic Notice</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label for="notice-title" class="form-label small fw-semibold">Notice Title</label>
+              <input type="text" class="form-control" id="notice-title" placeholder="e.g. Phase 1 Assessment Project brief" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="notice-scope" class="form-label small fw-semibold">Target Course Track</label>
+              <select class="form-select" id="notice-scope" required>
+                <!-- Loaded dynamically -->
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="notice-content" class="form-label small fw-semibold">Notice Details / Announcement Text</label>
+              <textarea class="form-control" id="notice-content" rows="4" placeholder="Type announcement instructions here..." required></textarea>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-info text-white" style="background-color: var(--accent-teal);">Publish Announcement</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+    import { seedAdminMockDatabase, getRegisteredStudentsList } from "./admin.js";
+
+    // Secure Authorization Layer
+    const isInst = sessionStorage.getItem("instructor_logged_in") === "true";
+    if (!isInst) {
+      window.location.href = "admin.html";
+    }
+
+    // Retrieve active details
+    const currentCentreId = sessionStorage.getItem("instructor_centre_id") || "abk";
+    const currentCentreName = sessionStorage.getItem("instructor_centre_name") || "ABK Centre";
+    const instructorName = sessionStorage.getItem("instructor_name") || "Engr. Kayode";
+    const instructorEmail = sessionStorage.getItem("instructor_email") || "";
+
+    // Set UI branding
+    document.getElementById("sidebar-centre-badge").textContent = currentCentreName + " Desk";
+    document.getElementById("sidebar-inst-name").textContent = instructorName;
+    document.getElementById("sidebar-inst-email").textContent = instructorEmail;
+    document.getElementById("navbar-inst-badge").textContent = `${instructorName} - Academic Command Center`;
+    document.getElementById("campus-badge").textContent = currentCentreName + " Campus";
+
+    // Dynamic lists
+    let myStudents = [];
+    let myCourses = [];
+    let attendanceLogs = [];
+    let gradingLogs = [];
+    let announcements = [];
+
+    // Modal objects
+    const attendanceModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+    const gradingModal = new bootstrap.Modal(document.getElementById('gradingModal'));
+    const noticeModal = new bootstrap.Modal(document.getElementById('noticeModal'));
+
+    window.switchTab = switchTab;
+    window.toggleSidebar = toggleSidebar;
+    window.logoutInstructor = logoutInstructor;
+    window.showLogAttendanceModal = showLogAttendanceModal;
+    window.showGradeInputModal = showGradeInputModal;
+    window.showAnnouncementModal = showAnnouncementModal;
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      seedAdminMockDatabase();
+      await loadDatabaseSnapshot();
+      switchTab('overview');
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+    });
+
+    function updateLiveClock() {
+      const liveBadge = document.getElementById("live-time-badge");
+      if (liveBadge) {
+        const now = new Date();
+        liveBadge.textContent = "UTC Core: " + now.toISOString().replace("T", " ").substring(0, 19);
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("instructorSidebar");
+      sidebar.classList.toggle("show");
+    }
+
+    function logoutInstructor() {
+      sessionStorage.clear();
+      window.location.href = "admin.html";
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-pane-custom").forEach(pane => pane.classList.add("d-none"));
+      document.querySelectorAll(".menu-item").forEach(item => item.classList.remove("active"));
+
+      const selectedPane = document.getElementById(`tab-${tabId}`);
+      if (selectedPane) selectedPane.classList.remove("d-none");
+
+      const selectedMenu = document.getElementById(`menu-${tabId}`);
+      if (selectedMenu) selectedMenu.classList.add("active");
+
+      const sidebar = document.getElementById("instructorSidebar");
+      sidebar.classList.remove("show");
+    }
+
+    // --- DATA COORDINATOR ---
+    async function loadDatabaseSnapshot() {
+      // Find all courses where instructor matches
+      const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
+      myCourses = allCourses.filter(c => c.instructor === instructorName && c.centreId === currentCentreId);
+
+      const courseTitles = myCourses.map(c => c.title);
+
+      // Fetch students enrolled in those courses at this center
+      const allStudents = await getRegisteredStudentsList();
+      myStudents = allStudents.filter(s => s.centreId === currentCentreId && s.status === "approved" && courseTitles.includes(s.course));
+
+      // Fetch attendance
+      const allAttendance = JSON.parse(localStorage.getItem("mock_attendance") || "[]");
+      attendanceLogs = allAttendance.filter(a => courseTitles.includes(a.course) && a.centreId === currentCentreId);
+
+      // Fetch grades
+      const allGrades = JSON.parse(localStorage.getItem("mock_grades") || "[]");
+      gradingLogs = allGrades.filter(g => courseTitles.includes(g.course) && g.centreId === currentCentreId);
+
+      // Fetch announcements
+      const allAnnouncements = JSON.parse(localStorage.getItem("mock_announcements") || "[]");
+      announcements = allAnnouncements.filter(n => courseTitles.includes(n.course) && n.centreId === currentCentreId);
+
+      // Seed UI Overview Stats
+      document.getElementById("stat-students").textContent = myStudents.length;
+      document.getElementById("stat-attendance-sessions").textContent = attendanceLogs.length;
+      document.getElementById("stat-notices").textContent = announcements.length;
+
+      renderStudentsTable();
+      renderAttendanceTable();
+      renderGradingTable();
+      renderAnnouncementsGrid();
+      populateDropdowns();
+    }
+
+    // --- RENDER MODULES ---
+
+    function renderStudentsTable() {
+      const body = document.getElementById("students-tbody");
+      body.innerHTML = "";
+
+      if (myStudents.length === 0) {
+        body.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No students assigned to your course tracks.</td></tr>`;
+        return;
+      }
+
+      myStudents.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="fw-bold text-dark">${s.studentId}</span></td>
+          <td><span class="fw-semibold text-dark">${s.fullname}</span></td>
+          <td>${s.email}</td>
+          <td>${s.phone}</td>
+          <td><span class="badge bg-secondary-subtle text-dark border">${s.course}</span></td>
+          <td>${s.gender || "Male"}</td>
+          <td><i class="bi bi-star-fill text-warning"></i> 5.0 (Optimal)</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderAttendanceTable() {
+      const body = document.getElementById("attendance-tbody");
+      body.innerHTML = "";
+
+      if (attendanceLogs.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No class attendance registers logged yet.</td></tr>`;
+        return;
+      }
+
+      attendanceLogs.forEach(a => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${a.date}</strong></td>
+          <td><span class="badge bg-light text-dark border">${a.course}</span></td>
+          <td><span class="badge bg-success-subtle text-success">${a.present} Present</span></td>
+          <td><span class="badge bg-danger-subtle text-danger">${a.absent} Absent</span></td>
+          <td>${a.topic}</td>
+          <td><code>${a.instructor}</code></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderGradingTable() {
+      const body = document.getElementById("grading-tbody");
+      body.innerHTML = "";
+
+      if (gradingLogs.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No results logged yet for your class.</td></tr>`;
+        return;
+      }
+
+      gradingLogs.forEach(g => {
+        const total = Number(g.testScore) + Number(g.examScore);
+        let grade = "F";
+        let badgeColor = "bg-danger";
+
+        if (total >= 70) { grade = "A"; badgeColor = "bg-success"; }
+        else if (total >= 60) { grade = "B"; badgeColor = "bg-primary"; }
+        else if (total >= 50) { grade = "C"; badgeColor = "bg-info text-dark"; }
+        else if (total >= 40) { grade = "D"; badgeColor = "bg-warning text-dark"; }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="fw-bold text-dark">${g.studentId}</span></td>
+          <td><span class="fw-semibold text-dark">${g.studentName}</span></td>
+          <td><span class="badge bg-light text-dark border">${g.course}</span></td>
+          <td>${g.testScore} / 30</td>
+          <td>${g.examScore} / 70</td>
+          <td><strong>${total} / 100</strong></td>
+          <td><span class="badge ${badgeColor}">${grade}</span></td>
+          <td><span class="fst-italic text-muted">${g.remarks || "Good"}</span></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderAnnouncementsGrid() {
+      const container = document.getElementById("notices-container");
+      container.innerHTML = "";
+
+      if (announcements.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-5 text-muted">No announcements launched.</div>`;
+        return;
+      }
+
+      announcements.forEach(a => {
+        const div = document.createElement("div");
+        div.className = "col-md-6";
+        div.innerHTML = `
+          <div class="card h-100 border border-info-subtle bg-white rounded-4 shadow-sm p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+              <span class="badge bg-info-subtle text-info border border-info text-uppercase fw-semibold" style="font-size: 0.7rem;">${a.course}</span>
+              <small class="text-muted">${a.date}</small>
+            </div>
+            <h5 class="fw-bold text-dark font-display mb-2">${a.title}</h5>
+            <p class="text-muted small mb-0" style="line-height: 1.6;">${a.content}</p>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function populateDropdowns() {
+      // Attendance Courses
+      const attCourseSelect = document.getElementById("att-course");
+      if (attCourseSelect) {
+        attCourseSelect.innerHTML = "";
+        myCourses.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.title;
+          opt.textContent = c.title;
+          attCourseSelect.appendChild(opt);
+        });
+        
+        // Load checkboxes based on selected course
+        attCourseSelect.addEventListener("change", updateAttendanceCheckboxList);
+        updateAttendanceCheckboxList();
+      }
+
+      // Grading Students
+      const gradeStudentSelect = document.getElementById("grade-student");
+      if (gradeStudentSelect) {
+        gradeStudentSelect.innerHTML = "";
+        myStudents.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.studentId;
+          opt.textContent = `${s.fullname} (${s.studentId}) - ${s.course}`;
+          gradeStudentSelect.appendChild(opt);
+        });
+      }
+
+      // Notice Scope Courses
+      const noticeScopeSelect = document.getElementById("notice-scope");
+      if (noticeScopeSelect) {
+        noticeScopeSelect.innerHTML = "";
+        myCourses.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.title;
+          opt.textContent = c.title;
+          noticeScopeSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function updateAttendanceCheckboxList() {
+      const courseTitle = document.getElementById("att-course").value;
+      const container = document.getElementById("att-students-list-container");
+      container.innerHTML = "";
+
+      const enrolled = myStudents.filter(s => s.course === courseTitle);
+
+      if (enrolled.length === 0) {
+        container.innerHTML = `<span class="text-muted small">No active students registered in this course.</span>`;
+        return;
+      }
+
+      enrolled.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "form-check mb-2 d-flex align-items-center justify-content-between";
+        div.innerHTML = `
+          <label class="form-check-label text-dark fw-medium small" for="chk-${s.studentId}">
+            ${s.fullname} (${s.studentId})
+          </label>
+          <input class="form-check-input student-att-chk" type="checkbox" value="${s.studentId}" id="chk-${s.studentId}" checked style="width: 1.2rem; height: 1.2rem;">
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Modal Triggers
+    function showLogAttendanceModal() {
+      document.getElementById("attendance-form").reset();
+      updateAttendanceCheckboxList();
+      attendanceModal.show();
+    }
+
+    function showGradeInputModal() {
+      document.getElementById("grading-form").reset();
+      gradingModal.show();
+    }
+
+    function showAnnouncementModal() {
+      document.getElementById("notice-form").reset();
+      noticeModal.show();
+    }
+
+    // Modal Submits
+    document.getElementById("attendance-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const date = document.getElementById("att-date").value;
+      const course = document.getElementById("att-course").value;
+      const topic = document.getElementById("att-topic").value;
+
+      const chks = document.querySelectorAll(".student-att-chk");
+      let presentCount = 0;
+      let absentCount = 0;
+
+      chks.forEach(chk => {
+        if (chk.checked) presentCount++;
+        else absentCount++;
+      });
+
+      try {
+        const allAtt = JSON.parse(localStorage.getItem("mock_attendance") || "[]");
+        const newLog = {
+          id: "att-" + Date.now(),
+          date,
+          course,
+          present: presentCount,
+          absent: absentCount,
+          topic,
+          instructor: instructorName,
+          centreId: currentCentreId
+        };
+
+        allAtt.unshift(newLog);
+        localStorage.setItem("mock_attendance", JSON.stringify(allAtt));
+
+        attendanceModal.hide();
+        await loadDatabaseSnapshot();
+        alert("Daily attendance register saved.");
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    document.getElementById("grading-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById("grade-student").value;
+      const testScore = document.getElementById("grade-test").value;
+      const examScore = document.getElementById("grade-exam").value;
+      const remarks = document.getElementById("grade-remarks").value;
+
+      const student = myStudents.find(s => s.studentId === studentId);
+      if (!student) return;
+
+      try {
+        const allGrades = JSON.parse(localStorage.getItem("mock_grades") || "[]");
+        
+        // Remove old grade if exists to avoid duplication
+        const filteredGrades = allGrades.filter(g => !(g.studentId === studentId && g.course === student.course));
+
+        const newGrade = {
+          id: "grade-" + Date.now(),
+          studentId: student.studentId,
+          studentName: student.fullname,
+          course: student.course,
+          testScore: Number(testScore),
+          examScore: Number(examScore),
+          remarks,
+          instructor: instructorName,
+          centreId: currentCentreId
+        };
+
+        filteredGrades.unshift(newGrade);
+        localStorage.setItem("mock_grades", JSON.stringify(filteredGrades));
+
+        gradingModal.hide();
+        await loadDatabaseSnapshot();
+        alert("Examination scores logged successfully.");
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    document.getElementById("notice-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("notice-title").value;
+      const course = document.getElementById("notice-scope").value;
+      const content = document.getElementById("notice-content").value;
+
+      try {
+        const allAnnouncements = JSON.parse(localStorage.getItem("mock_announcements") || "[]");
+        const newAnn = {
+          id: "ann-" + Date.now(),
+          title,
+          course,
+          content,
+          date: new Date().toISOString().split("T")[0],
+          instructor: instructorName,
+          centreId: currentCentreId
+        };
+
+        allAnnouncements.unshift(newAnn);
+        localStorage.setItem("mock_announcements", JSON.stringify(allAnnouncements));
+
+        noticeModal.hide();
+        await loadDatabaseSnapshot();
+        alert("Academic notice published to student boards.");
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

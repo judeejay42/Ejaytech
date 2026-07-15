@@ -34,7 +34,8 @@ export function seedAdminMockDatabase() {
         courseImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&auto=format&fit=crop&q=60",
         isArchived: false,
         deadline: "2026-08-15",
-        instructor: "Engr. Kayode"
+        instructor: "Engr. Kayode",
+        centreId: "abk"
       },
       {
         id: "course-2",
@@ -48,7 +49,8 @@ export function seedAdminMockDatabase() {
         courseImage: "https://images.unsplash.com/photo-1561070791-26c113006238?w=500&auto=format&fit=crop&q=60",
         isArchived: false,
         deadline: "2026-07-30",
-        instructor: "Mr. Femi Adeleye"
+        instructor: "Mr. Femi Adeleye",
+        centreId: "ibadan"
       },
       {
         id: "course-3",
@@ -62,7 +64,8 @@ export function seedAdminMockDatabase() {
         courseImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500&auto=format&fit=crop&q=60",
         isArchived: false,
         deadline: "2026-09-01",
-        instructor: "Engr. Kayode"
+        instructor: "Engr. Kayode",
+        centreId: "abuja"
       }
     ];
     localStorage.setItem("mock_courses", JSON.stringify(defaultCourses));
@@ -88,6 +91,7 @@ export function seedAdminMockDatabase() {
         approvalStatus: "pending",
         createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
         bio: "Passionate about web development and JavaScript systems.",
+        centreId: "abk",
         // Administrative multi-stage workflow status
         workflow: {
           submitted: true,
@@ -123,6 +127,7 @@ export function seedAdminMockDatabase() {
         approvalStatus: "approved",
         createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
         bio: "Creative graphic designer learning Adobe tools and layouts.",
+        centreId: "ibadan",
         workflow: {
           submitted: true,
           pendingReview: "approved",
@@ -156,6 +161,7 @@ export function seedAdminMockDatabase() {
         approvalStatus: "approved",
         createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
         bio: "Aspiring cybersecurity operations analyst.",
+        centreId: "abuja",
         workflow: {
           submitted: true,
           pendingReview: "approved",
@@ -189,6 +195,7 @@ export function seedAdminMockDatabase() {
         approvalStatus: "rejected",
         createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
         bio: "Wants to learn programming concepts but document mismatched.",
+        centreId: "abk",
         workflow: {
           submitted: true,
           pendingReview: "approved",
@@ -223,6 +230,7 @@ export function seedAdminMockDatabase() {
         referenceNumber: "REF-GRAPH-98213",
         proofOfPayment: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=500&auto=format&fit=crop&q=60",
         status: "Verified", // Pending, Verified, Failed, Refunded
+        centreId: "ibadan",
         createdAt: new Date(Date.now() - 3600000 * 23).toISOString()
       },
       {
@@ -236,6 +244,7 @@ export function seedAdminMockDatabase() {
         referenceNumber: "REF-CYBER-55019",
         proofOfPayment: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=500&auto=format&fit=crop&q=60",
         status: "Verified",
+        centreId: "abuja",
         createdAt: new Date(Date.now() - 3600000 * 47).toISOString()
       },
       {
@@ -249,6 +258,7 @@ export function seedAdminMockDatabase() {
         referenceNumber: "REF-SOFT-77123",
         proofOfPayment: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=500&auto=format&fit=crop&q=60",
         status: "Pending",
+        centreId: "abk",
         createdAt: new Date(Date.now() - 3600000 * 4).toISOString()
       }
     ];
@@ -266,46 +276,51 @@ export function seedAdminMockDatabase() {
         role: "Super Admin", // Super Admin, Administrator, Finance Officer, Admissions Officer, Instructor
         avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70",
         active: true,
+        centreId: "all",
         createdAt: "2026-01-10T12:00:00Z"
       },
       {
-        id: "admin-regular",
-        name: "Femi Adeleye",
-        email: "admin@ejaytech-concepts.local",
-        username: "femi_adeleye",
-        role: "Administrator",
+        id: "admin-abk",
+        name: "ABK Centre Admin",
+        email: "ejaytechabkadmin@gmail.com",
+        username: "abk_admin",
+        role: "Centre Admin",
         avatarUrl: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=70",
         active: true,
+        centreId: "abk",
         createdAt: "2026-02-15T09:30:00Z"
       },
       {
-        id: "admin-finance",
-        name: "Tunde Olanrewaju",
-        email: "finance@ejaytech-concepts.local",
-        username: "tunde_finance",
-        role: "Finance Officer",
+        id: "admin-ibadan",
+        name: "Ibadan Centre Admin",
+        email: "ejaytechibadmin@gmail.com",
+        username: "ibadan_admin",
+        role: "Centre Admin",
         avatarUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=70",
         active: true,
+        centreId: "ibadan",
         createdAt: "2026-03-01T10:00:00Z"
       },
       {
-        id: "admin-admissions",
-        name: "Chioma Nwachukwu",
-        email: "admissions@ejaytech-concepts.local",
-        username: "chioma_admission",
-        role: "Admissions Officer",
+        id: "admin-abuja",
+        name: "Abuja Centre Admin",
+        email: "ejaytechabjadmin@gmail.com",
+        username: "abuja_admin",
+        role: "Centre Admin",
         avatarUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=70",
         active: true,
+        centreId: "abuja",
         createdAt: "2026-03-12T14:15:00Z"
       },
       {
-        id: "admin-instructor",
+        id: "admin-instructor-abk",
         name: "Engr. Kayode",
-        email: "instructor@ejaytech-concepts.local",
-        username: "kayode_eng",
+        email: "instructor.abk@ejaytech.com",
+        username: "kayode_abk",
         role: "Instructor",
         avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=70",
         active: true,
+        centreId: "abk",
         createdAt: "2026-04-05T08:20:00Z"
       }
     ];
@@ -327,8 +342,8 @@ export function seedAdminMockDatabase() {
       },
       {
         id: "log-2",
-        adminName: "Chioma Nwachukwu",
-        adminEmail: "admissions@ejaytech-concepts.local",
+        adminName: "ABK Centre Admin",
+        adminEmail: "ejaytechabkadmin@gmail.com",
         action: "Student Review Started",
         message: "Opened multi-stage verification dossier for Oluwaseun Adebayo.",
         date: "2026-07-14",
@@ -351,6 +366,7 @@ export function seedAdminMockDatabase() {
         message: "Congratulations! Your registration for Graphic Design has been verified and fully approved.",
         type: "Admission Status",
         channel: "In-App & Email Dispatched",
+        centreId: "ibadan",
         createdAt: new Date(Date.now() - 3600000 * 22).toISOString()
       },
       {
@@ -362,6 +378,7 @@ export function seedAdminMockDatabase() {
         message: "Payment reference REF-CYBER-55019 of ₦120,000 has been verified by our Finance Desk.",
         type: "Payment Audit",
         channel: "In-App & Email Dispatched",
+        centreId: "abuja",
         createdAt: new Date(Date.now() - 3600000 * 46).toISOString()
       }
     ];

@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centre Core Operations - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Chart.js for High Fidelity Reports -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS variables -->
+  <style>
+    :root {
+      --primary-navy: #1e293b;
+      --accent-blue: #0f766e; /* Teal tone for Centre Admin to distinguish from Navy blue Super Admin */
+      --hover-blue: #0d9488;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #334155;
+      --sidebar-width: 280px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* Elegant Sidebar */
+    .sidebar-panel {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--primary-navy);
+      color: #f8fafc;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #334155;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #334155;
+      background-color: #0f172a;
+    }
+
+    .sidebar-menu {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem 0.75rem;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      color: #f8fafc;
+    }
+
+    .menu-item.active {
+      background-color: var(--accent-blue) !important;
+      color: #ffffff !important;
+    }
+
+    /* Main Workspace area */
+    .main-workspace {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    .top-navbar {
+      height: 72px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .workspace-content {
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    /* Metric Cards styling */
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+    .metric-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .badge-workflow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Workflow status indicators */
+    .workflow-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    .workflow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .nav-tabs-premium {
+      border-bottom: 2px solid var(--border-color);
+    }
+    .nav-tabs-premium .nav-link {
+      border: none;
+      color: #64748b;
+      font-weight: 500;
+      padding: 0.75rem 1.25rem;
+      position: relative;
+    }
+    .nav-tabs-premium .nav-link:hover {
+      color: var(--accent-blue);
+    }
+    .nav-tabs-premium .nav-link.active {
+      color: var(--accent-blue);
+      background: none;
+    }
+    .nav-tabs-premium .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--accent-blue);
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar-panel {
+        transform: translateX(-100%);
+      }
+      .sidebar-panel.show {
+        transform: translateX(0);
+      }
+      .main-workspace {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar-panel" id="adminSidebar">
+    <div class="sidebar-header d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2">
+        <img src="/assets/images/logo-512.png" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
+        <div>
+          <span class="fw-bold d-block text-white" style="font-size: 0.95rem; letter-spacing: 0.03em;">EJaytech</span>
+          <span class="text-teal-400 d-block text-uppercase fw-semibold text-info" id="sidebar-centre-badge" style="font-size: 0.65rem; letter-spacing: 0.05em;">ABK Centre</span>
+        </div>
+      </div>
+      <button class="btn btn-dark d-lg-none p-1" onclick="toggleSidebar()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="sidebar-menu">
+      <span class="text-uppercase text-muted d-block px-3 mb-2 fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Operations Hub</span>
+      <button onclick="switchTab('overview')" class="menu-item active" id="menu-overview">
+        <i class="bi bi-speedometer2"></i> Dashboard Overview
+      </button>
+      <button onclick="switchTab('registrations')" class="menu-item" id="menu-registrations">
+        <i class="bi bi-person-plus-fill"></i> Admission Workflow
+        <span class="badge bg-danger rounded-pill ms-auto" id="badge-pending-count">0</span>
+      </button>
+      <button onclick="switchTab('students')" class="menu-item" id="menu-students">
+        <i class="bi bi-people-fill"></i> Student Dossiers
+      </button>
+      <button onclick="switchTab('payments')" class="menu-item" id="menu-payments">
+        <i class="bi bi-credit-card-fill"></i> Tuition Ledger
+      </button>
+      <button onclick="switchTab('courses')" class="menu-item" id="menu-courses">
+        <i class="bi bi-journal-bookmark-fill"></i> Local Courses
+      </button>
+
+      <span class="text-uppercase text-muted d-block px-3 mt-4 mb-2 fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Governance</span>
+      <button onclick="switchTab('logs')" class="menu-item" id="menu-logs">
+        <i class="bi bi-shield-check"></i> Campus Audit Logs
+      </button>
+    </div>
+
+    <div class="p-3 border-top border-secondary mt-auto bg-dark">
+      <div class="d-flex align-items-center gap-3">
+        <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=70" alt="Avatar" class="rounded-circle bg-white p-1" style="width: 42px; height: 42px; object-fit: cover;" id="sidebar-admin-avatar">
+        <div class="overflow-hidden">
+          <span class="fw-semibold text-white d-block text-truncate small" id="sidebar-admin-name">ABK Admin</span>
+          <span class="text-muted d-block text-truncate" style="font-size: 0.72rem;" id="sidebar-admin-email">ejaytechabkadmin@gmail.com</span>
+        </div>
+      </div>
+      <button onclick="logoutAdmin()" class="btn btn-outline-danger btn-sm w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
+        <i class="bi bi-box-arrow-left"></i> End Console Session
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main class="main-workspace">
+    
+    <!-- Top Nav -->
+    <header class="top-navbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <h5 class="fw-bold text-dark font-display mb-0" id="navbar-centre-name">ABK Centre Administration Portal</h5>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-success-subtle text-success border border-success px-3 py-1 text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.04em;">
+          <i class="bi bi-circle-fill text-success spinner-grow spinner-grow-sm me-1" style="width: 6px; height: 6px;"></i> Live Syncing Active
+        </span>
+        <button onclick="syncAllDatabaseState()" class="btn btn-outline-secondary btn-sm p-2 rounded-circle" title="Sync database coordinates">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Workspace -->
+    <section class="workspace-content">
+      
+      <!-- TAB 1: OVERVIEW -->
+      <div id="tab-overview" class="tab-pane-custom">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Welcome Back, <span id="welcome-admin-name">Campus Admin</span></h4>
+            <p class="text-muted small">Real-time status metrics and workflow pipeline coordinates for <span class="fw-bold" id="dashboard-centre-text">ABK Centre</span>.</p>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-dark px-3 py-2" id="live-time-badge">UTC Core Live</span>
+          </div>
+        </div>
+
+        <!-- Metric Widgets Grid -->
+        <div class="row g-3 mb-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted small fw-semibold text-uppercase">Total Registrations</span>
+                <div class="metric-icon-box bg-primary-subtle text-primary">
+                  <i class="bi bi-person-plus"></i>
+                </div>
+              </div>
+              <h2 class="fw-bold mb-1" id="stat-registrations">0</h2>
+              <span class="text-muted" style="font-size: 0.75rem;">Submitted applications</span>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted small fw-semibold text-uppercase">Active Students</span>
+                <div class="metric-icon-box bg-success-subtle text-success">
+                  <i class="bi bi-people"></i>
+                </div>
+              </div>
+              <h2 class="fw-bold mb-1" id="stat-active-students">0</h2>
+              <span class="text-muted" style="font-size: 0.75rem;">Approved & Active dossiers</span>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted small fw-semibold text-uppercase">Tuition Collected</span>
+                <div class="metric-icon-box bg-info-subtle text-info">
+                  <i class="bi bi-wallet2"></i>
+                </div>
+              </div>
+              <h2 class="fw-bold mb-1" id="stat-tuition-collected">₦0</h2>
+              <span class="text-muted" style="font-size: 0.75rem;">Verified tuition payments</span>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted small fw-semibold text-uppercase">Unverified Payments</span>
+                <div class="metric-icon-box bg-warning-subtle text-warning">
+                  <i class="bi bi-shield-exclamation"></i>
+                </div>
+              </div>
+              <h2 class="fw-bold mb-1" id="stat-unverified-payments">0</h2>
+              <span class="text-muted" style="font-size: 0.75rem;">Pending administrative review</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-8">
+            <div class="card border border-light-subtle rounded-4 p-4 shadow-sm bg-white">
+              <h6 class="fw-bold mb-3 font-display">Tuition Receipt Influx</h6>
+              <div style="height: 300px; position: relative;">
+                <canvas id="tuitionChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card border border-light-subtle rounded-4 p-4 shadow-sm bg-white h-100">
+              <h6 class="fw-bold mb-3 font-display">Workflow Clearance Stage</h6>
+              <div style="height: 220px; position: relative;" class="d-flex align-items-center justify-content-center">
+                <canvas id="workflowPieChart"></canvas>
+              </div>
+              <div class="d-flex justify-content-around mt-3 small text-center text-muted">
+                <div>
+                  <span class="d-block fw-bold text-success" id="chart-lbl-approved">0</span>
+                  Approved
+                </div>
+                <div>
+                  <span class="d-block fw-bold text-warning" id="chart-lbl-pending">0</span>
+                  Pending
+                </div>
+                <div>
+                  <span class="d-block fw-bold text-danger" id="chart-lbl-rejected">0</span>
+                  Rejected
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Activity Logs Panel -->
+        <div class="card border border-light-subtle rounded-4 shadow-sm bg-white p-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold font-display mb-0">Campus Activities Audit Feed</h6>
+            <button onclick="switchTab('logs')" class="btn btn-link text-decoration-none small text-teal p-0">Detailed view</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Operator</th>
+                  <th>Action Coordinates</th>
+                  <th>Description</th>
+                  <th>Timestamp</th>
+                  <th>IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="quick-logs-tbody">
+                <tr><td colspan="5" class="text-center py-3 text-muted">Awaiting sync parameters...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ADMISSION WORKFLOW -->
+      <div id="tab-registrations" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Multi-Stage Admission Workflow</h4>
+            <p class="text-muted small">Verify submitted documents, crosscheck payment records, and approve/activate student dossiers.</p>
+          </div>
+        </div>
+
+        <div class="card border border-light-subtle rounded-4 bg-white shadow-sm p-4">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+            <div class="input-group" style="max-width: 400px;">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" class="form-control border-start-0" id="reg-search-input" placeholder="Search applicant by name or email..." onkeyup="filterRegistrationsTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Student ID</th>
+                  <th>Full Name</th>
+                  <th>Registered Course</th>
+                  <th>Docs State</th>
+                  <th>Fees State</th>
+                  <th>Review Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="registrations-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: STUDENT DOSSIERS -->
+      <div id="tab-students" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Active Campus Student Dossiers</h4>
+            <p class="text-muted small">Access and manage all verified student profiles, attendance, courses, and credentials.</p>
+          </div>
+          <button onclick="showCreateStudentModal()" class="btn btn-teal text-white fw-medium px-4" style="background-color: var(--accent-blue);">
+            <i class="bi bi-plus-lg me-1"></i> Register Student Dossier
+          </button>
+        </div>
+
+        <div class="card border border-light-subtle bg-white rounded-4 shadow-sm p-4">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+            <div class="input-group" style="max-width: 400px;">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" class="form-control border-start-0" id="student-search-input" placeholder="Search dossier registry..." onkeyup="filterStudentsTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Student ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Contact Number</th>
+                  <th>Enrolled Course</th>
+                  <th>Clearance State</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: TUITION LEDGER -->
+      <div id="tab-payments" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Tuition Payment Audit Ledger</h4>
+            <p class="text-muted small">Review tuition transactions, verify bank transfer receipts, and audit total campus collections.</p>
+          </div>
+          <button onclick="showAddPaymentModal()" class="btn btn-teal text-white fw-medium px-4" style="background-color: var(--accent-blue);">
+            <i class="bi bi-plus-lg me-1"></i> Log Tuition Payment
+          </button>
+        </div>
+
+        <div class="card border border-light-subtle bg-white rounded-4 shadow-sm p-4">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>TXN ID</th>
+                  <th>Student Name</th>
+                  <th>Course Track</th>
+                  <th>Amount Paid</th>
+                  <th>Reference</th>
+                  <th>Method</th>
+                  <th>Trans. Date</th>
+                  <th>Audit Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payments-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: COURSE CATALOG -->
+      <div id="tab-courses" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Campus Course Catalog</h4>
+            <p class="text-muted small">Organize academic curricula, set deadlines, schedule fees, and assign certified instructors.</p>
+          </div>
+          <button onclick="showCreateCourseModal()" class="btn btn-teal text-white fw-medium px-4" style="background-color: var(--accent-blue);">
+            <i class="bi bi-plus-lg me-1"></i> Launch New Course Track
+          </button>
+        </div>
+
+        <div class="row g-4" id="courses-grid-container">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+
+      <!-- TAB 6: AUDIT LOGS -->
+      <div id="tab-logs" class="tab-pane-custom d-none">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold text-dark font-display mb-1">Security Audit & Campus Logs</h4>
+            <p class="text-muted small">Historical cryptographically tracked timeline of administrative interventions and modifications.</p>
+          </div>
+        </div>
+
+        <div class="card border border-light-subtle bg-white rounded-4 shadow-sm p-4">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle small mb-0">
+              <thead>
+                <tr class="table-dark">
+                  <th>Log ID</th>
+                  <th>Operator Name</th>
+                  <th>Action Taken</th>
+                  <th>Description Coordinates</th>
+                  <th>Timestamp</th>
+                  <th>IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="audit-logs-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- --- MODALS --- -->
+
+  <!-- Modal: View Registration Review Panel -->
+  <div class="modal fade" id="regReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title font-display fw-bold" id="review-modal-title">Dossier Admission Review</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" id="review-modal-body">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Register Student Dossier (Add/Edit Student) -->
+  <div class="modal fade" id="studentDossierModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <form id="student-dossier-form">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title font-display fw-bold" id="student-modal-title">Register New Student Dossier</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <input type="hidden" id="stud-action-uid">
+            
+            <div class="mb-3">
+              <label for="stud-fullname" class="form-label small fw-semibold">Full Name</label>
+              <input type="text" class="form-control" id="stud-fullname" required>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="stud-email" class="form-label small fw-semibold">Email Address</label>
+                <input type="email" class="form-control" id="stud-email" required>
+              </div>
+              <div class="col">
+                <label for="stud-phone" class="form-label small fw-semibold">Phone Number</label>
+                <input type="text" class="form-control" id="stud-phone" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="stud-gender" class="form-label small fw-semibold">Gender</label>
+                <select class="form-select" id="stud-gender">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div class="col">
+                <label for="stud-dob" class="form-label small fw-semibold">Date of Birth</label>
+                <input type="date" class="form-control" id="stud-dob" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="stud-state" class="form-label small fw-semibold">State of Residence</label>
+                <input type="text" class="form-control" id="stud-state" required>
+              </div>
+              <div class="col">
+                <label for="stud-course" class="form-label small fw-semibold">Course Enrolling</label>
+                <select class="form-select" id="stud-course" required>
+                  <!-- Filled dynamically -->
+                </select>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="stud-address" class="form-label small fw-semibold">Residential Address</label>
+              <textarea class="form-control" id="stud-address" rows="2" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="student-submit-btn">Save Dossier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Log Tuition Payment -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <form id="payment-form">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title font-display fw-bold">Log New Tuition Payment</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label for="pay-student" class="form-label small fw-semibold">Select Student Dossier</label>
+              <select class="form-select" id="pay-student" required>
+                <!-- Loaded dynamically -->
+              </select>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="pay-amount" class="form-label small fw-semibold">Amount Paid (₦)</label>
+                <input type="number" class="form-control" id="pay-amount" required>
+              </div>
+              <div class="col">
+                <label for="pay-method" class="form-label small fw-semibold">Payment Method</label>
+                <select class="form-select" id="pay-method">
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Cash Deposit">Cash Deposit</option>
+                  <option value="POS Machine">POS Machine</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="pay-ref" class="form-label small fw-semibold">Reference Number / Receipt ID</label>
+                <input type="text" class="form-control" id="pay-ref" required placeholder="e.g. TXN-99120">
+              </div>
+              <div class="col">
+                <label for="pay-date" class="form-label small fw-semibold">Transaction Date</label>
+                <input type="date" class="form-control" id="pay-date" required>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Log & Verify Transaction</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Launch/Edit Course Track -->
+  <div class="modal fade" id="courseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <form id="course-form">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title font-display fw-bold" id="course-modal-title">Launch New Course Track</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <input type="hidden" id="course-action-id">
+
+            <div class="mb-3">
+              <label for="c-title" class="form-label small fw-semibold">Course Title</label>
+              <input type="text" class="form-control" id="c-title" required placeholder="e.g. Full-Stack Web Engineering">
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="c-duration" class="form-label small fw-semibold">Duration</label>
+                <input type="text" class="form-control" id="c-duration" required placeholder="e.g. 6 Months">
+              </div>
+              <div class="col">
+                <label for="c-fee" class="form-label small fw-semibold">Tuition Fee (₦)</label>
+                <input type="number" class="form-control" id="c-fee" required>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="c-deadline" class="form-label small fw-semibold">Enrollment Deadline</label>
+                <input type="date" class="form-control" id="c-deadline" required>
+              </div>
+              <div class="col">
+                <label for="c-instructor" class="form-label small fw-semibold">Assigned Instructor</label>
+                <input type="text" class="form-control" id="c-instructor" required placeholder="e.g. Engr. Kayode">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="c-desc" class="form-label small fw-semibold">Course Description</label>
+              <textarea class="form-control" id="c-desc" rows="2" required></textarea>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="c-requirements" class="form-label small fw-semibold">Prerequisites</label>
+                <input type="text" class="form-control" id="c-requirements" required placeholder="e.g. Basic Computer Skill">
+              </div>
+              <div class="col">
+                <label for="c-outcomes" class="form-label small fw-semibold">Learning Outcomes</label>
+                <input type="text" class="form-control" id="c-outcomes" required placeholder="e.g. Ability to build APIs">
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Publish Track</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+    import { 
+      seedAdminMockDatabase, 
+      logAdminActivity, 
+      getRegisteredStudentsList, 
+      editStudentRecordAdmin, 
+      deleteStudentRecordAdmin,
+      getActivityLogsList,
+      updateDocumentStatus
+    } from "./admin.js";
+
+    // Enforce Secure Auth Access
+    const isCentreAdmin = sessionStorage.getItem("centre_admin_logged_in") === "true";
+    if (!isCentreAdmin) {
+      window.location.href = "admin.html";
+    }
+
+    // Retrieve active Centre metadata
+    const currentCentreId = sessionStorage.getItem("current_centre_id") || "abk";
+    const currentCentreName = sessionStorage.getItem("current_centre_name") || "ABK Centre";
+    const currentCentreEmail = sessionStorage.getItem("current_centre_email") || "";
+
+    // DOM Elements setups
+    document.getElementById("sidebar-centre-badge").textContent = currentCentreName;
+    document.getElementById("sidebar-admin-name").textContent = currentCentreName + " Admin";
+    document.getElementById("sidebar-admin-email").textContent = currentCentreEmail;
+    document.getElementById("welcome-admin-name").textContent = currentCentreName + " Administrator";
+    document.getElementById("dashboard-centre-text").textContent = currentCentreName;
+    document.getElementById("navbar-centre-name").textContent = `${currentCentreName} - Core Command Center`;
+
+    // Dynamic states
+    let students = [];
+    let payments = [];
+    let courses = [];
+    let logs = [];
+
+    // Charts objects
+    let tuitionChartInstance = null;
+    let workflowChartInstance = null;
+
+    // Standard bootstrap modal triggers
+    const regReviewModal = new bootstrap.Modal(document.getElementById('regReviewModal'));
+    const studentDossierModal = new bootstrap.Modal(document.getElementById('studentDossierModal'));
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    const courseModal = new bootstrap.Modal(document.getElementById('courseModal'));
+
+    // Initialization hook
+    window.addEventListener("DOMContentLoaded", async () => {
+      seedAdminMockDatabase();
+      await syncAllDatabaseState();
+      switchTab('overview');
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+    });
+
+    // Make functions globally available
+    window.switchTab = switchTab;
+    window.toggleSidebar = toggleSidebar;
+    window.logoutAdmin = logoutAdmin;
+    window.syncAllDatabaseState = syncAllDatabaseState;
+    window.triggerReviewRegistration = triggerReviewRegistration;
+    window.approveStage = approveStage;
+    window.rejectStage = rejectStage;
+    window.triggerDossierApprovalAndActivation = triggerDossierApprovalAndActivation;
+    window.showCreateStudentModal = showCreateStudentModal;
+    window.showEditStudentModal = showEditStudentModal;
+    window.triggerDeleteStudentDossier = triggerDeleteStudentDossier;
+    window.showAddPaymentModal = showAddPaymentModal;
+    window.triggerVerifyPaymentTxn = triggerVerifyPaymentTxn;
+    window.showCreateCourseModal = showCreateCourseModal;
+    window.showEditCourseModal = showEditCourseModal;
+    window.triggerDeleteCourse = triggerDeleteCourse;
+
+    function updateLiveClock() {
+      const liveBadge = document.getElementById("live-time-badge");
+      if (liveBadge) {
+        const now = new Date();
+        liveBadge.textContent = "UTC Core: " + now.toISOString().replace("T", " ").substring(0, 19);
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("adminSidebar");
+      sidebar.classList.toggle("show");
+    }
+
+    function logoutAdmin() {
+      sessionStorage.clear();
+      window.location.href = "admin.html";
+    }
+
+    function switchTab(tabId) {
+      // Hide all panes
+      document.querySelectorAll(".tab-pane-custom").forEach(pane => pane.classList.add("d-none"));
+      // Deactivate menu items
+      document.querySelectorAll(".menu-item").forEach(item => item.classList.remove("active"));
+
+      // Display selected
+      const selectedPane = document.getElementById(`tab-${tabId}`);
+      if (selectedPane) selectedPane.classList.remove("d-none");
+
+      const selectedMenu = document.getElementById(`menu-${tabId}`);
+      if (selectedMenu) selectedMenu.classList.add("active");
+
+      // Mobile responsive sidebar dismiss
+      const sidebar = document.getElementById("adminSidebar");
+      sidebar.classList.remove("show");
+    }
+
+    // --- DATA COORDINATOR / SYNCRONIZER ---
+    async function syncAllDatabaseState() {
+      // Load and filter registrations/students
+      const allStudents = await getRegisteredStudentsList();
+      students = allStudents.filter(s => s.centreId === currentCentreId);
+
+      // Filter courses
+      const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
+      courses = allCourses.filter(c => c.centreId === currentCentreId);
+
+      // Filter payments
+      const allPayments = JSON.parse(localStorage.getItem("mock_payments") || "[]");
+      payments = allPayments.filter(p => p.centreId === currentCentreId);
+
+      // Filter logs
+      const allLogs = await getActivityLogsList();
+      logs = allLogs.filter(l => l.adminEmail === currentCentreEmail || l.adminName.includes(currentCentreName));
+
+      // Fill badges
+      const pendingCount = students.filter(s => s.status === "pending").length;
+      document.getElementById("badge-pending-count").textContent = pendingCount;
+
+      // Render tab datasets
+      renderMetricsDashboard();
+      renderRegistrationsTable();
+      renderStudentsTable();
+      renderPaymentsTable();
+      renderCoursesCatalog();
+      renderLogsTable();
+      populateDropdowns();
+    }
+
+    // --- RENDER COMPONENT MODULES ---
+
+    // Metrics Dashboard View
+    function renderMetricsDashboard() {
+      const totalReg = students.length;
+      const activeStudentsCount = students.filter(s => s.status === "approved").length;
+      
+      const tuitionSum = payments
+        .filter(p => p.status === "Verified")
+        .reduce((sum, p) => sum + Number(p.amount), 0);
+
+      const pendingPayCount = payments.filter(p => p.status === "Pending").length;
+
+      document.getElementById("stat-registrations").textContent = totalReg;
+      document.getElementById("stat-active-students").textContent = activeStudentsCount;
+      document.getElementById("stat-tuition-collected").textContent = "₦" + tuitionSum.toLocaleString();
+      document.getElementById("stat-unverified-payments").textContent = pendingPayCount;
+
+      // Load charts
+      renderTuitionInflowChart();
+      renderWorkflowPieChart();
+
+      // Quick logs
+      const quickLogsBody = document.getElementById("quick-logs-tbody");
+      quickLogsBody.innerHTML = "";
+      if (logs.length === 0) {
+        quickLogsBody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-muted">No campus logging history recorded.</td></tr>`;
+        return;
+      }
+
+      logs.slice(0, 5).forEach(l => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="fw-bold">${l.adminName}</span></td>
+          <td><span class="badge bg-secondary-subtle text-secondary border">${l.action}</span></td>
+          <td>${l.message}</td>
+          <td>${l.date} <small class="text-muted">${l.time}</small></td>
+          <td><code class="text-dark">${l.ip}</code></td>
+        `;
+        quickLogsBody.appendChild(tr);
+      });
+    }
+
+    // Chart: Tuition receipt lines
+    function renderTuitionInflowChart() {
+      const ctx = document.getElementById('tuitionChart').getContext('2d');
+      if (tuitionChartInstance) {
+        tuitionChartInstance.destroy();
+      }
+
+      // Group payments by date
+      const grouped = {};
+      payments.forEach(p => {
+        if (p.status === "Verified") {
+          const dateStr = p.paymentDate || "Undated";
+          grouped[dateStr] = (grouped[dateStr] || 0) + Number(p.amount);
+        }
+      });
+
+      const labels = Object.keys(grouped).sort();
+      const data = labels.map(lbl => grouped[lbl]);
+
+      tuitionChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.length > 0 ? labels : ["No data"],
+          datasets: [{
+            label: 'Tuition Income Received (₦)',
+            data: data.length > 0 ? data : [0],
+            borderColor: '#0f766e',
+            backgroundColor: 'rgba(15, 118, 110, 0.1)',
+            fill: true,
+            tension: 0.3,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // Chart: Workflow Pie
+    function renderWorkflowPieChart() {
+      const ctx = document.getElementById('workflowPieChart').getContext('2d');
+      if (workflowChartInstance) {
+        workflowChartInstance.destroy();
+      }
+
+      const approved = students.filter(s => s.status === "approved").length;
+      const pending = students.filter(s => s.status === "pending").length;
+      const rejected = students.filter(s => s.status === "rejected").length;
+
+      document.getElementById("chart-lbl-approved").textContent = approved;
+      document.getElementById("chart-lbl-pending").textContent = pending;
+      document.getElementById("chart-lbl-rejected").textContent = rejected;
+
+      workflowChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Approved', 'Pending Review', 'Rejected'],
+          datasets: [{
+            data: [approved, pending, rejected],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    // Registrations Table View
+    function renderRegistrationsTable() {
+      const regBody = document.getElementById("registrations-tbody");
+      regBody.innerHTML = "";
+
+      const pendingRegistrations = students.filter(s => s.status === "pending" || s.status === "rejected");
+
+      if (pendingRegistrations.length === 0) {
+        regBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No pending admission files at this campus.</td></tr>`;
+        return;
+      }
+
+      pendingRegistrations.forEach(s => {
+        const docsState = s.workflow.documentVerification === "approved" 
+          ? '<span class="badge bg-success-subtle text-success border border-success">Verified</span>'
+          : s.workflow.documentVerification === "rejected"
+          ? '<span class="badge bg-danger-subtle text-danger border border-danger">Mismatched</span>'
+          : '<span class="badge bg-warning-subtle text-warning border border-warning">Reviewing</span>';
+
+        // Check tuition verification stage
+        const matchingPayments = payments.filter(p => p.studentId === s.studentId);
+        const verifiedPay = matchingPayments.some(p => p.status === "Verified");
+        const pendingPay = matchingPayments.some(p => p.status === "Pending");
+
+        const tuitionState = verifiedPay
+          ? '<span class="badge bg-success-subtle text-success border border-success">Verified</span>'
+          : pendingPay
+          ? '<span class="badge bg-warning-subtle text-warning border border-warning">Awaiting Audit</span>'
+          : '<span class="badge bg-secondary-subtle text-secondary border">Unpaid</span>';
+
+        const statusBadge = s.status === "pending"
+          ? '<span class="badge bg-warning text-dark">Under Review</span>'
+          : '<span class="badge bg-danger">Rejected</span>';
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="fw-bold text-dark">${s.studentId}</span></td>
+          <td>
+            <div class="fw-semibold">${s.fullname}</div>
+            <div class="text-muted" style="font-size: 0.75rem;">${s.email}</div>
+          </td>
+          <td><span class="badge bg-light text-dark border">${s.course}</span></td>
+          <td>${docsState}</td>
+          <td>${tuitionState}</td>
+          <td>${statusBadge}</td>
+          <td class="text-end">
+            <button onclick="triggerReviewRegistration('${s.uid}')" class="btn btn-outline-dark btn-sm fw-semibold">
+              <i class="bi bi-folder-check"></i> Audit Dossier
+            </button>
+          </td>
+        `;
+        regBody.appendChild(tr);
+      });
+    }
+
+    // Audit Dossier Panel Trigger
+    function triggerReviewRegistration(uid) {
+      const student = students.find(s => s.uid === uid);
+      if (!student) return;
+
+      document.getElementById("review-modal-title").innerHTML = `<i class="bi bi-file-earmark-person-fill"></i> Admission Dossier: ${student.fullname}`;
+
+      let documentsHtml = "";
+      Object.keys(student.documents).forEach(docKey => {
+        const doc = student.documents[docKey];
+        const label = docKey.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+        
+        let statusBadge = "";
+        if (doc.status === "approved") {
+          statusBadge = `<span class="badge bg-success small"><i class="bi bi-check-circle"></i> Approved</span>`;
+        } else if (doc.status === "rejected") {
+          statusBadge = `<span class="badge bg-danger small"><i class="bi bi-exclamation-octagon"></i> Rejected</span>`;
+        } else {
+          statusBadge = `<span class="badge bg-warning text-dark small"><i class="bi bi-clock"></i> Pending Review</span>`;
+        }
+
+        documentsHtml += `
+          <div class="col-md-6 mb-3">
+            <div class="card p-3 border rounded-3 bg-light h-100">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="fw-bold small text-uppercase text-secondary">${label}</span>
+                ${statusBadge}
+              </div>
+              <div class="mb-2 text-center" style="background: #e2e8f0; height: 140px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <img src="${doc.fileUrl || 'https://images.unsplash.com/photo-1589330694653-ded6df53f6ee?w=200&auto=format&fit=crop&q=80'}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div class="small text-muted mb-2">Feedback: <span class="fst-italic">${doc.feedback || "None"}</span></div>
+              <div class="d-flex gap-2">
+                <button onclick="approveStage('${student.uid}', '${docKey}')" class="btn btn-success btn-sm w-50">Approve</button>
+                <button onclick="rejectStage('${student.uid}', '${docKey}')" class="btn btn-danger btn-sm w-50">Reject</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      const bodyHtml = `
+        <div class="row g-3">
+          <div class="col-md-4 border-end">
+            <h6 class="fw-bold text-dark font-display border-bottom pb-2 mb-3">Applicant Overview</h6>
+            <ul class="list-unstyled small gap-2 d-flex flex-column mb-3">
+              <li><strong>EJaytech ID:</strong> <code class="text-primary">${student.studentId}</code></li>
+              <li><strong>Full Name:</strong> ${student.fullname}</li>
+              <li><strong>Gender:</strong> ${student.gender}</li>
+              <li><strong>State:</strong> ${student.state}</li>
+              <li><strong>Course:</strong> ${student.course}</li>
+              <li><strong>Contact:</strong> ${student.phone}</li>
+            </ul>
+
+            <h6 class="fw-bold text-dark font-display border-bottom pb-2 mb-2 mt-4">Clearance Stage</h6>
+            <div class="workflow-indicator mb-2">
+              <div class="workflow-dot bg-${student.workflow.documentVerification === 'approved' ? 'success' : student.workflow.documentVerification === 'rejected' ? 'danger' : 'warning'}"></div>
+              <span>Documents: <strong class="text-uppercase">${student.workflow.documentVerification}</strong></span>
+            </div>
+
+            <button onclick="triggerDossierApprovalAndActivation('${student.uid}')" class="btn btn-teal text-white w-100 mt-4 py-2" style="background-color: var(--accent-blue);">
+              <i class="bi bi-bookmark-star-fill"></i> Approve & Activate Student
+            </button>
+            <button onclick="rejectAdmissionFile('${student.uid}')" class="btn btn-outline-danger w-100 mt-2">
+              <i class="bi bi-x-circle"></i> Reject Application
+            </button>
+          </div>
+
+          <div class="col-md-8">
+            <h6 class="fw-bold text-dark font-display border-bottom pb-2 mb-3">Multi-Stage Document Dossier Verification</h6>
+            <div class="row">
+              ${documentsHtml}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("review-modal-body").innerHTML = bodyHtml;
+      regReviewModal.show();
+    }
+
+    // Document Approve / Reject handlers
+    async function approveStage(uid, docType) {
+      const feedback = prompt("Add confirmation comment (Optional):", "Validated and verified as legitimate.");
+      if (feedback === null) return;
+      await updateDocumentStatus(uid, docType, "approved", feedback);
+      await syncAllDatabaseState();
+      // Re-trigger review view
+      triggerReviewRegistration(uid);
+    }
+
+    async function rejectStage(uid, docType) {
+      const feedback = prompt("Reason for rejection (Required):", "");
+      if (!feedback) {
+        alert("Rejection comments are mandatory to assist applicants.");
+        return;
+      }
+      await updateDocumentStatus(uid, docType, "rejected", feedback);
+      await syncAllDatabaseState();
+      triggerReviewRegistration(uid);
+    }
+
+    // Final Approval of Student Dossier
+    async function triggerDossierApprovalAndActivation(uid) {
+      const student = students.find(s => s.uid === uid);
+      if (!student) return;
+
+      if (student.workflow.documentVerification !== "approved") {
+        if (!confirm("Caution: Documents are not completely verified. Force approval anyway?")) return;
+      }
+
+      if (!confirm(`Verify payment parameters and completely activate admission slot for: ${student.fullname}?`)) return;
+
+      try {
+        // Log log
+        student.status = "approved";
+        student.approvalStatus = "approved";
+        student.workflow.studentActivated = true;
+        student.workflow.adminApproval = "approved";
+
+        await editStudentRecordAdmin(uid, student);
+        await logAdminActivity("Dossier Approved", `Fully approved and activated slot EJ-${student.studentId} for ${student.fullname}`);
+        
+        regReviewModal.hide();
+        await syncAllDatabaseState();
+        alert("Student dossier activated! Credentials and enrollment badge generated.");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    window.rejectAdmissionFile = async function(uid) {
+      const student = students.find(s => s.uid === uid);
+      if (!student) return;
+
+      const reason = prompt("Enter rejection reason (Required):");
+      if (!reason) {
+        alert("Rejection reason is required.");
+        return;
+      }
+
+      try {
+        student.status = "rejected";
+        student.approvalStatus = "rejected";
+        student.workflow.adminApproval = "rejected";
+        await editStudentRecordAdmin(uid, student);
+        await logAdminActivity("Admission File Rejected", `Rejected admission file for: ${student.fullname}. Reason: ${reason}`);
+
+        regReviewModal.hide();
+        await syncAllDatabaseState();
+        alert("Admission file marked as rejected.");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Active Student Dossier Table View
+    function renderStudentsTable() {
+      const stBody = document.getElementById("students-tbody");
+      stBody.innerHTML = "";
+
+      const approvedStudents = students.filter(s => s.status === "approved");
+
+      if (approvedStudents.length === 0) {
+        stBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No active verified student profiles found on campus.</td></tr>`;
+        return;
+      }
+
+      approvedStudents.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="fw-bold text-dark">${s.studentId}</span></td>
+          <td><span class="fw-semibold text-dark">${s.fullname}</span></td>
+          <td>${s.email}</td>
+          <td>${s.phone}</td>
+          <td><span class="badge bg-secondary-subtle text-dark border">${s.course}</span></td>
+          <td>
+            <span class="badge bg-success-subtle text-success border border-success fw-semibold text-uppercase" style="font-size: 0.7rem;">Active</span>
+          </td>
+          <td class="text-end">
+            <button onclick="showEditStudentModal('${s.uid}')" class="btn btn-outline-secondary btn-sm me-1">
+              <i class="bi bi-pencil-square"></i> Edit
+            </button>
+            <button onclick="triggerDeleteStudentDossier('${s.uid}')" class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-trash3"></i> Purge
+            </button>
+          </td>
+        `;
+        stBody.appendChild(tr);
+      });
+    }
+
+    // Student CRUD
+    function showCreateStudentModal() {
+      document.getElementById("student-modal-title").textContent = "Register New Student Dossier";
+      document.getElementById("stud-action-uid").value = "";
+      document.getElementById("student-dossier-form").reset();
+      studentDossierModal.show();
+    }
+
+    function showEditStudentModal(uid) {
+      const student = students.find(s => s.uid === uid);
+      if (!student) return;
+
+      document.getElementById("student-modal-title").textContent = "Edit Student Dossier Info";
+      document.getElementById("stud-action-uid").value = student.uid;
+      document.getElementById("stud-fullname").value = student.fullname;
+      document.getElementById("stud-email").value = student.email;
+      document.getElementById("stud-phone").value = student.phone;
+      document.getElementById("stud-gender").value = student.gender || "Male";
+      document.getElementById("stud-dob").value = student.dob || "";
+      document.getElementById("stud-state").value = student.state || "";
+      document.getElementById("stud-course").value = student.course;
+      document.getElementById("stud-address").value = student.address || "";
+
+      studentDossierModal.show();
+    }
+
+    // Submit handler
+    document.getElementById("student-dossier-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const uid = document.getElementById("stud-action-uid").value;
+      const fullname = document.getElementById("stud-fullname").value;
+      const email = document.getElementById("stud-email").value;
+      const phone = document.getElementById("stud-phone").value;
+      const gender = document.getElementById("stud-gender").value;
+      const dob = document.getElementById("stud-dob").value;
+      const state = document.getElementById("stud-state").value;
+      const course = document.getElementById("stud-course").value;
+      const address = document.getElementById("stud-address").value;
+
+      try {
+        if (uid) {
+          // Editing
+          const student = students.find(s => s.uid === uid);
+          await editStudentRecordAdmin(uid, {
+            ...student,
+            fullname,
+            fullName: fullname,
+            email,
+            phone,
+            gender,
+            dob,
+            state,
+            course,
+            address
+          });
+          alert("Student coordinates modified in local registers.");
+        } else {
+          // Registering raw student dossier
+          const allList = await getRegisteredStudentsList();
+          const generatedId = "EJ-2026-" + Math.floor(Math.random() * 8999 + 1000);
+          
+          const newStudent = {
+            uid: "stud-" + Date.now(),
+            studentId: generatedId,
+            fullname,
+            fullName: fullname,
+            email,
+            phone,
+            gender,
+            dob,
+            state,
+            address,
+            course,
+            role: "student",
+            status: "approved", // Automatically verified when registered by Administrator
+            approvalStatus: "approved",
+            createdAt: new Date().toISOString(),
+            centreId: currentCentreId,
+            workflow: {
+              submitted: true,
+              pendingReview: "approved",
+              documentVerification: "approved",
+              paymentVerification: "approved",
+              adminApproval: "approved",
+              studentActivated: true
+            },
+            documents: {
+              passportPhoto: { status: "approved", fileUrl: "", feedback: "Pre-validated by Administrator" },
+              idCard: { status: "approved", fileUrl: "", feedback: "Pre-validated by Administrator" },
+              certificates: { status: "approved", fileUrl: "", feedback: "Pre-validated by Administrator" },
+              supportingDocuments: { status: "approved", fileUrl: "", feedback: "Pre-validated by Administrator" }
+            },
+            paymentHistory: []
+          };
+
+          allList.push(newStudent);
+          localStorage.setItem("mock_students_list", JSON.stringify(allList));
+          await logAdminActivity("Student Dossier Created", `Admin logged new dossier: ${fullname} with ID: ${generatedId}`);
+          alert("New student profile created.");
+        }
+
+        studentDossierModal.hide();
+        await syncAllDatabaseState();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    async function triggerDeleteStudentDossier(uid) {
+      if (!confirm("Are you sure you want to permanently purge this student dossier from local database indexes?")) return;
+      try {
+        await deleteStudentRecordAdmin(uid);
+        await syncAllDatabaseState();
+        alert("Dossier purged.");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Payments Ledger view
+    function renderPaymentsTable() {
+      const payBody = document.getElementById("payments-tbody");
+      payBody.innerHTML = "";
+
+      if (payments.length === 0) {
+        payBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">No tuition transactions documented on campus.</td></tr>`;
+        return;
+      }
+
+      payments.forEach(p => {
+        const statusBadge = p.status === "Verified"
+          ? '<span class="badge bg-success-subtle text-success border border-success fw-semibold">Verified</span>'
+          : p.status === "Pending"
+          ? '<span class="badge bg-warning-subtle text-warning border border-warning fw-semibold">Pending Audit</span>'
+          : '<span class="badge bg-danger-subtle text-danger border border-danger fw-semibold">Rejected</span>';
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><code class="text-primary fw-bold">${p.id}</code></td>
+          <td><span class="fw-semibold text-dark">${p.studentName}</span></td>
+          <td><span class="badge bg-light text-dark border">${p.course}</span></td>
+          <td><strong>₦${Number(p.amount).toLocaleString()}</strong></td>
+          <td><code>${p.referenceNumber}</code></td>
+          <td>${p.paymentMethod}</td>
+          <td>${p.paymentDate}</td>
+          <td>${statusBadge}</td>
+          <td class="text-end">
+            ${p.status === 'Pending' 
+              ? `<button onclick="triggerVerifyPaymentTxn('${p.id}')" class="btn btn-sm btn-success py-1">Verify Audit</button>`
+              : `<span class="text-muted small"><i class="bi bi-shield-check-fill text-success"></i> Confirmed</span>`
+            }
+          </td>
+        `;
+        payBody.appendChild(tr);
+      });
+    }
+
+    // Add tuition payment
+    function showAddPaymentModal() {
+      document.getElementById("payment-form").reset();
+      paymentModal.show();
+    }
+
+    // Payment submit handler
+    document.getElementById("payment-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById("pay-student").value;
+      const amount = document.getElementById("pay-amount").value;
+      const method = document.getElementById("pay-method").value;
+      const ref = document.getElementById("pay-ref").value;
+      const date = document.getElementById("pay-date").value;
+
+      const student = students.find(s => s.studentId === studentId);
+      if (!student) return;
+
+      try {
+        const allPayments = JSON.parse(localStorage.getItem("mock_payments") || "[]");
+        const newPay = {
+          id: "PAY-" + Date.now().toString().substring(8),
+          studentName: student.fullname,
+          studentId: student.studentId,
+          course: student.course,
+          amount: Number(amount),
+          paymentMethod: method,
+          paymentDate: date,
+          referenceNumber: ref,
+          proofOfPayment: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=500&auto=format&fit=crop&q=60",
+          status: "Verified", // Admin payments are verified instantly
+          centreId: currentCentreId,
+          createdAt: new Date().toISOString()
+        };
+
+        allPayments.unshift(newPay);
+        localStorage.setItem("mock_payments", JSON.stringify(allPayments));
+
+        // Add to student payment history
+        const allStudents = await getRegisteredStudentsList();
+        const index = allStudents.findIndex(s => s.uid === student.uid);
+        if (index !== -1) {
+          if (!allStudents[index].paymentHistory) allStudents[index].paymentHistory = [];
+          allStudents[index].paymentHistory.push(ref);
+          localStorage.setItem("mock_students_list", JSON.stringify(allStudents));
+        }
+
+        await logAdminActivity("Tuition Receipt Logged", `Logged payment of ₦${amount} from student ${student.fullname}`);
+        paymentModal.hide();
+        await syncAllDatabaseState();
+        alert("Tuition payment verified and logged!");
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    async function triggerVerifyPaymentTxn(id) {
+      if (!confirm(`Verify payment coordinates for transaction ${id}?`)) return;
+      try {
+        const allPayments = JSON.parse(localStorage.getItem("mock_payments") || "[]");
+        const index = allPayments.findIndex(p => p.id === id);
+        if (index !== -1) {
+          allPayments[index].status = "Verified";
+          localStorage.setItem("mock_payments", JSON.stringify(allPayments));
+          await logAdminActivity("Tuition Receipt Verified", `Audited and verified tuition txn ${id}`);
+          await syncAllDatabaseState();
+          alert("Tuition transaction fully verified.");
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Render Courses Catalog
+    function renderCoursesCatalog() {
+      const container = document.getElementById("courses-grid-container");
+      container.innerHTML = "";
+
+      if (courses.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-5 text-muted">No courses hosted at this campus catalog.</div>`;
+        return;
+      }
+
+      courses.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "col-md-4";
+        div.innerHTML = `
+          <div class="card h-100 border border-light-subtle rounded-4 overflow-hidden bg-white shadow-sm">
+            <div style="height: 160px; background-image: url('${c.courseImage}'); background-size: cover; background-position: center; position: relative;">
+              <span class="badge bg-teal position-absolute top-0 end-0 m-3" style="background-color: var(--accent-blue);">₦${Number(c.fee).toLocaleString()}</span>
+            </div>
+            <div class="card-body p-4">
+              <h5 class="fw-bold font-display text-dark">${c.title}</h5>
+              <p class="text-muted small text-clamp-3 mb-3" style="font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${c.description}</p>
+              
+              <div class="row g-2 mb-3 small text-muted border-top border-bottom py-2">
+                <div class="col-6"><i class="bi bi-clock me-1 text-primary"></i> ${c.duration}</div>
+                <div class="col-6"><i class="bi bi-calendar-event me-1 text-danger"></i> Deadline: ${c.deadline}</div>
+                <div class="col-12 mt-2"><i class="bi bi-person-badge me-1 text-success"></i> ${c.instructor}</div>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button onclick="showEditCourseModal('${c.id}')" class="btn btn-outline-secondary btn-sm w-50">Modify</button>
+                <button onclick="triggerDeleteCourse('${c.id}')" class="btn btn-outline-danger btn-sm w-50">Remove</button>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function showCreateCourseModal() {
+      document.getElementById("course-modal-title").textContent = "Launch Campus Course Track";
+      document.getElementById("course-action-id").value = "";
+      document.getElementById("course-form").reset();
+      courseModal.show();
+    }
+
+    function showEditCourseModal(id) {
+      const course = courses.find(c => c.id === id);
+      if (!course) return;
+
+      document.getElementById("course-modal-title").textContent = "Modify Course Track Specs";
+      document.getElementById("course-action-id").value = course.id;
+      document.getElementById("c-title").value = course.title;
+      document.getElementById("c-duration").value = course.duration;
+      document.getElementById("c-fee").value = course.fee;
+      document.getElementById("c-deadline").value = course.deadline;
+      document.getElementById("c-instructor").value = course.instructor;
+      document.getElementById("c-desc").value = course.description;
+      document.getElementById("c-requirements").value = course.requirements || "";
+      document.getElementById("c-outcomes").value = course.learningOutcomes || "";
+
+      courseModal.show();
+    }
+
+    document.getElementById("course-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("course-action-id").value;
+      const title = document.getElementById("c-title").value;
+      const duration = document.getElementById("c-duration").value;
+      const fee = document.getElementById("c-fee").value;
+      const deadline = document.getElementById("c-deadline").value;
+      const instructor = document.getElementById("c-instructor").value;
+      const description = document.getElementById("c-desc").value;
+      const requirements = document.getElementById("c-requirements").value;
+      const outcomes = document.getElementById("c-outcomes").value;
+
+      try {
+        const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
+        if (id) {
+          // Editing
+          const index = allCourses.findIndex(c => c.id === id);
+          if (index !== -1) {
+            allCourses[index] = {
+              ...allCourses[index],
+              title,
+              courseName: title,
+              duration,
+              fee: Number(fee),
+              deadline,
+              instructor,
+              description,
+              requirements,
+              learningOutcomes: outcomes
+            };
+          }
+          await logAdminActivity("Course Track Modified", `Modified specifications for local course track: ${title}`);
+          alert("Course track specs updated.");
+        } else {
+          // Create
+          const generatedId = "course-" + Date.now().toString().substring(10);
+          const newCourse = {
+            id: generatedId,
+            title,
+            courseName: title,
+            duration,
+            fee: Number(fee),
+            deadline,
+            instructor,
+            description,
+            requirements,
+            learningOutcomes: outcomes,
+            courseImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&auto=format&fit=crop&q=60",
+            isArchived: false,
+            centreId: currentCentreId
+          };
+          allCourses.push(newCourse);
+          await logAdminActivity("Course Track Launched", `Created new local course track: ${title}`);
+          alert("New course track launched!");
+        }
+
+        localStorage.setItem("mock_courses", JSON.stringify(allCourses));
+        courseModal.hide();
+        await syncAllDatabaseState();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    function triggerDeleteCourse(id) {
+      if (!confirm("Are you sure you want to delete this course? It will affect student registrations enrolled in this track.")) return;
+      try {
+        const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
+        const course = allCourses.find(c => c.id === id);
+        const filtered = allCourses.filter(c => c.id !== id);
+        localStorage.setItem("mock_courses", JSON.stringify(filtered));
+        logAdminActivity("Course Track Purged", `Permanently purged course track: ${course ? course.title : id}`);
+        syncAllDatabaseState();
+        alert("Course track successfully removed from catalog.");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Render Logs Table
+    function renderLogsTable() {
+      const logsBody = document.getElementById("audit-logs-tbody");
+      logsBody.innerHTML = "";
+
+      if (logs.length === 0) {
+        logsBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No localized system logs.</td></tr>`;
+        return;
+      }
+
+      logs.forEach(l => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><code>${l.id.substring(0, 10)}</code></td>
+          <td><span class="fw-bold text-dark">${l.adminName}</span></td>
+          <td><span class="badge bg-dark">${l.action}</span></td>
+          <td>${l.message}</td>
+          <td>${l.date} <small class="text-muted">${l.time}</small></td>
+          <td><code>${l.ip}</code></td>
+        `;
+        logsBody.appendChild(tr);
+      });
+    }
+
+    // Helpers to fill input dropdowns dynamically
+    function populateDropdowns() {
+      // Course enrolling select
+      const courseSelect = document.getElementById("stud-course");
+      if (courseSelect) {
+        courseSelect.innerHTML = "";
+        courses.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.title;
+          opt.textContent = c.title + ` (₦${Number(c.fee).toLocaleString()})`;
+          courseSelect.appendChild(opt);
+        });
+      }
+
+      // Student billing select
+      const studentSelect = document.getElementById("pay-student");
+      if (studentSelect) {
+        studentSelect.innerHTML = "";
+        students.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.studentId;
+          opt.textContent = `${s.fullname} (${s.studentId}) - ${s.course}`;
+          studentSelect.appendChild(opt);
+        });
+      }
+    }
+
+    // Filter registrations table
+    window.filterRegistrationsTable = function() {
+      const term = document.getElementById("reg-search-input").value.toLowerCase();
+      const rows = document.querySelectorAll("#registrations-tbody tr");
+      rows.forEach(r => {
+        if (r.children.length > 1) {
+          const text = r.children[1].textContent.toLowerCase() + r.children[2].textContent.toLowerCase();
+          if (text.includes(term)) {
+            r.classList.remove("d-none");
+          } else {
+            r.classList.add("d-none");
+          }
+        }
+      });
+    }
+
+    // Filter students table
+    window.filterStudentsTable = function() {
+      const term = document.getElementById("student-search-input").value.toLowerCase();
+      const rows = document.querySelectorAll("#students-tbody tr");
+      rows.forEach(r => {
+        if (r.children.length > 1) {
+          const text = r.children[1].textContent.toLowerCase() + r.children[2].textContent.toLowerCase();
+          if (text.includes(term)) {
+            r.classList.remove("d-none");
+          } else {
+            r.classList.add("d-none");
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
