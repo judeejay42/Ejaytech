@@ -367,6 +367,25 @@
     let students = [];
 
     document.addEventListener("DOMContentLoaded", () => {
+      // Fix link routes for GitHub Pages / Local Static environments to prevent 404s
+      const isGitHubPages = window.location.hostname.includes("github.io");
+      const isLocalFile = window.location.protocol === "file:";
+      if (isGitHubPages || isLocalFile) {
+        document.querySelectorAll("a").forEach(a => {
+          const href = a.getAttribute("href");
+          if (href) {
+            if (href.startsWith("/admin/")) {
+              const page = href.split("/admin/")[1];
+              a.setAttribute("href", `admin-${page}.html`);
+            } else if (href === "/admin.html" || href === "/admin") {
+              a.setAttribute("href", "admin.html");
+            } else if (href === "/admin/portals") {
+              a.setAttribute("href", "admin-portals.html");
+            }
+          }
+        });
+      }
+
       letterModal = new bootstrap.Modal(document.getElementById("letterModal"));
 
       if (sessionStorage.getItem("admin_admissions_logged_in") === "true") {

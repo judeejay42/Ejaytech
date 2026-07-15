@@ -18,6 +18,7 @@ const staticPath = fs.existsSync(path.join(__dirname, 'index.html')) ? __dirname
 console.log(`[Static Server] Serving content from ${staticPath}`);
 
 app.use(express.static(staticPath));
+app.use('/admin', express.static(staticPath));
 
 // Secure Admin Authentication Endpoint
 app.post('/api/admin/authenticate', (req, res) => {

@@ -293,5 +293,28 @@
     </div>
   </footer>
 
+  <!-- Dynamic Routing Helper for Static Hosting Environments -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isGitHubPages = window.location.hostname.includes("github.io");
+      const isLocalFile = window.location.protocol === "file:";
+      if (isGitHubPages || isLocalFile) {
+        document.querySelectorAll("a").forEach(a => {
+          const href = a.getAttribute("href");
+          if (href) {
+            if (href.startsWith("/admin/")) {
+              const page = href.split("/admin/")[1];
+              a.setAttribute("href", `admin-${page}.html`);
+            } else if (href === "/admin.html" || href === "/admin") {
+              a.setAttribute("href", "admin.html");
+            } else if (href === "/admin/portals") {
+              a.setAttribute("href", "admin-portals.html");
+            }
+          }
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
