@@ -16,21 +16,6 @@
   <link rel="icon" type="image/png" href="assets/images/logo-512.png">
   <!-- Custom CSS -->
   <link href="css/style.css" rel="stylesheet">
-  <style>
-    .portal-btn {
-      border: 1px solid #e2e8f0;
-      transition: all 0.2s ease-in-out;
-    }
-    .portal-btn:hover {
-      border-color: #cbd5e1;
-      background-color: #f8fafc !important;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    }
-    .portal-btn:hover .portal-btn-icon {
-      transform: scale(1.05);
-    }
-  </style>
 </head>
 <body>
 
@@ -80,87 +65,7 @@
               </div>
               <h3 class="fw-bold text-dark font-display mb-1">EJaytech Concepts</h3>
               <span class="badge bg-dark-subtle text-dark border border-secondary fw-semibold mb-3 px-3 py-1 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">Admin Command Core</span>
-              <p class="text-muted small mb-4">Authorized personnel only. Secure administrative operations portal.</p>
-            </div>
-
-            <!-- Premium Portal Selection Card -->
-            <div class="card border border-2 border-primary-subtle rounded-4 p-3 mb-4 bg-light shadow-sm text-start">
-              <h6 class="fw-bold text-dark mb-3 font-display">
-                <i class="bi bi-grid-1x2-fill text-primary me-2"></i>Choose an Administrative Portal
-              </h6>
-              <div class="d-grid gap-2">
-                
-                <!-- 1. Super Admin -->
-                <a href="/admin/super-admin" class="portal-btn d-flex align-items-center justify-content-between p-3 rounded-3 border bg-white text-decoration-none transition-all">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="portal-btn-icon bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
-                      <i class="bi bi-shield-lock-fill"></i>
-                    </div>
-                    <div>
-                      <span class="d-block fw-bold text-dark mb-0 small" style="font-size: 0.85rem;">Super Admin Portal</span>
-                      <span class="text-muted" style="font-size: 0.72rem; line-height: 1.2; display: block;">Root Access & Security Clearance</span>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted"></i>
-                </a>
-
-                <!-- 2. Centre Administrator -->
-                <a href="/admin/centre-admin" class="portal-btn d-flex align-items-center justify-content-between p-3 rounded-3 border bg-white text-decoration-none transition-all">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="portal-btn-icon bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
-                      <i class="bi bi-buildings-fill"></i>
-                    </div>
-                    <div>
-                      <span class="d-block fw-bold text-dark mb-0 small" style="font-size: 0.85rem;">Centre Administrator Portal</span>
-                      <span class="text-muted" style="font-size: 0.72rem; line-height: 1.2; display: block;">Curriculum & Campus Settings</span>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted"></i>
-                </a>
-
-                <!-- 3. Admissions Officer -->
-                <a href="/admin/admissions" class="portal-btn d-flex align-items-center justify-content-between p-3 rounded-3 border bg-white text-decoration-none transition-all">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="portal-btn-icon bg-warning-subtle text-warning-emphasis rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
-                      <i class="bi bi-file-earmark-person-fill"></i>
-                    </div>
-                    <div>
-                      <span class="d-block fw-bold text-dark mb-0 small" style="font-size: 0.85rem;">Admissions Officer Portal</span>
-                      <span class="text-muted" style="font-size: 0.72rem; line-height: 1.2; display: block;">Applications & Admissions</span>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted"></i>
-                </a>
-
-                <!-- 4. Finance Officer -->
-                <a href="/admin/finance" class="portal-btn d-flex align-items-center justify-content-between p-3 rounded-3 border bg-white text-decoration-none transition-all">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="portal-btn-icon rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px; color: #8b5cf6; background-color: #f5f3ff;">
-                      <i class="bi bi-cash-coin"></i>
-                    </div>
-                    <div>
-                      <span class="d-block fw-bold text-dark mb-0 small" style="font-size: 0.85rem;">Finance Officer Portal</span>
-                      <span class="text-muted" style="font-size: 0.72rem; line-height: 1.2; display: block;">Tuition Audits & Receipts</span>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted"></i>
-                </a>
-
-                <!-- 5. Instructor -->
-                <a href="/admin/instructor" class="portal-btn d-flex align-items-center justify-content-between p-3 rounded-3 border bg-white text-decoration-none transition-all">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="portal-btn-icon rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px; color: #db2777; background-color: #fdf2f8;">
-                      <i class="bi bi-person-video3"></i>
-                    </div>
-                    <div>
-                      <span class="d-block fw-bold text-dark mb-0 small" style="font-size: 0.85rem;">Instructor Portal</span>
-                      <span class="text-muted" style="font-size: 0.72rem; line-height: 1.2; display: block;">Roster, Attendances & Grades</span>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted"></i>
-                </a>
-
-              </div>
+              <p class="text-muted small">Authorized personnel only. Secure administrative operations portal.</p>
             </div>
 
             <!-- Login Form -->
@@ -344,25 +249,6 @@
     import { db, auth } from "./js/firebase-config.js";
     import { loginAdmin, redirectIfSessionActive } from "./js/admin-auth.js";
     import { logAdminActivity } from "./admin.js";
-
-    // Fix link routes for GitHub Pages / Local Static environments to prevent 404s
-    const isGitHubPages = window.location.hostname.includes("github.io");
-    const isLocalFile = window.location.protocol === "file:";
-    if (isGitHubPages || isLocalFile) {
-      document.querySelectorAll("a").forEach(a => {
-        const href = a.getAttribute("href");
-        if (href) {
-          if (href.startsWith("/admin/")) {
-            const page = href.split("/admin/")[1];
-            a.setAttribute("href", `admin-${page}.html`);
-          } else if (href === "/admin.html" || href === "/admin") {
-            a.setAttribute("href", "admin.html");
-          } else if (href === "/admin/portals") {
-            a.setAttribute("href", "admin-portals.html");
-          }
-        }
-      });
-    }
 
     // Restore remember-me state if present on page load
     if (localStorage.getItem("admin_logged_in") === "true") {
