@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Portal - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-navy: #0f172a;
+      --accent-pink: #ec4899;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --sidebar-width: 260px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .auth-bg {
+      background: radial-gradient(circle at top right, #9d174d, #0f172a 75%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-panel {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--primary-navy);
+      color: #f8fafc;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #1e293b;
+    }
+
+    .main-workspace {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    .top-navbar {
+      height: 70px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: #cbd5e1;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background-color: var(--accent-pink);
+      color: #ffffff;
+    }
+
+    .card {
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. AUTH SCREEN -->
+  <div id="auth-section" class="auth-bg">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+          <div class="card p-4 p-md-5 bg-white shadow-lg text-center border-0" style="border-radius: 20px;">
+            <div class="mb-4">
+              <img src="/assets/images/logo-512.png" alt="Logo" style="width: 70px;" class="mb-3">
+              <h4 class="fw-bold text-dark mb-1">Academic Workstation</h4>
+              <span class="badge text-white px-3 py-1 text-uppercase font-mono" style="font-size: 0.7rem; background-color: var(--accent-pink);">Instructor Portal Gateway</span>
+            </div>
+
+            <!-- Credentials Box -->
+            <div class="p-3 bg-light rounded text-start mb-4 border border-pink-subtle">
+              <span class="small text-pink d-block fw-bold" style="color: var(--accent-pink);"><i class="bi bi-info-circle-fill"></i> Instructor Keys:</span>
+              <code class="small text-dark d-block mt-1">Username: <strong>instructor@ejaytech.com</strong></code>
+              <code class="small text-dark d-block">Password: <strong>instructorpass</strong></code>
+            </div>
+
+            <form id="login-form" class="text-start">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Academic Email</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" id="auth-email" required placeholder="instructor@ejaytech.com">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Access Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" id="auth-password" required placeholder="••••••••">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="background-color: var(--accent-pink); border-color: var(--accent-pink);"><i class="bi bi-shield-lock-fill me-1"></i> Open Academic Log</button>
+            </form>
+            <div id="auth-alert" class="alert alert-danger d-none mt-3 small text-start"></div>
+            <div class="mt-4 pt-3 border-top">
+              <a href="/admin/portals" class="text-decoration-none small fw-semibold" style="color: var(--accent-pink);"><i class="bi bi-arrow-left"></i> Return to Portals</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN WORKSPACE -->
+  <div id="dashboard-section" class="d-none">
+    <!-- SIDEBAR -->
+    <div class="sidebar-panel">
+      <div class="p-4 border-bottom border-secondary d-flex align-items-center gap-3">
+        <img src="assets/images/logo-512.png" alt="Logo" style="width: 35px;">
+        <div>
+          <h6 class="mb-0 fw-bold text-white">EJaytech Core</h6>
+          <span class="small text-muted" style="font-size: 0.65rem;">Academic Panel</span>
+        </div>
+      </div>
+      <div class="p-3 flex-grow-1">
+        <button class="menu-item active" onclick="switchTab('roll')"><i class="bi bi-people-fill"></i> Classroom Roll</button>
+        <button class="menu-item" onclick="switchTab('attendance')"><i class="bi bi-calendar-check-fill"></i> Attendance Log</button>
+        <button class="menu-item" onclick="switchTab('grades')"><i class="bi bi-journal-check"></i> Grades &amp; Scoring</button>
+      </div>
+      <div class="p-3 border-top border-secondary">
+        <button onclick="handleLogout()" class="btn btn-outline-danger w-100 btn-sm py-2"><i class="bi bi-box-arrow-right"></i> Close Session</button>
+      </div>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="main-workspace">
+      <!-- TOP NAV -->
+      <div class="top-navbar">
+        <span class="fw-semibold text-muted" id="workspace-title">Console / Classroom Roll</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge text-white font-mono" style="background-color: var(--accent-pink);"><i class="bi bi-shield-lock-fill"></i> Instructor: Engr. Kayode</span>
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150" alt="Admin" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT BODY -->
+      <div class="p-4">
+        
+        <!-- PANE: ROLL -->
+        <div id="pane-roll" class="pane-content">
+          <div class="card p-4 bg-pink-subtle text-pink-emphasis border-0 shadow-sm mb-4">
+            <h5 class="fw-bold mb-2">Classroom Guide Workspace</h5>
+            <p class="mb-0 small">Welcome Back, <strong>Engr. Kayode</strong>. Below is your formal academic roster of assigned students pursuing the <strong>Software Engineering Track</strong> and other related tracks. You have administrative clearance to record daily attendances and enter assessment results.</p>
+          </div>
+
+          <h5 class="fw-bold mb-3">Your Assigned Students</h5>
+          <div class="card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Academic Pathway</th>
+                    <th>Email Address</th>
+                    <th>Phone Contact</th>
+                    <th>Session Status</th>
+                  </tr>
+                </thead>
+                <tbody id="roll-tbody">
+                  <!-- Dynamically synced -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE: ATTENDANCE -->
+        <div id="pane-attendance" class="pane-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold mb-1">Classroom Attendance Log</h5>
+              <p class="text-muted small mb-0">Record and persist student classroom attendances for academic review.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <input type="date" class="form-control" id="attendance-date" style="width: 180px;">
+              <button onclick="saveAttendance()" class="btn btn-primary text-white" style="background-color: var(--accent-pink); border-color: var(--accent-pink);"><i class="bi bi-save"></i> Save Log</button>
+            </div>
+          </div>
+
+          <div class="card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Classroom Track</th>
+                    <th class="text-center">Present</th>
+                    <th class="text-center">Absent</th>
+                    <th class="text-center">Late</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-tbody">
+                  <!-- Sync roll for marking -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE: GRADES -->
+        <div id="pane-grades" class="pane-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h5 class="fw-bold mb-1">Assessments &amp; Academic Results</h5>
+              <p class="text-muted small mb-0">Publish quiz scores, exam results, and project feedbacks directly to student ledgers.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <select class="form-select" id="assessment-select" style="width: 220px;">
+                <option value="Quiz 1">Quiz 1 (HTML/CSS Syntax)</option>
+                <option value="Midterm Exam">Midterm Exam (JS Algorithms)</option>
+                <option value="Capstone Project">Capstone Project (Fullstack Portals)</option>
+              </select>
+              <button onclick="saveGrades()" class="btn btn-primary text-white" style="background-color: var(--accent-pink); border-color: var(--accent-pink);"><i class="bi bi-cloud-upload"></i> Publish Grades</button>
+            </div>
+          </div>
+
+          <div class="card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th style="width: 200px;">Score (out of 100)</th>
+                    <th>Qualitative Academic Feedback</th>
+                  </tr>
+                </thead>
+                <tbody id="grades-tbody">
+                  <!-- Grading inputs -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { logAdminActivity } from "./admin.js";
+
+    let students = [];
+    let assignedStudents = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Date Picker Default to Today
+      document.getElementById("attendance-date").valueAsDate = new Date();
+
+      if (sessionStorage.getItem("admin_instructor_logged_in") === "true") {
+        showDashboard();
+      }
+
+      // Bind Login Form
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("auth-email").value.trim();
+        const password = document.getElementById("auth-password").value;
+        const alertBox = document.getElementById("auth-alert");
+
+        if (email === "instructor@ejaytech.com" && password === "instructorpass") {
+          sessionStorage.setItem("admin_instructor_logged_in", "true");
+          showDashboard();
+        } else {
+          alertBox.textContent = "Invalid Instructor credentials. Check workstation codes.";
+          alertBox.classList.remove("d-none");
+        }
+      });
+
+      window.switchTab = switchTab;
+      window.handleLogout = handleLogout;
+      window.saveAttendance = saveAttendance;
+      window.saveGrades = saveGrades;
+    });
+
+    function showDashboard() {
+      document.getElementById("auth-section").classList.add("d-none");
+      document.getElementById("dashboard-section").classList.remove("d-none");
+
+      // Bind real-time snapshot listener
+      db.collection("students").onSnapshot((snapshot) => {
+        students = [];
+        snapshot.docs.forEach(doc => {
+          students.push(doc.data());
+        });
+        
+        // Filter students assigned to "Engr. Kayode" (or approved general software students as fallbacks!)
+        assignedStudents = students.filter(s => s.status === "approved" && (s.instructor === "Engr. Kayode" || s.course === "Software Engineering" || s.course === "Cybersecurity Basics"));
+        
+        renderRoll();
+        renderAttendanceSheet();
+        renderGradesSheet();
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".pane-content").forEach(p => p.classList.add("d-none"));
+      document.querySelectorAll(".menu-item").forEach(m => m.classList.remove("active"));
+
+      document.getElementById(`pane-${tabId}`).classList.remove("d-none");
+      event.currentTarget.classList.add("active");
+      document.getElementById("workspace-title").textContent = `Console / Classroom ${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`;
+    }
+
+    function handleLogout() {
+      if (confirm("End this Instructor core workstation session?")) {
+        sessionStorage.removeItem("admin_instructor_logged_in");
+        window.location.reload();
+      }
+    }
+
+    function renderRoll() {
+      const tbody = document.getElementById("roll-tbody");
+      tbody.innerHTML = "";
+
+      if (assignedStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No students assigned to your classes yet.</td></tr>`;
+        return;
+      }
+
+      assignedStudents.forEach(s => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="font-mono text-primary fw-bold">${s.studentId || "N/A"}</td>
+            <td class="fw-semibold text-dark">${s.fullName || s.fullname}</td>
+            <td><span class="badge bg-secondary-subtle text-dark">${s.course}</span></td>
+            <td class="small text-muted"><i class="bi bi-envelope"></i> ${s.email}</td>
+            <td class="small text-muted"><i class="bi bi-telephone"></i> ${s.phone}</td>
+            <td><span class="badge bg-success">ACTIVE ROLL</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderAttendanceSheet() {
+      const tbody = document.getElementById("attendance-tbody");
+      tbody.innerHTML = "";
+
+      if (assignedStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No students to mark.</td></tr>`;
+        return;
+      }
+
+      assignedStudents.forEach(s => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="font-mono text-primary small">${s.studentId || "N/A"}</td>
+            <td class="fw-semibold text-dark">${s.fullName || s.fullname}</td>
+            <td><span class="small text-muted">${s.course}</span></td>
+            <td class="text-center">
+              <input class="form-check-input" type="radio" name="att-${s.uid}" value="Present" checked>
+            </td>
+            <td class="text-center">
+              <input class="form-check-input" type="radio" name="att-${s.uid}" value="Absent">
+            </td>
+            <td class="text-center">
+              <input class="form-check-input" type="radio" name="att-${s.uid}" value="Late">
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function saveAttendance() {
+      const date = document.getElementById("attendance-date").value;
+      if (!date) {
+        alert("Please specify an attendance date.");
+        return;
+      }
+
+      const log = [];
+      assignedStudents.forEach(s => {
+        const radios = document.getElementsByName(`att-${s.uid}`);
+        let status = "Present";
+        for (let r of radios) {
+          if (r.checked) status = r.value;
+        }
+        log.push({ uid: s.uid, name: s.fullName || s.fullname, status: status });
+      });
+
+      // Save to local storage cache
+      const attendanceDb = JSON.parse(localStorage.getItem("mock_attendance_logs") || "{}");
+      attendanceDb[date] = log;
+      localStorage.setItem("mock_attendance_logs", JSON.stringify(attendanceDb));
+
+      logAdminActivity("Instructor", `Recorded student daily attendance roster for date "${date}".`);
+      alert("Attendance log published and synchronized successfully!");
+    }
+
+    function renderGradesSheet() {
+      const tbody = document.getElementById("grades-tbody");
+      tbody.innerHTML = "";
+
+      if (assignedStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No students to grade.</td></tr>`;
+        return;
+      }
+
+      assignedStudents.forEach(s => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="font-mono text-primary small">${s.studentId || "N/A"}</td>
+            <td class="fw-semibold text-dark">${s.fullName || s.fullname}</td>
+            <td>
+              <input type="number" class="form-control form-control-sm grade-input" data-uid="${s.uid}" min="0" max="100" placeholder="e.g. 85" style="width: 100px;">
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm feedback-input" data-uid="${s.uid}" placeholder="Excellent conceptual layouts and execution...">
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function saveGrades() {
+      const examName = document.getElementById("assessment-select").value;
+      const inputs = document.querySelectorAll(".grade-input");
+      let count = 0;
+
+      inputs.forEach(inp => {
+        const uid = inp.getAttribute("data-uid");
+        const val = inp.value.trim();
+        const feedback = document.querySelector(`.feedback-input[data-uid="${uid}"]`).value.trim();
+
+        if (val) {
+          const score = parseInt(val);
+          // Sync grade back to database student record
+          const sIndex = students.findIndex(item => item.uid === uid);
+          if (sIndex !== -1) {
+            if (!students[sIndex].grades) students[sIndex].grades = {};
+            students[sIndex].grades[examName] = { score: score, feedback: feedback, date: new Date().toLocaleDateString() };
+            
+            db.collection("students").doc(uid).update({ grades: students[sIndex].grades });
+            count++;
+          }
+        }
+      });
+
+      if (count > 0) {
+        logAdminActivity("Instructor", `Published numerical grades for academic assessment "${examName}".`);
+        alert(`Published grades for ${count} students successfully!`);
+      } else {
+        alert("Please enter at least one score to publish.");
+      }
+    }
+  </script>
+</body>
+</html>

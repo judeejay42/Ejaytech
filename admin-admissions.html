@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admissions Officer Portal - EJaytech Concepts</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-navy: #0f172a;
+      --accent-amber: #f59e0b;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --sidebar-width: 260px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .auth-bg {
+      background: radial-gradient(circle at top right, #78350f, #0f172a 75%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-panel {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--primary-navy);
+      color: #f8fafc;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #1e293b;
+    }
+
+    .main-workspace {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    .top-navbar {
+      height: 70px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: #cbd5e1;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background-color: var(--accent-amber);
+      color: #000000;
+      font-weight: 600;
+    }
+
+    .card {
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Admission Letter styling inside modal */
+    .letter-frame {
+      border: 4px double #b45309;
+      padding: 40px;
+      background-color: #fffbeb;
+      font-family: 'Times New Roman', serif;
+      color: #1e293b;
+      position: relative;
+    }
+
+    .letter-seal {
+      width: 100px;
+      opacity: 0.15;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .letter-frame, .letter-frame * {
+        visibility: visible;
+      }
+      .letter-frame {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        background: white;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. AUTH SCREEN -->
+  <div id="auth-section" class="auth-bg">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+          <div class="card p-4 p-md-5 bg-white shadow-lg text-center border-0" style="border-radius: 20px;">
+            <div class="mb-4">
+              <img src="/assets/images/logo-512.png" alt="Logo" style="width: 70px;" class="mb-3">
+              <h4 class="fw-bold text-dark mb-1">Admissions Desk</h4>
+              <span class="badge bg-warning text-dark px-3 py-1 text-uppercase font-mono" style="font-size: 0.7rem;">Official Registrar workstation</span>
+            </div>
+
+            <!-- Credentials Box -->
+            <div class="p-3 bg-light rounded text-start mb-4 border border-warning-subtle">
+              <span class="small text-warning-emphasis d-block fw-bold"><i class="bi bi-info-circle-fill"></i> Credentials Key:</span>
+              <code class="small text-dark d-block mt-1">Username: <strong>admissions@ejaytech.com</strong></code>
+              <code class="small text-dark d-block">Password: <strong>admissionspass</strong></code>
+            </div>
+
+            <form id="login-form" class="text-start">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Admissions Email</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" id="auth-email" required placeholder="admissions@ejaytech.com">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Access Key</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" id="auth-password" required placeholder="••••••••">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold text-dark"><i class="bi bi-shield-lock-fill me-1"></i> Authenticate Credentials</button>
+            </form>
+            <div id="auth-alert" class="alert alert-danger d-none mt-3 small text-start"></div>
+            <div class="mt-4 pt-3 border-top">
+              <a href="/admin/portals" class="text-decoration-none small fw-semibold text-warning"><i class="bi bi-arrow-left"></i> Return to Portals</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN WORKSPACE -->
+  <div id="dashboard-section" class="d-none">
+    <!-- SIDEBAR -->
+    <div class="sidebar-panel">
+      <div class="p-4 border-bottom border-secondary d-flex align-items-center gap-3">
+        <img src="assets/images/logo-512.png" alt="Logo" style="width: 35px;">
+        <div>
+          <h6 class="mb-0 fw-bold text-white">EJaytech Core</h6>
+          <span class="small text-muted" style="font-size: 0.65rem;">Admissions Panel</span>
+        </div>
+      </div>
+      <div class="p-3 flex-grow-1">
+        <button class="menu-item active" onclick="switchTab('pipeline')"><i class="bi bi-file-earmark-person-fill"></i> Review Pipeline</button>
+        <button class="menu-item" onclick="switchTab('archive')"><i class="bi bi-archive-fill"></i> Dispatch Archive</button>
+      </div>
+      <div class="p-3 border-top border-secondary">
+        <button onclick="handleLogout()" class="btn btn-outline-danger w-100 btn-sm py-2"><i class="bi bi-box-arrow-right"></i> Close Session</button>
+      </div>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="main-workspace">
+      <!-- TOP NAV -->
+      <div class="top-navbar">
+        <span class="fw-semibold text-muted" id="workspace-title">Console / Admissions pipeline</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-warning text-dark font-mono"><i class="bi bi-shield-lock-fill"></i> Registrar Active</span>
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150" alt="Admin" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT BODY -->
+      <div class="p-4">
+        
+        <!-- PANE: PIPELINE -->
+        <div id="pane-pipeline" class="pane-content">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold mb-1">Admissions Entry Queue</h5>
+              <p class="text-muted small mb-0">Evaluate student application rosters, make decisions, and issue official admission confirmation papers.</p>
+            </div>
+            <input type="text" class="form-control" id="pipeline-search" placeholder="Search applicant..." style="width: 250px;" oninput="filterPipeline()">
+          </div>
+
+          <div class="card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Track Path</th>
+                    <th>Submission Stamp</th>
+                    <th>Admissions status</th>
+                    <th class="text-end">Command Center</th>
+                  </tr>
+                </thead>
+                <tbody id="pipeline-tbody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE: DISPATCH ARCHIVE -->
+        <div id="pane-archive" class="pane-content d-none">
+          <h5 class="fw-bold mb-3">Approved Admissions Archive</h5>
+          <div class="card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Pathway Path</th>
+                    <th>Status</th>
+                    <th class="text-end">Documentation Dispatch</th>
+                  </tr>
+                </thead>
+                <tbody id="archive-tbody">
+                  <!-- Approved students directory -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMISSION LETTER MODAL -->
+  <div class="modal fade" id="letterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Admission Confirmation Documentation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          
+          <!-- LETTER CONTAINER (PRINT TARGET) -->
+          <div class="letter-frame rounded shadow-sm" id="letter-content">
+            <img src="/assets/images/logo-512.png" alt="Seal" class="letter-seal">
+            
+            <!-- Academic Header -->
+            <div class="text-center border-bottom border-secondary pb-3 mb-4">
+              <h2 class="fw-bold mb-0 font-serif" style="color: #78350f; font-size: 1.8rem; letter-spacing: 0.05em;">EJaytech Concepts</h2>
+              <span class="small font-monospace text-uppercase" style="font-size: 0.72rem; color: #451a03; letter-spacing: 0.2em;">Center for High-Tech Mastery &bull; Engineering &bull; Innovation</span>
+              <p class="small text-muted mb-0 mt-1 font-monospace">12 Segun Osoba Way, Abeokuta &bull; admissions@ejaytech.com &bull; +234 (0) 8143 2109</p>
+            </div>
+
+            <!-- Letter Body -->
+            <div class="font-serif" style="line-height: 1.6; font-size: 1.05rem;">
+              <div class="d-flex justify-content-between mb-4">
+                <div>
+                  <strong>Ref:</strong> EJ-ADM-<span id="letter-id">1001</span>
+                </div>
+                <div>
+                  <strong>Date:</strong> <span id="letter-date">July 15, 2026</span>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <strong>To:</strong><br>
+                <span id="letter-name" class="fw-bold fs-5 text-dark">Oluwaseun Adebayo</span><br>
+                <span>Student Admissions Registry ID: </span><span id="letter-student-id" class="fw-bold text-primary font-monospace">EJ-2026-1042</span>
+              </div>
+
+              <p class="text-dark">Dear <span id="letter-salutation">Oluwaseun Adebayo</span>,</p>
+              
+              <p class="text-dark" style="text-align: justify;">
+                We are extremely pleased to inform you that your application for enrolment has been reviewed and formally <strong>APPROVED</strong>. You have been granted admission to pursue our intensive professional training curriculum:
+              </p>
+
+              <div class="p-3 bg-light rounded border border-warning-subtle mb-4">
+                <span class="d-block"><strong>Admitted Program Track:</strong> <span id="letter-course" class="fw-bold text-dark text-uppercase">Software Engineering Track</span></span>
+                <span class="d-block"><strong>Duration parameters:</strong> <span id="letter-duration">6 Months (Comprehensive Mastery Module)</span></span>
+                <span class="d-block"><strong>Academic Advisor:</strong> Registrar Admissions Board</span>
+              </div>
+
+              <p class="text-dark" style="text-align: justify;">
+                At EJaytech Concepts, our students are exposed to real-world industrial environments designed to convert technical passion into robust leadership coordinates. You are requested to finalize your tuition configurations and program activations to secure your seat.
+              </p>
+
+              <p class="text-dark">Once again, congratulations on your admission. We look forward to welcome you on campus.</p>
+
+              <!-- Signature block -->
+              <div class="mt-5 pt-3 border-top border-light d-flex justify-content-between align-items-end">
+                <div>
+                  <span class="small text-muted font-monospace">VERIFICATION CODE: EJ-SEC-A91B4</span>
+                </div>
+                <div class="text-center" style="width: 220px;">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Jon_Kirsch_Signature.png" alt="Signature" style="height: 45px; object-fit: contain;" referrerPolicy="no-referrer">
+                  <div class="border-top border-dark pt-1 mt-1">
+                    <strong class="small d-block text-dark">Director of Admissions</strong>
+                    <span class="small text-muted d-block" style="font-size: 0.72rem;">EJaytech Academic Council</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" onclick="window.print()" class="btn btn-warning text-dark fw-bold"><i class="bi bi-printer"></i> Print Admission Letter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { logAdminActivity } from "./admin.js";
+
+    let letterModal = null;
+    let students = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      letterModal = new bootstrap.Modal(document.getElementById("letterModal"));
+
+      if (sessionStorage.getItem("admin_admissions_logged_in") === "true") {
+        showDashboard();
+      }
+
+      // Bind Login Form
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("auth-email").value.trim();
+        const password = document.getElementById("auth-password").value;
+        const alertBox = document.getElementById("auth-alert");
+
+        if (email === "admissions@ejaytech.com" && password === "admissionspass") {
+          sessionStorage.setItem("admin_admissions_logged_in", "true");
+          showDashboard();
+        } else {
+          alertBox.textContent = "Invalid Admissions Officer credentials. Please check codes.";
+          alertBox.classList.remove("d-none");
+        }
+      });
+
+      window.switchTab = switchTab;
+      window.handleLogout = handleLogout;
+      window.approveReg = approveReg;
+      window.rejectReg = rejectReg;
+      window.viewAdmissionLetter = viewAdmissionLetter;
+      window.filterPipeline = filterPipeline;
+    });
+
+    function showDashboard() {
+      document.getElementById("auth-section").classList.add("d-none");
+      document.getElementById("dashboard-section").classList.remove("d-none");
+
+      // Bind to shared live collection
+      db.collection("students").onSnapshot((snapshot) => {
+        students = [];
+        snapshot.docs.forEach(doc => {
+          students.push(doc.data());
+        });
+        
+        renderPipeline();
+        renderArchive();
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".pane-content").forEach(p => p.classList.add("d-none"));
+      document.querySelectorAll(".menu-item").forEach(m => m.classList.remove("active"));
+
+      document.getElementById(`pane-${tabId}`).classList.remove("d-none");
+      event.currentTarget.classList.add("active");
+      document.getElementById("workspace-title").textContent = `Console / Admissions ${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`;
+    }
+
+    function handleLogout() {
+      if (confirm("End this Admissions Officer core workstation session?")) {
+        sessionStorage.removeItem("admin_admissions_logged_in");
+        window.location.reload();
+      }
+    }
+
+    function renderPipeline() {
+      const tbody = document.getElementById("pipeline-tbody");
+      tbody.innerHTML = "";
+
+      students.forEach(s => {
+        let badgeColor = "bg-warning text-dark";
+        if (s.status === "approved") badgeColor = "bg-success";
+        if (s.status === "rejected") badgeColor = "bg-danger";
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="font-mono text-primary fw-bold">${s.studentId || "N/A"}</td>
+            <td class="fw-semibold text-dark">${s.fullName || s.fullname}</td>
+            <td><span class="badge bg-secondary-subtle text-dark">${s.course}</span></td>
+            <td class="small text-muted">${new Date(s.createdAt).toLocaleDateString()}</td>
+            <td><span class="badge ${badgeColor}">${s.status.toUpperCase()}</span></td>
+            <td class="text-end">
+              ${s.status === 'pending' ? `
+                <button onclick="approveReg('${s.uid}')" class="btn btn-sm btn-success text-white me-1"><i class="bi bi-check-lg"></i> Approve</button>
+                <button onclick="rejectReg('${s.uid}')" class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Reject</button>
+              ` : `
+                <button onclick="viewAdmissionLetter('${s.uid}')" class="btn btn-sm btn-outline-warning text-dark fw-bold"><i class="bi bi-file-earmark-pdf-fill"></i> View Admission Letter</button>
+              `}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function approveReg(uid) {
+      if (confirm("Approve and admit this student applicant?")) {
+        db.collection("students").doc(uid).update({ status: "approved" });
+        logAdminActivity("Admissions Officer", `Formally admitted student with UID "${uid}".`);
+      }
+    }
+
+    function rejectReg(uid) {
+      if (confirm("Reject this student application?")) {
+        db.collection("students").doc(uid).update({ status: "rejected" });
+        logAdminActivity("Admissions Officer", `Formally rejected application with UID "${uid}".`);
+      }
+    }
+
+    function renderArchive() {
+      const tbody = document.getElementById("archive-tbody");
+      tbody.innerHTML = "";
+
+      const approvedList = students.filter(s => s.status === "approved");
+      if (approvedList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No approved admission records recorded.</td></tr>`;
+        return;
+      }
+
+      approvedList.forEach(s => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="font-mono text-primary fw-bold">${s.studentId || "N/A"}</td>
+            <td class="fw-semibold text-dark">${s.fullName || s.fullname}</td>
+            <td><span class="badge bg-light text-dark border">${s.course}</span></td>
+            <td><span class="badge bg-success">ADMITTED</span></td>
+            <td class="text-end">
+              <button onclick="viewAdmissionLetter('${s.uid}')" class="btn btn-sm btn-warning text-dark fw-bold"><i class="bi bi-journal-check"></i> Generate Admission Letter</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function viewAdmissionLetter(uid) {
+      const s = students.find(item => item.uid === uid);
+      if (!s) return;
+
+      document.getElementById("letter-id").textContent = s.studentId ? s.studentId.split("-")[2] : "1042";
+      document.getElementById("letter-date").textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById("letter-name").textContent = s.fullName || s.fullname;
+      document.getElementById("letter-salutation").textContent = s.fullName ? s.fullName.split(" ")[0] : "Applicant";
+      document.getElementById("letter-student-id").textContent = s.studentId || "EJ-2026-1042";
+      document.getElementById("letter-course").textContent = s.course;
+      
+      let duration = "6 Months";
+      if (s.course === "Graphic Design") duration = "3 Months";
+      if (s.course === "Cybersecurity Basics") duration = "4 Months";
+      document.getElementById("letter-duration").textContent = `${duration} (Comprehensive Mastery Module)`;
+
+      letterModal.show();
+    }
+
+    function filterPipeline() {
+      const q = document.getElementById("pipeline-search").value.toLowerCase().trim();
+      const tbody = document.getElementById("pipeline-tbody");
+      tbody.innerHTML = "";
+
+      const filtered = students.filter(s => (s.fullName || s.fullname || "").toLowerCase().includes(q));
+      filtered.forEach(s => {
+        let badgeColor = "bg-warning text-dark";
+        if (s.status === "approved") badgeColor = "bg-success";
+        if (s.status === "rejected") badgeColor = "bg-danger";
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="font-mono text-primary fw-bold">${s.studentId || "N/A"}</td>
+            <td class="fw-semibold text-dark">${s.fullName || s.fullname}</td>
+            <td><span class="badge bg-secondary-subtle text-dark">${s.course}</span></td>
+            <td class="small text-muted">${new Date(s.createdAt).toLocaleDateString()}</td>
+            <td><span class="badge ${badgeColor}">${s.status.toUpperCase()}</span></td>
+            <td class="text-end">
+              ${s.status === 'pending' ? `
+                <button onclick="approveReg('${s.uid}')" class="btn btn-sm btn-success text-white me-1"><i class="bi bi-check-lg"></i> Approve</button>
+                <button onclick="rejectReg('${s.uid}')" class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Reject</button>
+              ` : `
+                <button onclick="viewAdmissionLetter('${s.uid}')" class="btn btn-sm btn-outline-warning text-dark fw-bold"><i class="bi bi-file-earmark-pdf-fill"></i> View Admission Letter</button>
+              `}
+            </td>
+          </tr>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>

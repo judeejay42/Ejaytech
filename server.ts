@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
 });
 
 // Explicit routes for pages
-const pages = ['about', 'services', 'courses', 'student', 'admin', 'student-dashboard', 'admin-dashboard'];
+const pages = ['about', 'services', 'courses', 'student', 'admin', 'student-dashboard', 'admin-dashboard', 'admin-portals', 'admin-super-admin', 'admin-centre-admin', 'admin-admissions', 'admin-finance', 'admin-instructor'];
 pages.forEach(page => {
   app.get(`/${page}`, (req, res) => {
     res.sendFile(path.join(staticPath, `${page}.html`));
@@ -55,6 +55,26 @@ pages.forEach(page => {
   app.get(`/${page}.html`, (req, res) => {
     res.sendFile(path.join(staticPath, `${page}.html`));
   });
+});
+
+// Direct role-based URLs
+app.get('/admin/super-admin', (req, res) => {
+  res.sendFile(path.join(staticPath, 'admin-super-admin.html'));
+});
+app.get('/admin/centre-admin', (req, res) => {
+  res.sendFile(path.join(staticPath, 'admin-centre-admin.html'));
+});
+app.get('/admin/admissions', (req, res) => {
+  res.sendFile(path.join(staticPath, 'admin-admissions.html'));
+});
+app.get('/admin/finance', (req, res) => {
+  res.sendFile(path.join(staticPath, 'admin-finance.html'));
+});
+app.get('/admin/instructor', (req, res) => {
+  res.sendFile(path.join(staticPath, 'admin-instructor.html'));
+});
+app.get('/admin/portals', (req, res) => {
+  res.sendFile(path.join(staticPath, 'admin-portals.html'));
 });
 
 // Map student directory and registrations pages to serve the admin dashboard

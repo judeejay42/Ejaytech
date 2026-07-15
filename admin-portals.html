@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrative Portals Gateway - EJaytech Concepts</title>
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Custom Style -->
+  <style>
+    :root {
+      --primary-navy: #0f172a;
+      --accent-blue: #2563eb;
+      --hover-blue: #1d4ed8;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top right, #1e293b, #0f172a 70%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar-custom {
+      background-color: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid #1e293b;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-logo {
+      color: #ffffff !important;
+    }
+
+    /* Portal Cards */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      padding: 20px 0;
+    }
+
+    .portal-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 30px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-8px);
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--accent-blue);
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
+    }
+
+    .portal-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      background: rgba(37, 99, 235, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .portal-card:hover .portal-icon-wrapper {
+      background: var(--accent-blue);
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    .feature-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 25px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    .feature-list li i {
+      color: #10b981;
+    }
+
+    .btn-portal {
+      background-color: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: #60a5fa;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .portal-card:hover .btn-portal {
+      background-color: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    /* Animation effects */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
+        <img src="/assets/images/logo-512.png"
+             alt="EJaytech Concepts Logo"
+             class="navbar-logo-img me-3"
+             style="height: 48px;"
+             referrerPolicy="no-referrer">
+        <div>
+          <span class="brand-logo fs-4 text-white fw-bold">EJaytech Concepts</span>
+          <span class="brand-tagline text-muted font-monospace" style="font-size: 0.68rem; display: block; letter-spacing: 0.05em; text-transform: uppercase;">Innovate &bull; Create &bull; Elevate</span>
+        </div>
+      </a>
+      <div class="ms-auto">
+        <a href="admin.html" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left me-1"></i> Admin Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container py-5 flex-grow-1 d-flex flex-column justify-content-center">
+    <div class="text-center mb-5 animate-fade-in">
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 text-uppercase fw-semibold mb-3" style="font-size: 0.75rem;">Command &amp; Control Centre</span>
+      <h2 class="fw-bold tracking-tight text-white mb-2">Office Operations Workstations</h2>
+      <p class="text-muted max-w-2xl mx-auto" style="max-width: 600px; margin: 0 auto;">Select your designated administrative portal. Access is strictly audited and limited based on security roles.</p>
+    </div>
+
+    <!-- Portal Cards Grid -->
+    <div class="portal-grid">
+      
+      <!-- 1. Super Admin -->
+      <div class="portal-card animate-fade-in delay-1">
+        <div>
+          <div class="portal-icon-wrapper">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">Super Admin</h4>
+          <p class="text-muted small mb-4">Complete root access to coordinates, global settings, security registers, and overall system audits.</p>
+          <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> Full system control</li>
+            <li><i class="bi bi-check-circle-fill"></i> Manage administrators</li>
+            <li><i class="bi bi-check-circle-fill"></i> View all student records</li>
+            <li><i class="bi bi-check-circle-fill"></i> Global configuration settings</li>
+            <li><i class="bi bi-check-circle-fill"></i> Advanced executive reports</li>
+          </ul>
+        </div>
+        <a href="/admin/super-admin" class="btn btn-portal w-100">
+          Access Console <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- 2. Centre Administrator -->
+      <div class="portal-card animate-fade-in delay-2">
+        <div>
+          <div class="portal-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
+            <i class="bi bi-buildings-fill"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">Centre Administrator</h4>
+          <p class="text-muted small mb-4">Supervise centre operations, curriculum pipelines, instructor allocations, and local campus statistics.</p>
+          <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> Manage students database</li>
+            <li><i class="bi bi-check-circle-fill"></i> Approve student registrations</li>
+            <li><i class="bi bi-check-circle-fill"></i> Assign program instructors</li>
+            <li><i class="bi bi-check-circle-fill"></i> Manage courses catalog</li>
+            <li><i class="bi bi-check-circle-fill"></i> Track centre vital statistics</li>
+          </ul>
+        </div>
+        <a href="/admin/centre-admin" class="btn btn-portal w-100" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+          Access Station <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- 3. Admissions Officer -->
+      <div class="portal-card animate-fade-in delay-3">
+        <div>
+          <div class="portal-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">
+            <i class="bi bi-file-earmark-person-fill"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">Admissions Officer</h4>
+          <p class="text-muted small mb-4">Command the student registration pipelines, verify credential papers, and dispatch official admissions letters.</p>
+          <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> Review entry applications</li>
+            <li><i class="bi bi-check-circle-fill"></i> Approve / reject admissions</li>
+            <li><i class="bi bi-check-circle-fill"></i> Generate admission letters</li>
+            <li><i class="bi bi-check-circle-fill"></i> Track real-time applicants status</li>
+          </ul>
+        </div>
+        <a href="/admin/admissions" class="btn btn-portal w-100" style="border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;">
+          Access Station <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- 4. Finance Officer -->
+      <div class="portal-card animate-fade-in delay-4">
+        <div>
+          <div class="portal-icon-wrapper" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.3);">
+            <i class="bi bi-cash-coin"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">Finance Officer</h4>
+          <p class="text-muted small mb-4">Audit tuition payments, approve bank deposit vouchers, and construct accurate campus revenue maps.</p>
+          <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> Verify student payments</li>
+            <li><i class="bi bi-check-circle-fill"></i> Approve payment records</li>
+            <li><i class="bi bi-check-circle-fill"></i> Generate official receipts</li>
+            <li><i class="bi bi-check-circle-fill"></i> Financial audits &amp; revenue reports</li>
+          </ul>
+        </div>
+        <a href="/admin/finance" class="btn btn-portal w-100" style="border-color: rgba(139, 92, 246, 0.4); color: #a78bfa;">
+          Access Station <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- 5. Instructor -->
+      <div class="portal-card animate-fade-in delay-5">
+        <div>
+          <div class="portal-icon-wrapper" style="background: rgba(236, 72, 153, 0.15); color: #ec4899; border-color: rgba(236, 72, 153, 0.3);">
+            <i class="bi bi-person-video3"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">Instructor Portal</h4>
+          <p class="text-muted small mb-4">View assigned course tracks, mark student daily attendances, score academic projects, and submit grades.</p>
+          <ul class="feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> View assigned students list</li>
+            <li><i class="bi bi-check-circle-fill"></i> Manage daily classroom attendance</li>
+            <li><i class="bi bi-check-circle-fill"></i> Upload assessments coordinates</li>
+            <li><i class="bi bi-check-circle-fill"></i> Enter grades and view results</li>
+          </ul>
+        </div>
+        <a href="/admin/instructor" class="btn btn-portal w-100" style="border-color: rgba(236, 72, 153, 0.4); color: #f472b6;">
+          Access Station <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 border-top border-secondary" style="background-color: rgba(15, 23, 42, 0.9); font-size: 0.85rem;">
+    <div class="container text-muted">
+      &copy; 2026 EJaytech Concepts. All security sessions are encrypted and logged for security audits.
+    </div>
+  </footer>
+
+</body>
+</html>
