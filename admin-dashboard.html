@@ -825,13 +825,21 @@
         <!-- Search, filter and actions bar -->
         <div class="card p-3 mb-4">
           <div class="row g-3">
-            <div class="col-md-5">
+            <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" class="form-control" id="reg-search-input" placeholder="Search applicant by name, email, phone or ID..." oninput="renderRegistrationsTable()">
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
+              <select class="form-select" id="reg-centre-filter" onchange="renderRegistrationsTable()">
+                <option value="">All Centres</option>
+                <option value="abk">ABK Centre</option>
+                <option value="ibadan">Ibadan Centre</option>
+                <option value="abuja">Abuja Centre</option>
+              </select>
+            </div>
+            <div class="col-md-2">
               <select class="form-select" id="reg-course-filter" onchange="renderRegistrationsTable()">
                 <option value="">All Curricula Courses</option>
               </select>
@@ -882,13 +890,21 @@
         <!-- Search and Filter -->
         <div class="card p-3 mb-4">
           <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" class="form-control" id="stud-search-input" placeholder="Search active directory by student name or credentials..." oninput="renderStudentsTable()">
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+              <select class="form-select" id="stud-centre-filter" onchange="renderStudentsTable()">
+                <option value="">All Centres</option>
+                <option value="abk">ABK Centre</option>
+                <option value="ibadan">Ibadan Centre</option>
+                <option value="abuja">Abuja Centre</option>
+              </select>
+            </div>
+            <div class="col-md-3">
               <select class="form-select" id="stud-course-filter" onchange="renderStudentsTable()">
                 <option value="">All Courses</option>
               </select>
@@ -935,13 +951,21 @@
         <!-- Payments stats & filters -->
         <div class="card p-3 mb-4">
           <div class="row g-3 align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" class="form-control" id="pay-search-input" placeholder="Search by student, course, reference..." oninput="renderPaymentsTable()">
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
+              <select class="form-select" id="pay-centre-filter" onchange="renderPaymentsTable()">
+                <option value="">All Centres</option>
+                <option value="abk">ABK Centre</option>
+                <option value="ibadan">Ibadan Centre</option>
+                <option value="abuja">Abuja Centre</option>
+              </select>
+            </div>
+            <div class="col-md-2">
               <select class="form-select" id="pay-status-filter" onchange="renderPaymentsTable()">
                 <option value="">All Payment States</option>
                 <option value="Pending">Pending Audit</option>
@@ -2005,6 +2029,7 @@
       const search = document.getElementById("reg-search-input").value.toLowerCase();
       const courseFilter = document.getElementById("reg-course-filter").value;
       const statusFilter = document.getElementById("reg-status-filter").value;
+      const centreFilter = document.getElementById("reg-centre-filter") ? document.getElementById("reg-centre-filter").value : "";
 
       // Dynamically fill filter course options
       const cfSelect = document.getElementById("reg-course-filter");
@@ -2023,7 +2048,8 @@
                               s.email.toLowerCase().includes(search);
         const matchesCourse = courseFilter ? s.course === courseFilter : true;
         const matchesStatus = statusFilter ? s.status === statusFilter : true;
-        return matchesSearch && matchesCourse && matchesStatus;
+        const matchesCentre = centreFilter ? s.centreId === centreFilter : true;
+        return matchesSearch && matchesCourse && matchesStatus && matchesCentre;
       });
 
       if (filtered.length === 0) {
@@ -2073,6 +2099,7 @@
     function renderStudentsTable() {
       const search = document.getElementById("stud-search-input").value.toLowerCase();
       const courseFilter = document.getElementById("stud-course-filter").value;
+      const centreFilter = document.getElementById("stud-centre-filter") ? document.getElementById("stud-centre-filter").value : "";
 
       // Populate options
       const scSelect = document.getElementById("stud-course-filter");
@@ -2093,7 +2120,8 @@
                               s.studentId.toLowerCase().includes(search) ||
                               s.email.toLowerCase().includes(search);
         const matchesCourse = courseFilter ? s.course === courseFilter : true;
-        return matchesSearch && matchesCourse;
+        const matchesCentre = centreFilter ? s.centreId === centreFilter : true;
+        return matchesSearch && matchesCourse && matchesCentre;
       });
 
       if (filtered.length === 0) {
@@ -2130,6 +2158,7 @@
     function renderPaymentsTable() {
       const search = document.getElementById("pay-search-input").value.toLowerCase();
       const statusFilter = document.getElementById("pay-status-filter").value;
+      const centreFilter = document.getElementById("pay-centre-filter") ? document.getElementById("pay-centre-filter").value : "";
 
       const tbody = document.getElementById("payments-tbody");
       tbody.innerHTML = "";
@@ -2139,7 +2168,17 @@
                               p.referenceNumber.toLowerCase().includes(search) || 
                               p.course.toLowerCase().includes(search);
         const matchesStatus = statusFilter ? p.status === statusFilter : true;
-        return matchesSearch && matchesStatus;
+        
+        let matchesCentre = true;
+        if (centreFilter) {
+          const student = students.find(s => s.studentId === p.studentId || s.id === p.studentId || s.uid === p.studentId);
+          if (student) {
+            matchesCentre = student.centreId === centreFilter;
+          } else {
+            matchesCentre = false;
+          }
+        }
+        return matchesSearch && matchesStatus && matchesCentre;
       });
 
       if (filtered.length === 0) {

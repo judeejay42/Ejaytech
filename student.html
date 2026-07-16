@@ -16,6 +16,34 @@
   <link rel="icon" type="image/png" href="assets/images/logo-512.png">
   <!-- Custom CSS -->
   <link href="css/style.css" rel="stylesheet">
+  <style>
+    .centre-select-card {
+      cursor: pointer;
+      border: 2px solid #e2e8f0 !important;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .centre-select-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px -5px rgba(37, 99, 235, 0.1), 0 8px 16px -8px rgba(37, 99, 235, 0.08);
+      border-color: #3b82f6 !important;
+    }
+    .centre-select-card.active {
+      border-color: #2563eb !important;
+      background-color: #f0f7ff !important;
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.15);
+    }
+    .centre-select-card .select-btn {
+      transition: all 0.2s ease;
+    }
+    .centre-select-card.active .select-btn {
+      background-color: #2563eb !important;
+      color: #ffffff !important;
+      border-color: #2563eb !important;
+    }
+    #student-gateway-col {
+      transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
 </head>
 <body>
 
@@ -52,7 +80,7 @@
   <section class="py-5 bg-light" id="student-gateway">
     <div class="container py-4">
       <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+        <div class="col-lg-6 col-md-8" id="student-gateway-col">
           <div class="card-premium p-4 p-md-5 bg-white text-center">
             <div class="mb-4">
               <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
@@ -106,7 +134,97 @@
 
               <!-- Register Tab -->
               <div class="tab-pane fade" id="register-content" role="tabpanel" aria-labelledby="register-tab">
-                <form id="student-register-form">
+                
+                <!-- STEP 1: Centre Selection -->
+                <div id="centre-selection-step">
+                  <div class="text-center mb-4 mt-2">
+                    <h4 class="fw-bold font-display text-dark">Choose Your Preferred Training Centre</h4>
+                    <p class="text-muted small">Select the EJaytech Concepts centre where you want to study.</p>
+                  </div>
+                  
+                  <div class="row g-3 mb-4">
+                    <!-- Card 1: ABK Centre -->
+                    <div class="col-lg-4 col-md-12">
+                      <div class="card h-100 border rounded-4 overflow-hidden centre-select-card" id="card-abk" onclick="selectCentre('ABK', 'abk')">
+                        <div class="centre-img-wrapper" style="height: 130px; background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'); background-size: cover; background-position: center; position: relative;">
+                          <span class="badge bg-success position-absolute top-0 end-0 m-2" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill"></i> Open for Registration</span>
+                        </div>
+                        <div class="card-body p-3 text-start">
+                          <h6 class="fw-bold font-display text-dark mb-1">🏢 ABK Centre</h6>
+                          <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Abeokuta, Ogun</p>
+                          <div class="small text-muted mb-2 d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-book text-primary me-1"></i> Available Programs:</span>
+                            <span class="badge bg-light text-dark border font-mono" id="abk-course-count">Counting...</span>
+                          </div>
+                          <p class="text-muted mb-3" style="font-size: 0.75rem; line-height: 1.4; min-height: 2.5rem;">State-of-the-art programming laboratories and dedicated software engineering mentors.</p>
+                          <button type="button" class="btn btn-outline-primary btn-sm w-full select-btn font-display py-2" id="btn-select-abk">
+                            Select Centre
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Card 2: Ibadan Centre -->
+                    <div class="col-lg-4 col-md-12">
+                      <div class="card h-100 border rounded-4 overflow-hidden centre-select-card" id="card-ibadan" onclick="selectCentre('IBADAN', 'ibadan')">
+                        <div class="centre-img-wrapper" style="height: 130px; background-image: url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&auto=format&fit=crop&q=80'); background-size: cover; background-position: center; position: relative;">
+                          <span class="badge bg-success position-absolute top-0 end-0 m-2" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill"></i> Open for Registration</span>
+                        </div>
+                        <div class="card-body p-3 text-start">
+                          <h6 class="fw-bold font-display text-dark mb-1">🏢 Ibadan Centre</h6>
+                          <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Ibadan, Oyo</p>
+                          <div class="small text-muted mb-2 d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-book text-primary me-1"></i> Available Programs:</span>
+                            <span class="badge bg-light text-dark border font-mono" id="ibadan-course-count">Counting...</span>
+                          </div>
+                          <p class="text-muted mb-3" style="font-size: 0.75rem; line-height: 1.4; min-height: 2.5rem;">Modern creative design studios, workstations, and layout analysis suites.</p>
+                          <button type="button" class="btn btn-outline-primary btn-sm w-full select-btn font-display py-2" id="btn-select-ibadan">
+                            Select Centre
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Card 3: Abuja Centre -->
+                    <div class="col-lg-4 col-md-12">
+                      <div class="card h-100 border rounded-4 overflow-hidden centre-select-card" id="card-abuja" onclick="selectCentre('ABUJA', 'abuja')">
+                        <div class="centre-img-wrapper" style="height: 130px; background-image: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&auto=format&fit=crop&q=80'); background-size: cover; background-position: center; position: relative;">
+                          <span class="badge bg-success position-absolute top-0 end-0 m-2" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill"></i> Open for Registration</span>
+                        </div>
+                        <div class="card-body p-3 text-start">
+                          <h6 class="fw-bold font-display text-dark mb-1">🏢 Abuja Centre</h6>
+                          <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Abuja, FCT</p>
+                          <div class="small text-muted mb-2 d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-book text-primary me-1"></i> Available Programs:</span>
+                            <span class="badge bg-light text-dark border font-mono" id="abuja-course-count">Counting...</span>
+                          </div>
+                          <p class="text-muted mb-3" style="font-size: 0.75rem; line-height: 1.4; min-height: 2.5rem;">Enterprise security networks, cloud platforms, and cybersecurity testing facilities.</p>
+                          <button type="button" class="btn btn-outline-primary btn-sm w-full select-btn font-display py-2" id="btn-select-abuja">
+                            Select Centre
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- STEP 2: Registration Form -->
+                <div id="registration-form-step" class="d-none">
+                  <!-- Selected Centre Banner -->
+                  <div class="alert alert-info border-0 shadow-sm rounded-4 p-3 mb-4 d-flex align-items-center justify-content-between" id="selected-centre-banner">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="bg-primary text-white p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-building-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <span class="small text-muted text-uppercase fw-bold tracking-wider" style="font-size: 0.65rem; display: block; line-height: 1;">Your Selected Centre</span>
+                        <h6 class="fw-bold mb-0 text-dark mt-1" id="banner-centre-name">ABK Centre</h6>
+                      </div>
+                    </div>
+                    <a href="#" onclick="showCentreSelection(event)" class="text-primary text-decoration-none small fw-bold"><i class="bi bi-arrow-left-right"></i> Change Centre</a>
+                  </div>
+
+                  <form id="student-register-form">
                   <div class="row">
                     <div class="col-md-6 mb-3">
                       <label for="reg-name" class="form-label font-display fw-semibold text-dark small">Full Name</label>
@@ -197,6 +315,7 @@
                     <i class="bi bi-person-plus me-2"></i> Register Account
                   </button>
                 </form>
+                </div>
               </div>
             </div>
 
@@ -339,31 +458,147 @@
   <script type="module">
     import { db } from "./js/firebase-config.js";
 
-    // Handle parsing the apply query param to auto-select course
-    document.addEventListener("DOMContentLoaded", () => {
+    let selectedCentre = "";   // "ABK", "IBADAN", or "ABUJA"
+    let selectedCentreId = ""; // "abk", "ibadan", or "abuja"
+
+    // Responsive width helper for dynamic center layout scaling
+    function adjustGatewayWidth(state) {
+      const col = document.getElementById("student-gateway-col");
+      if (!col) return;
+      
+      if (state === "login") {
+        col.className = "col-lg-6 col-md-8";
+      } else if (state === "register-selection") {
+        col.className = "col-lg-10 col-md-11 col-xl-10";
+      } else if (state === "register-form") {
+        col.className = "col-lg-8 col-md-10";
+      }
+    }
+
+    // Expose selectCentre and showCentreSelection to the window global scope
+    window.selectCentre = function(centreName, id) {
+      selectedCentre = centreName;
+      selectedCentreId = id;
+
+      // Highlight active selected card
+      document.querySelectorAll(".centre-select-card").forEach(c => c.classList.remove("active"));
+      const card = document.getElementById(`card-${id}`);
+      if (card) card.classList.add("active");
+
+      // Update banner text
+      document.getElementById("banner-centre-name").textContent = `${centreName} Centre`;
+
+      // Delightful delayed transition to Step 2
+      setTimeout(() => {
+        document.getElementById("centre-selection-step").classList.add("d-none");
+        document.getElementById("registration-form-step").classList.remove("d-none");
+        adjustGatewayWidth("register-form");
+
+        // Dynamically build and pre-select courses offered under the selected branch
+        filterCoursesByCentre(id);
+      }, 350);
+    };
+
+    window.showCentreSelection = function(e) {
+      if (e) e.preventDefault();
+
+      // Reset card selection states
+      document.querySelectorAll(".centre-select-card").forEach(c => c.classList.remove("active"));
+      selectedCentre = "";
+      selectedCentreId = "";
+
+      // Transition back to selection bento grid
+      document.getElementById("registration-form-step").classList.add("d-none");
+      document.getElementById("centre-selection-step").classList.remove("d-none");
+      adjustGatewayWidth("register-selection");
+    };
+
+    // Filter course pathway selections based on matching training centers
+    function filterCoursesByCentre(id) {
+      const courseSelect = document.getElementById("reg-course");
+      if (!courseSelect) return;
+
+      courseSelect.innerHTML = '<option value="" disabled selected>Select pathway...</option>';
+
+      const defaultCourses = [
+        { title: "Software Engineering", duration: "6 Months", centreId: "abk" },
+        { title: "Graphic Design", duration: "3 Months", centreId: "ibadan" },
+        { title: "Cybersecurity Basics", duration: "4 Months", centreId: "abuja" }
+      ];
+      const allCourses = JSON.parse(localStorage.getItem("mock_courses")) || defaultCourses;
+      const matched = allCourses.filter(c => c.centreId === id);
+
+      matched.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.title || c.courseName;
+        opt.textContent = `${c.title || c.courseName} (${c.duration})`;
+        courseSelect.appendChild(opt);
+      });
+
+      // Handle auto-selection of course if apply query param is active
       const urlParams = new URLSearchParams(window.location.search);
-      const applyCourse = urlParams.get('apply');
+      const applyCourse = urlParams.get("apply");
+      if (applyCourse) {
+        for (let i = 0; i < courseSelect.options.length; i++) {
+          if (courseSelect.options[i].value === applyCourse || courseSelect.options[i].text.includes(applyCourse)) {
+            courseSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    // Dynamic count badges on cards based on registered course catalog
+    function updateCourseCountsOnCards() {
+      const defaultCourses = [
+        { title: "Software Engineering", duration: "6 Months", centreId: "abk" },
+        { title: "Graphic Design", duration: "3 Months", centreId: "ibadan" },
+        { title: "Cybersecurity Basics", duration: "4 Months", centreId: "abuja" }
+      ];
+      const allCourses = JSON.parse(localStorage.getItem("mock_courses")) || defaultCourses;
+
+      const abkCount = allCourses.filter(c => c.centreId === "abk").length;
+      const ibadanCount = allCourses.filter(c => c.centreId === "ibadan").length;
+      const abujaCount = allCourses.filter(c => c.centreId === "abuja").length;
+
+      const abkEl = document.getElementById("abk-course-count");
+      const ibadanEl = document.getElementById("ibadan-course-count");
+      const abujaEl = document.getElementById("abuja-course-count");
+
+      if (abkEl) abkEl.textContent = `${abkCount} program${abkCount !== 1 ? "s" : ""}`;
+      if (ibadanEl) ibadanEl.textContent = `${ibadanCount} program${ibadanCount !== 1 ? "s" : ""}`;
+      if (abujaEl) abujaEl.textContent = `${abujaCount} program${abujaCount !== 1 ? "s" : ""}`;
+    }
+
+    // Handle parsing the apply query param to auto-select course and toggle registration
+    document.addEventListener("DOMContentLoaded", () => {
+      updateCourseCountsOnCards();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const applyCourse = urlParams.get("apply");
       if (applyCourse) {
         // Toggle to register tab
-        const registerTabBtn = document.getElementById('register-tab');
+        const registerTabBtn = document.getElementById("register-tab");
         if (registerTabBtn) {
           const tab = new bootstrap.Tab(registerTabBtn);
           tab.show();
         }
-        // Auto select dropdown
-        const courseDropdown = document.getElementById('reg-course');
-        if (courseDropdown) {
-          for (let i = 0; i < courseDropdown.options.length; i++) {
-            if (courseDropdown.options[i].value === applyCourse || courseDropdown.options[i].text.includes(applyCourse)) {
-              courseDropdown.selectedIndex = i;
-              break;
-            }
-          }
-        }
       }
     });
 
-    // Form Handlers (Local Simulation for Phase 1)
+    // Listen to tab switching to intelligently toggle the container's column sizes
+    document.getElementById("login-tab").addEventListener("shown.bs.tab", () => {
+      adjustGatewayWidth("login");
+    });
+    document.getElementById("register-tab").addEventListener("shown.bs.tab", () => {
+      if (selectedCentreId) {
+        adjustGatewayWidth("register-form");
+      } else {
+        adjustGatewayWidth("register-selection");
+      }
+    });
+
+    // Form Handlers (Local Simulation Alert Frame)
     const successAlert = document.getElementById("portal-alert-success");
     const errorAlert = document.getElementById("portal-alert-error");
 
@@ -404,6 +639,13 @@
     // Register Form Handler
     document.getElementById("student-register-form").addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      if (!selectedCentreId) {
+        displayNotification(false, "Centre Selection Required", "Please select a training centre before continuing.");
+        showCentreSelection();
+        return;
+      }
+
       const name = document.getElementById("reg-name").value;
       const email = document.getElementById("reg-email").value;
       const phone = document.getElementById("reg-phone").value;
@@ -442,6 +684,8 @@
           approvalStatus: "pending",
           createdAt: new Date().toISOString(),
           bio: "Enthusiastic EJaytech Concepts student.",
+          centre: selectedCentre,           // Automatically assigned selected Centre Name
+          centreId: selectedCentreId,       // Automatically assigned selected Centre ID code
           lastDocumentSubmitted: "",
           workflow: {
             submitted: true,
@@ -467,7 +711,10 @@
         btn.innerHTML = '<i class="bi bi-person-plus me-2"></i> Register Account';
 
         displayNotification(true, "Registration Successful", `Welcome ${name}! Your registration for "${course}" was successfully recorded on Firestore. Assigned ID: ${studentId}`);
+        
+        // Return back to selection step for subsequent users
         document.getElementById("student-register-form").reset();
+        showCentreSelection();
       } catch (err) {
         console.error("[Firestore Student Registration Failure] Error logged to console for debugging:", err);
         btn.disabled = false;
