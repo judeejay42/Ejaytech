@@ -32,6 +32,30 @@ function seedMockStudentPortalData() {
         message: "Congratulations! Your application to EJaytech Concepts has been reviewed and approved. Welcome to your learning workspace.",
         status: "unread",
         createdAt: new Date().toISOString()
+      },
+      {
+        id: "notif-3",
+        studentId: "EJ-2026-9999",
+        title: "Registration Approved",
+        message: "Your course registration has been officially approved. Check the 'My Courses' tab to view your active curriculum.",
+        status: "unread",
+        createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+      },
+      {
+        id: "notif-4",
+        studentId: "EJ-2026-9999",
+        title: "Payment Confirmed",
+        message: "Your payment reference has been verified by the finance department. Download your receipts under 'Payments'.",
+        status: "unread",
+        createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
+      },
+      {
+        id: "notif-5",
+        studentId: "EJ-2026-9999",
+        title: "Assignment Posted",
+        message: "A new design layout assignment has been posted by Mr. Femi Adeleye under Learning Resources.",
+        status: "unread",
+        createdAt: new Date(Date.now() - 3600000 * 10).toISOString()
       }
     ];
     localStorage.setItem("mock_notifications", JSON.stringify(defaultNotifications));
@@ -44,9 +68,10 @@ function seedMockStudentPortalData() {
         title: "Introduction to HTML5 & CSS3 Basics",
         description: "Learn the foundational structural markup and styling concepts for modern web layouts.",
         courseId: "Software Engineering",
-        fileUrl: "#",
+        filePath: "assets/images/placeholder_document.pdf",
         fileType: "pdf",
         fileName: "html5_css3_guide.pdf",
+        fileSize: "2.4 MB",
         createdAt: new Date(Date.now() - 3600000 * 48).toISOString()
       },
       {
@@ -54,13 +79,170 @@ function seedMockStudentPortalData() {
         title: "Responsive Visual Grid Exercise Sheet",
         description: "Graphic Design grids, Photoshop guides, and UI wireframe project layouts.",
         courseId: "Graphic Design",
-        fileUrl: "#",
+        filePath: "assets/images/placeholder_document.pdf",
         fileType: "zip",
         fileName: "grid_system_templates.zip",
+        fileSize: "12.8 MB",
         createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
+      },
+      {
+        id: "mat-3",
+        title: "Network Protection & Firewall Operations Guide",
+        description: "Standard security frameworks and firewall configurations for active network defense.",
+        courseId: "Cybersecurity Basics",
+        filePath: "assets/images/placeholder_document.pdf",
+        fileType: "pdf",
+        fileName: "firewall_networks_guide.pdf",
+        fileSize: "5.1 MB",
+        createdAt: new Date(Date.now() - 3600000 * 36).toISOString()
       }
     ];
     localStorage.setItem("mock_materials", JSON.stringify(defaultMaterials));
+  }
+
+  if (!localStorage.getItem("mock_instructors")) {
+    const defaultInstructors = [
+      {
+        id: "inst-1",
+        name: "Engr. Kayode",
+        department: "Software Engineering & Cyber Operations",
+        assignedCourses: "Software Engineering, Cybersecurity Basics",
+        centre: "Abuja Hub & ABK",
+        officeHours: "Mon - Thu, 10:00 AM - 02:00 PM",
+        email: "instructor.abk@ejaytech.com",
+        phone: "+234 814 321 0987",
+        profilePhoto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
+      },
+      {
+        id: "inst-2",
+        name: "Mr. Femi Adeleye",
+        department: "Visual Communication & UI/UX Design",
+        assignedCourses: "Graphic Design",
+        centre: "Ibadan Centre",
+        officeHours: "Tue - Fri, 01:00 PM - 05:00 PM",
+        email: "femi.adeleye@ejaytech.com",
+        phone: "+234 708 877 6655",
+        profilePhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80"
+      }
+    ];
+    localStorage.setItem("mock_instructors", JSON.stringify(defaultInstructors));
+  }
+
+  if (!localStorage.getItem("mock_timetable")) {
+    const defaultTimetable = [
+      {
+        id: "time-1",
+        day: "Monday",
+        time: "09:00 AM - 12:00 PM",
+        course: "Software Engineering",
+        venue: "Main Lab - Abuja Garki",
+        instructor: "Engr. Kayode"
+      },
+      {
+        id: "time-2",
+        day: "Wednesday",
+        time: "10:00 AM - 01:00 PM",
+        course: "Software Engineering",
+        venue: "Virtual Room A & Live Stream",
+        instructor: "Engr. Kayode"
+      },
+      {
+        id: "time-3",
+        day: "Tuesday",
+        time: "11:00 AM - 02:00 PM",
+        course: "Graphic Design",
+        venue: "Creative Studio - Ibadan",
+        instructor: "Mr. Femi Adeleye"
+      },
+      {
+        id: "time-4",
+        day: "Thursday",
+        time: "02:00 PM - 05:00 PM",
+        course: "Graphic Design",
+        venue: "Virtual Design Board",
+        instructor: "Mr. Femi Adeleye"
+      },
+      {
+        id: "time-5",
+        day: "Friday",
+        time: "09:00 AM - 12:00 PM",
+        course: "Cybersecurity Basics",
+        venue: "Cyber Range Lab - Abuja",
+        instructor: "Engr. Kayode"
+      }
+    ];
+    localStorage.setItem("mock_timetable", JSON.stringify(defaultTimetable));
+  }
+
+  if (!localStorage.getItem("mock_grades")) {
+    const defaultGrades = [
+      {
+        id: "grade-s1",
+        studentId: "EJ-2026-9999",
+        studentName: "EJaytech Student",
+        course: "Software Engineering",
+        courseCode: "SEN-201",
+        creditUnits: 4,
+        semester: "1st Semester",
+        testScore: 28,
+        examScore: 61,
+        totalScore: 89,
+        grade: "A",
+        remarks: "Excellent practical implementation skills.",
+        instructor: "Engr. Kayode"
+      },
+      {
+        id: "grade-s2",
+        studentId: "EJ-2026-9999",
+        studentName: "EJaytech Student",
+        course: "Software Engineering",
+        courseCode: "SEN-202",
+        creditUnits: 3,
+        semester: "1st Semester",
+        testScore: 24,
+        examScore: 54,
+        totalScore: 78,
+        grade: "B",
+        remarks: "Strong structural logic.",
+        instructor: "Engr. Kayode"
+      }
+    ];
+    localStorage.setItem("mock_grades", JSON.stringify(defaultGrades));
+  }
+
+  if (!localStorage.getItem("mock_attendance_individual")) {
+    const defaultAtt = [
+      { id: "att-i1", date: "2026-07-01", course: "Software Engineering", status: "Present", duration: "3 Hours", instructor: "Engr. Kayode" },
+      { id: "att-i2", date: "2026-07-03", course: "Software Engineering", status: "Present", duration: "3 Hours", instructor: "Engr. Kayode" },
+      { id: "att-i3", date: "2026-07-06", course: "Software Engineering", status: "Present", duration: "3 Hours", instructor: "Engr. Kayode" },
+      { id: "att-i4", date: "2026-07-08", course: "Software Engineering", status: "Absent", duration: "3 Hours", instructor: "Engr. Kayode" },
+      { id: "att-i5", date: "2026-07-10", course: "Software Engineering", status: "Present", duration: "3 Hours", instructor: "Engr. Kayode" },
+      { id: "att-i6", date: "2026-07-13", course: "Software Engineering", status: "Present", duration: "3 Hours", instructor: "Engr. Kayode" },
+      { id: "att-i7", date: "2026-07-15", course: "Software Engineering", status: "Present", duration: "3 Hours", instructor: "Engr. Kayode" }
+    ];
+    localStorage.setItem("mock_attendance_individual", JSON.stringify(defaultAtt));
+  }
+
+  if (!localStorage.getItem("mock_messages")) {
+    const defaultMessages = [
+      {
+        id: "msg-1",
+        sender: "Super Admin",
+        senderBadge: "Executive Board",
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=70",
+        message: "Dear Student, Welcome to EJaytech Concepts Workspace. Our mission is to accelerate your career. Let us know if you require structural or resource modifications.",
+        createdAt: new Date(Date.now() - 3600000 * 48).toISOString()
+      },
+      {
+        id: "msg-2",
+        sender: "Engr. Kayode",
+        senderBadge: "Assigned Instructor",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+        message: "Hello class! Please ensure you review Chapter 2: Responsive Grids before our lab session on Monday morning. Submit your zip exercises on the workspace portal.",
+        createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
+      }
+    ];
+    localStorage.setItem("mock_messages", JSON.stringify(defaultMessages));
   }
 }
 
