@@ -254,9 +254,31 @@ seedMockStudentPortalData();
  */
 export async function getStudentProfile(uid) {
   console.log(`[Mock DB] Loading student profile for UID: ${uid}`);
+  
+  // 1. Try to fetch from the master students list
+  try {
+    const listStr = localStorage.getItem("mock_students_list");
+    if (listStr) {
+      const list = JSON.parse(listStr);
+      const found = list.find(s => s.uid === uid || s.id === uid || s.studentId === uid);
+      if (found) {
+        localStorage.setItem("mock_student_profile", JSON.stringify(found));
+        return found;
+      }
+    }
+  } catch (e) {
+    console.warn("Error looking up profile in mock_students_list:", e);
+  }
+
+  // 2. Fallback to cached profile if matching
   const cached = localStorage.getItem("mock_student_profile");
   if (cached) {
-    return JSON.parse(cached);
+    try {
+      const parsed = JSON.parse(cached);
+      if (parsed.uid === uid || parsed.id === uid || parsed.studentId === uid) {
+        return parsed;
+      }
+    } catch (e) {}
   }
 
   // Return a beautiful default profile if none exists
@@ -277,7 +299,24 @@ export async function getStudentProfile(uid) {
     approvalStatus: "approved",
     createdAt: new Date().toISOString(),
     bio: "Enthusiastic EJaytech Concepts student.",
-    lastDocumentSubmitted: ""
+    centre: "Abuja Garki Hub",
+    centreId: "abuja",
+    lastDocumentSubmitted: "",
+    workflow: {
+      submitted: true,
+      pendingReview: "approved",
+      documentVerification: "approved",
+      paymentVerification: "approved",
+      adminApproval: "approved",
+      studentActivated: true
+    },
+    documents: {
+      passportPhoto: { status: "approved", fileUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80", feedback: "" },
+      idCard: { status: "approved", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" },
+      certificates: { status: "approved", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" },
+      supportingDocuments: { status: "approved", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" }
+    },
+    paymentHistory: []
   };
   localStorage.setItem("mock_student_profile", JSON.stringify(defaultProfile));
   return defaultProfile;
@@ -327,11 +366,36 @@ export async function updateStudentProfile(uid, fields) {
 export async function getStudentNotifications(studentId) {
   console.log(`[Mock DB] Querying student notifications for ID: ${studentId}`);
   let list = [];
+  let studentCentreId = "abuja"; // default fallback
+
+  // Find the student's centreId from the master list
+  try {
+    const listStr = localStorage.getItem("mock_students_list");
+    if (listStr) {
+      const list = JSON.parse(listStr);
+      const student = list.find(s => s.studentId === studentId || s.uid === studentId || s.id === studentId);
+      if (student) {
+        studentCentreId = (student.centreId || "abuja").toLowerCase();
+      }
+    }
+  } catch (e) {
+    console.warn("Could not fetch student centre for notification filtering:", e);
+  }
+
   try {
     const notificationsStr = localStorage.getItem("mock_notifications");
     if (notificationsStr) {
       const allNotifs = JSON.parse(notificationsStr);
-      list = allNotifs.filter(n => n.studentId === "all" || n.studentId === studentId);
+      list = allNotifs.filter(n => {
+        const matchesStudent = n.studentId === "all" || n.studentId === studentId;
+        const notificationCentreId = (n.centreId || n.centre || "").toLowerCase();
+        const matchesCentre = !notificationCentreId || notificationCentreId === "all" || 
+                              notificationCentreId === studentCentreId || 
+                              (studentCentreId === "abk" && notificationCentreId.includes("abk")) ||
+                              (studentCentreId === "ibadan" && notificationCentreId.includes("ibadan")) ||
+                              (studentCentreId === "abuja" && (notificationCentreId.includes("abuja") || notificationCentreId.includes("garki")));
+        return matchesStudent && matchesCentre;
+      });
     }
   } catch (e) {
     console.error("Failed to load mock notifications:", e);

@@ -375,7 +375,7 @@
           <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem;">
             <span class="visually-hidden">Syncing session...</span>
           </div>
-          <p class="text-muted mt-3 font-display">Synchronizing secure student records from Firebase...</p>
+          <p class="text-muted mt-3 font-display" id="dash-loading-text">Authenticating...</p>
         </div>
 
         <!-- ERROR/NOTICE COMPONENT SCREEN -->
@@ -1297,14 +1297,29 @@
       console.log("[Portal Initialization] Student workspace online.");
       
       const studentUid = sessionStorage.getItem("student_uid") || "mock_student_uid";
+      const loadingTextEl = document.getElementById("dash-loading-text");
       
       // Initialize clock
       updateLivePortalClock();
       setInterval(updateLivePortalClock, 1000);
 
       try {
+        if (loadingTextEl) loadingTextEl.textContent = "Authenticating...";
         const data = await getStudentProfile(studentUid);
-        await renderStudentDashboardWithData(data, studentUid);
+        
+        // Stagger progressive checks with high fidelity animations
+        setTimeout(() => {
+          if (loadingTextEl) loadingTextEl.textContent = "Verifying student records...";
+          
+          setTimeout(() => {
+            if (loadingTextEl) loadingTextEl.textContent = "Loading dashboard...";
+            
+            setTimeout(async () => {
+              await renderStudentDashboardWithData(data, studentUid);
+            }, 600);
+          }, 600);
+        }, 600);
+
       } catch (err) {
         console.error("[Portal Initialization Error]", err);
         showErrorState("Renderer Setup Error", "Could not assemble student dashboard layouts: " + err.message, true);
@@ -1677,17 +1692,24 @@
       container.innerHTML = "";
 
       const instructors = JSON.parse(localStorage.getItem("mock_instructors") || "[]");
+      const studentCentreId = (currentStudentData && currentStudentData.centreId || "abuja").toLowerCase();
       
-      // Filter: only show instructors assigned to registered course
+      // Filter: only show instructors assigned to registered course and matching training center
       const filtered = instructors.filter(inst => {
-        return inst.assignedCourses.toLowerCase().includes(courseName.toLowerCase());
+        const matchesCourse = inst.assignedCourses.toLowerCase().includes(courseName.toLowerCase());
+        const instCentre = (inst.centre || "").toLowerCase();
+        const matchesCentre = instCentre.includes(studentCentreId) || 
+                              (studentCentreId === "abuja" && (instCentre.includes("abuja") || instCentre.includes("garki") || instCentre.includes("hub"))) ||
+                              (studentCentreId === "abk" && instCentre.includes("abk")) ||
+                              (studentCentreId === "ibadan" && instCentre.includes("ibadan"));
+        return matchesCourse && matchesCentre;
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="col-12 text-center py-4 text-muted border rounded-3 bg-light">
             <i class="bi bi-people fs-2 d-block mb-2 text-secondary"></i>
-            No instructors assigned to your course track yet.
+            No instructors assigned to your course track yet at this centre.
           </div>`;
         return;
       }
@@ -1723,7 +1745,18 @@
       tbody.innerHTML = "";
 
       const timetable = JSON.parse(localStorage.getItem("mock_timetable") || "[]");
-      const matched = timetable.filter(t => t.course.toLowerCase().includes(courseName.toLowerCase()));
+      const studentCentreId = (currentStudentData && currentStudentData.centreId || "abuja").toLowerCase();
+      
+      const matched = timetable.filter(t => {
+        const matchesCourse = t.course.toLowerCase().includes(courseName.toLowerCase());
+        const venue = (t.venue || "").toLowerCase();
+        const matchesCentre = venue.includes(studentCentreId) || 
+                              venue.includes("virtual") || 
+                              (studentCentreId === "abuja" && (venue.includes("abuja") || venue.includes("garki"))) ||
+                              (studentCentreId === "abk" && venue.includes("abk")) ||
+                              (studentCentreId === "ibadan" && venue.includes("ibadan"));
+        return matchesCourse && matchesCentre;
+      });
 
       if (matched.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No timetable sessions loaded for: ${courseName}</td></tr>`;

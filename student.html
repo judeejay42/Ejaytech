@@ -457,6 +457,7 @@
 
   <script type="module">
     import { db } from "./js/firebase-config.js";
+    import { loginStudentAccount, resetStudentPassword } from "./js/student-auth.js";
 
     let selectedCentre = "";   // "ABK", "IBADAN", or "ABUJA"
     let selectedCentreId = ""; // "abk", "ibadan", or "abuja"
@@ -617,21 +618,39 @@
     }
 
     // Login Form Handler
-    document.getElementById("student-login-form").addEventListener("submit", (e) => {
+    document.getElementById("student-login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
       const btn = document.getElementById("login-submit-btn");
       
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
 
-      setTimeout(() => {
+      try {
+        // Step 1: Authenticate and verify student records in real database
+        const session = await loginStudentAccount(email, password);
+        
+        // Step 2: Display the required progressive loading screen messages with nice pauses
+        setTimeout(() => {
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying student records...';
+          
+          setTimeout(() => {
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading dashboard...';
+            
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerHTML = '<i class="bi bi-door-open me-2"></i> Access Portal';
+              window.location.href = "student-dashboard.html";
+            }, 800);
+          }, 800);
+        }, 800);
+
+      } catch (err) {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-door-open me-2"></i> Access Portal';
-        
-        displayNotification(true, "Login Simulated", `Successfully processed login request for ${email}. Portal routing will be connected in Phase 2/3.`);
-        document.getElementById("student-login-form").reset();
-      }, 1200);
+        displayNotification(false, "Authentication Failed", err.message);
+      }
     });
 
     // Register Form Handler
@@ -722,14 +741,19 @@
     });
 
     // Forgot Password Link Handler
-    document.getElementById("forgot-password-link").addEventListener("click", (e) => {
+    document.getElementById("forgot-password-link").addEventListener("click", async (e) => {
       e.preventDefault();
       const emailInput = document.getElementById("login-email").value;
       if (!emailInput) {
         displayNotification(false, "Email Required", "Please type your email address into the Email field first, then click 'Forgot?'.");
         return;
       }
-      displayNotification(true, "Reset Sent", `A password reset link has been simulated for ${emailInput}.`);
+      try {
+        await resetStudentPassword(emailInput);
+        displayNotification(true, "Reset Sent", `A password reset link has been successfully dispatched to ${emailInput}.`);
+      } catch (err) {
+        displayNotification(false, "Reset Failed", err.message);
+      }
     });
   </script>
 </body>
