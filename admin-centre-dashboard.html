@@ -879,9 +879,9 @@
       const allStudents = await getRegisteredStudentsList();
       students = allStudents.filter(s => s.centreId === currentCentreId);
 
-      // Filter courses
+      // Filter courses - complete centralized catalogue
       const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
-      courses = allCourses.filter(c => c.centreId === currentCentreId);
+      courses = allCourses;
 
       // Filter payments
       const allPayments = JSON.parse(localStorage.getItem("mock_payments") || "[]");
@@ -1518,6 +1518,7 @@
       }
 
       courses.forEach(c => {
+        const assignedInstructor = (c.instructorAssignments && c.instructorAssignments[currentCentreId]) || c.instructor || "Unassigned";
         const div = document.createElement("div");
         div.className = "col-md-4";
         div.innerHTML = `
@@ -1532,7 +1533,7 @@
               <div class="row g-2 mb-3 small text-muted border-top border-bottom py-2">
                 <div class="col-6"><i class="bi bi-clock me-1 text-primary"></i> ${c.duration}</div>
                 <div class="col-6"><i class="bi bi-calendar-event me-1 text-danger"></i> Deadline: ${c.deadline}</div>
-                <div class="col-12 mt-2"><i class="bi bi-person-badge me-1 text-success"></i> ${c.instructor}</div>
+                <div class="col-12 mt-2"><i class="bi bi-person-badge me-1 text-success"></i> ${assignedInstructor}</div>
               </div>
 
               <div class="d-flex gap-2">
@@ -1557,13 +1558,15 @@
       const course = courses.find(c => c.id === id);
       if (!course) return;
 
+      const assignedInstructor = (course.instructorAssignments && course.instructorAssignments[currentCentreId]) || course.instructor || "";
+
       document.getElementById("course-modal-title").textContent = "Modify Course Track Specs";
       document.getElementById("course-action-id").value = course.id;
       document.getElementById("c-title").value = course.title;
       document.getElementById("c-duration").value = course.duration;
       document.getElementById("c-fee").value = course.fee;
       document.getElementById("c-deadline").value = course.deadline;
-      document.getElementById("c-instructor").value = course.instructor;
+      document.getElementById("c-instructor").value = assignedInstructor;
       document.getElementById("c-desc").value = course.description;
       document.getElementById("c-requirements").value = course.requirements || "";
       document.getElementById("c-outcomes").value = course.learningOutcomes || "";
@@ -1589,6 +1592,9 @@
           // Editing
           const index = allCourses.findIndex(c => c.id === id);
           if (index !== -1) {
+            const currentAssignments = allCourses[index].instructorAssignments || {};
+            currentAssignments[currentCentreId] = instructor;
+
             allCourses[index] = {
               ...allCourses[index],
               title,
@@ -1597,6 +1603,7 @@
               fee: Number(fee),
               deadline,
               instructor,
+              instructorAssignments: currentAssignments,
               description,
               requirements,
               learningOutcomes: outcomes
@@ -1615,6 +1622,9 @@
             fee: Number(fee),
             deadline,
             instructor,
+            instructorAssignments: {
+              [currentCentreId]: instructor
+            },
             description,
             requirements,
             learningOutcomes: outcomes,

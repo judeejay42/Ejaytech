@@ -526,7 +526,7 @@
         { title: "Cybersecurity Basics", duration: "4 Months", centreId: "abuja" }
       ];
       const allCourses = JSON.parse(localStorage.getItem("mock_courses")) || defaultCourses;
-      const matched = allCourses.filter(c => c.centreId === id);
+      const matched = allCourses.filter(c => !c.isArchived);
 
       matched.forEach(c => {
         const opt = document.createElement("option");
@@ -556,18 +556,16 @@
         { title: "Cybersecurity Basics", duration: "4 Months", centreId: "abuja" }
       ];
       const allCourses = JSON.parse(localStorage.getItem("mock_courses")) || defaultCourses;
-
-      const abkCount = allCourses.filter(c => c.centreId === "abk").length;
-      const ibadanCount = allCourses.filter(c => c.centreId === "ibadan").length;
-      const abujaCount = allCourses.filter(c => c.centreId === "abuja").length;
+      const activeCourses = allCourses.filter(c => !c.isArchived);
+      const totalCount = activeCourses.length;
 
       const abkEl = document.getElementById("abk-course-count");
       const ibadanEl = document.getElementById("ibadan-course-count");
       const abujaEl = document.getElementById("abuja-course-count");
 
-      if (abkEl) abkEl.textContent = `${abkCount} program${abkCount !== 1 ? "s" : ""}`;
-      if (ibadanEl) ibadanEl.textContent = `${ibadanCount} program${ibadanCount !== 1 ? "s" : ""}`;
-      if (abujaEl) abujaEl.textContent = `${abujaCount} program${abujaCount !== 1 ? "s" : ""}`;
+      if (abkEl) abkEl.textContent = `${totalCount} program${totalCount !== 1 ? "s" : ""}`;
+      if (ibadanEl) ibadanEl.textContent = `${totalCount} program${totalCount !== 1 ? "s" : ""}`;
+      if (abujaEl) abujaEl.textContent = `${totalCount} program${totalCount !== 1 ? "s" : ""}`;
     }
 
     // Handle parsing the apply query param to auto-select course and toggle registration

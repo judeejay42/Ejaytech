@@ -606,7 +606,12 @@
     async function loadDatabaseSnapshot() {
       // Find all courses where instructor matches
       const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
-      myCourses = allCourses.filter(c => c.instructor === instructorName && c.centreId === currentCentreId);
+      myCourses = allCourses.filter(c => {
+        const assigned = (c.instructorAssignments && c.instructorAssignments[currentCentreId]) || c.instructor;
+        const matchesInstructor = assigned === instructorName;
+        const matchesLegacy = c.instructor === instructorName && c.centreId === currentCentreId;
+        return matchesInstructor || matchesLegacy;
+      });
 
       const courseTitles = myCourses.map(c => c.title);
 
