@@ -3,7 +3,7 @@
  * Manages secure login, validation logic, and workspace route guards.
  */
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 
 // Seed the student database with defaults if it doesn't exist
 export function seedStudentDatabase() {
@@ -333,10 +333,54 @@ export async function resetStudentPassword(email) {
  * Logout session for Student Portal.
  */
 export async function logoutStudentSession() {
+  try {
+    if (auth && typeof auth.signOut === "function") {
+      await auth.signOut();
+    }
+  } catch (e) {
+    console.error("Firebase Auth signout failed:", e);
+  }
   sessionStorage.removeItem("student_logged_in");
   sessionStorage.removeItem("student_uid");
   localStorage.removeItem("mock_student_profile");
   window.location.href = "student.html";
+}
+
+/**
+ * Update the password of a logged-in student.
+ */
+export async function changeStudentPassword(uid, currentPassword, newPassword) {
+  if (!uid || !currentPassword || !newPassword) {
+    throw new Error("All fields are required.");
+  }
+  
+  const snap = await db.collection("students").get();
+  let foundDocId = null;
+  let studentRecord = null;
+  
+  snap.forEach(doc => {
+    const data = doc.data();
+    if (data.uid === uid) {
+      studentRecord = data;
+      foundDocId = doc.id;
+    }
+  });
+
+  if (!studentRecord) {
+    throw new Error("Student record not found.");
+  }
+
+  const savedPassword = studentRecord.password || "password123";
+  if (savedPassword !== currentPassword) {
+    throw new Error("Incorrect current password.");
+  }
+
+  await db.collection("students").doc(foundDocId).update({ password: newPassword });
+  
+  studentRecord.password = newPassword;
+  localStorage.setItem("mock_student_profile", JSON.stringify(studentRecord));
+  
+  return true;
 }
 
 /**

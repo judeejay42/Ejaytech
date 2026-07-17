@@ -308,9 +308,10 @@
             <a href="#" class="nav-link" data-target="sec-courses"><i class="bi bi-journal-bookmark-fill"></i> My Courses</a>
             <a href="#" class="nav-link" data-target="sec-instructors"><i class="bi bi-people-fill"></i> Instructors</a>
             <a href="#" class="nav-link" data-target="sec-timetable"><i class="bi bi-calendar3"></i> Timetable</a>
-            <a href="#" class="nav-link" data-target="sec-payments"><i class="bi bi-wallet2"></i> Payments</a>
-            <a href="#" class="nav-link" data-target="sec-results"><i class="bi bi-award-fill"></i> Results</a>
-            <a href="#" class="nav-link" data-target="sec-attendance"><i class="bi bi-calendar-check-fill"></i> Attendance</a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-payments"><i class="bi bi-wallet2"></i> Payments</a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-results"><i class="bi bi-award-fill"></i> Results</a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-certificates"><i class="bi bi-patch-check-fill"></i> Certificates</a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-attendance"><i class="bi bi-calendar-check-fill"></i> Attendance</a>
             <a href="#" class="nav-link" data-target="sec-resources"><i class="bi bi-folder-symlink-fill"></i> Learning Resources</a>
             <a href="#" class="nav-link" data-target="sec-messages"><i class="bi bi-chat-dots-fill"></i> Messages <span class="badge bg-danger rounded-pill float-end" id="messages-unseen-badge" style="display: none;">0</span></a>
             <a href="#" class="nav-link" data-target="sec-notifications"><i class="bi bi-bell-fill"></i> Notifications <span class="badge bg-primary ms-auto" id="notif-badge-pill">0</span></a>
@@ -422,48 +423,66 @@
               </div>
             </div>
 
+            <!-- Hidden backward compatible display anchors -->
+            <div class="d-none">
+              <span id="student-course-display"></span>
+              <span id="student-level-display"></span>
+              <span id="student-balance-display"></span>
+            </div>
+
             <!-- Stats row -->
-            <div class="row g-3 mb-4">
-              <div class="col-md-6 col-xl-3">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
+              <div class="col">
                 <div class="card p-3 shadow-sm border-0 h-100">
                   <div class="d-flex align-items-center gap-3">
                     <div class="p-3 bg-primary-subtle text-primary rounded-3 fs-3"><i class="bi bi-journal-bookmark"></i></div>
                     <div>
-                      <span class="small text-muted d-block font-display">Active Program</span>
-                      <strong class="text-dark d-block" id="student-course-display">Software Track</strong>
+                      <span class="small text-muted d-block font-display">Registered Courses</span>
+                      <strong class="text-dark d-block" id="stat-registered-courses">1 Course</strong>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
+              <div class="col">
                 <div class="card p-3 shadow-sm border-0 h-100">
                   <div class="d-flex align-items-center gap-3">
-                    <div class="p-3 bg-success-subtle text-success rounded-3 fs-3"><i class="bi bi-person-check"></i></div>
+                    <div class="p-3 bg-success-subtle text-success rounded-3 fs-3"><i class="bi bi-award"></i></div>
                     <div>
-                      <span class="small text-muted d-block font-display">Student ID</span>
-                      <strong class="text-dark font-mono d-block" id="student-id-display">EJ-2026-XXXX</strong>
+                      <span class="small text-muted d-block font-display">Completed Courses</span>
+                      <strong class="text-dark d-block" id="stat-completed-courses">0 Courses</strong>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
+              <div class="col">
                 <div class="card p-3 shadow-sm border-0 h-100">
                   <div class="d-flex align-items-center gap-3">
-                    <div class="p-3 bg-warning-subtle text-warning rounded-3 fs-3"><i class="bi bi-award"></i></div>
+                    <div class="p-3 bg-warning-subtle text-warning rounded-3 fs-3"><i class="bi bi-file-earmark-text"></i></div>
                     <div>
-                      <span class="small text-muted d-block font-display">Current Level</span>
-                      <strong class="text-dark d-block" id="student-level-display">Intermediate Level</strong>
+                      <span class="small text-muted d-block font-display">Pending Assignments</span>
+                      <strong class="text-dark d-block" id="stat-pending-assignments">1 Pending</strong>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
+              <div class="col">
                 <div class="card p-3 shadow-sm border-0 h-100">
                   <div class="d-flex align-items-center gap-3">
-                    <div class="p-3 bg-info-subtle text-info rounded-3 fs-3"><i class="bi bi-wallet2"></i></div>
+                    <div class="p-3 bg-info-subtle text-info rounded-3 fs-3"><i class="bi bi-calendar-check"></i></div>
                     <div>
-                      <span class="small text-muted d-block font-display">Financial Balance</span>
-                      <strong class="text-dark d-block" id="student-balance-display">₦0.00</strong>
+                      <span class="small text-muted d-block font-display">Attendance %</span>
+                      <strong class="text-dark d-block" id="stat-attendance-percent">85.7%</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card p-3 shadow-sm border-0 h-100">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="p-3 bg-danger-subtle text-danger rounded-3 fs-3"><i class="bi bi-wallet2"></i></div>
+                    <div>
+                      <span class="small text-muted d-block font-display">Payment Status</span>
+                      <strong class="text-dark d-block" id="stat-payment-status">PENDING AUDIT</strong>
                     </div>
                   </div>
                 </div>
@@ -482,11 +501,15 @@
                   </div>
 
                   <h5 class="fw-bold text-dark font-display mb-1" id="profile-fullname">Student Name</h5>
+                  <div class="text-muted font-mono small mb-2">ID: <span id="student-id-display">EJ-2026-XXXX</span></div>
                   <span class="badge border badge-status mb-3" id="student-status-badge">Pending</span>
 
                   <div class="border-top pt-3 text-start">
                     <ul class="list-unstyled d-flex flex-column gap-2 small p-0 mb-0">
                       <li class="d-flex justify-content-between"><span class="text-muted">Academic Center:</span> <strong id="profile-centre">Abuja Hub</strong></li>
+                      <li class="d-flex justify-content-between"><span class="text-muted">Assigned Instructor:</span> <strong id="profile-instructor">Engr. Kayode</strong></li>
+                      <li class="d-flex justify-content-between"><span class="text-muted">Registration Status:</span> <strong id="profile-reg-status" class="text-primary">Approved</strong></li>
+                      <li class="d-flex justify-content-between"><span class="text-muted">Payment Status:</span> <strong id="profile-payment-status" class="text-success">Paid</strong></li>
                       <li class="d-flex justify-content-between"><span class="text-muted">Enrollment Date:</span> <strong id="profile-enrollment-date">Not Set</strong></li>
                       <li class="d-flex justify-content-between"><span class="text-muted">Student Email:</span> <strong class="text-truncate" style="max-width: 170px;" id="student-email-display">email@ex.com</strong></li>
                       <li class="d-flex justify-content-between"><span class="text-muted">Active Phone:</span> <strong id="student-phone-display">+234...</strong></li>
@@ -1086,6 +1109,39 @@
                   </select>
                 </div>
               </div>
+
+              <!-- Change Security Password Card -->
+              <div class="card shadow-sm border p-4 mt-4">
+                <h5 class="fw-bold font-display text-dark mb-3"><i class="bi bi-shield-lock me-2 text-primary"></i> Change Security Password</h5>
+                <form id="change-password-form">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold small">Current Password</label>
+                      <input type="password" class="form-control" id="change-current-password" required placeholder="••••••••">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold small">New Security Password</label>
+                      <input type="password" class="form-control" id="change-new-password" required minlength="6" placeholder="Min 6 characters">
+                    </div>
+                  </div>
+                  <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary px-4" id="change-pwd-sub-btn"><i class="bi bi-key-fill me-1"></i> Update Security Password</button>
+                  </div>
+                </form>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 14. VIEW: CERTIFICATES & CLEARANCES -->
+          <div id="sec-certificates" class="dashboard-view-module d-none">
+            <div class="card shadow-sm border p-4">
+              <h4 class="fw-bold font-display text-dark mb-1"><i class="bi bi-patch-check-fill text-success me-2"></i> Academic Certificates & Clearances</h4>
+              <p class="text-muted small mb-4">View and download your digital completion certificates and graduation credentials issued by the central registry.</p>
+              
+              <div id="certificate-status-container">
+                <!-- Loaded dynamically based on student programme status -->
+              </div>
             </div>
           </div>
 
@@ -1249,7 +1305,7 @@
   <!-- Page Dashboard Script -->
   <script type="module">
     import { db, auth } from "./js/firebase-config.js";
-    import { protectStudentPage as protectPageAccess } from "./js/student-auth.js";
+    import { protectStudentPage as protectPageAccess, logoutStudentSession, changeStudentPassword } from "./js/student-auth.js";
     import { getStudentProfile, updateStudentProfile, getStudentNotifications, markNotificationAsRead, getCourseMaterials, uploadAssignmentFile } from "./student.js";
 
     // Enforce student session protection
@@ -1381,6 +1437,7 @@
         "sec-timetable": "Course Timetables",
         "sec-payments": "Financial Payments Portal",
         "sec-results": "Semester Results & Grades",
+        "sec-certificates": "Academic Certificates & Clearances",
         "sec-attendance": "Attendance Register Logs",
         "sec-resources": "Learning Study Materials",
         "sec-messages": "Hub Communications Desk",
@@ -1404,10 +1461,15 @@
     /**
      * Action to execute actual sign-out
      */
-    window.confirmLogout = function() {
-      sessionStorage.removeItem("student_logged_in");
-      sessionStorage.removeItem("student_uid");
-      window.location.href = "student.html";
+    window.confirmLogout = async function() {
+      try {
+        await logoutStudentSession();
+      } catch (err) {
+        console.error("Sign out failed:", err);
+        sessionStorage.removeItem("student_logged_in");
+        sessionStorage.removeItem("student_uid");
+        window.location.href = "student.html";
+      }
     };
 
     /**
@@ -1533,8 +1595,55 @@
         }
         document.getElementById("navbar-avatar-initials").textContent = initials;
 
+        // Dynamic Calculations for the 5 stats cards and extra profile elements
+        const allCourses = JSON.parse(localStorage.getItem("mock_courses") || "[]");
+        const matchedCourses = allCourses.filter(c => c.title === courseVal || c.courseName === courseVal);
+        const coursesCount = matchedCourses.length;
+        document.getElementById("stat-registered-courses").textContent = `${coursesCount} Unit${coursesCount === 1 ? '' : 's'}`;
+
+        const statusLower = (data.status || "approved").toLowerCase();
+        const isCompleted = statusLower === "completed";
+        document.getElementById("stat-completed-courses").textContent = `${isCompleted ? coursesCount : 0} Unit${(isCompleted ? coursesCount : 0) === 1 ? '' : 's'}`;
+
+        const pendingAssignments = data.lastDocumentSubmitted ? 0 : 1;
+        document.getElementById("stat-pending-assignments").textContent = `${pendingAssignments} Pending`;
+
+        let attPercent = "92.5%";
+        try {
+          const atts = JSON.parse(localStorage.getItem("mock_attendance_individual") || "[]");
+          const studentAtt = atts.filter(a => a.studentId === studentIdVal);
+          if (studentAtt.length > 0) {
+            const present = studentAtt.filter(a => a.status === "Present").length;
+            attPercent = ((present / studentAtt.length) * 100).toFixed(1) + "%";
+          }
+        } catch (e) {
+          console.warn("Failed calculating attendance %", e);
+        }
+        document.getElementById("stat-attendance-percent").textContent = attPercent;
+
+        let payStatusText = "UNDER AUDIT";
+        let verifiedPaid = false;
+        try {
+          const payments = JSON.parse(localStorage.getItem("mock_payments") || "[]");
+          const studentPay = payments.filter(p => p.studentId === studentIdVal);
+          if (studentPay.length > 0) {
+            verifiedPaid = studentPay.some(p => p.status === "Verified" || p.status === "Approved");
+            payStatusText = verifiedPaid ? "VERIFIED PAID" : "PENDING AUDIT";
+          }
+        } catch (e) {
+          console.warn("Failed calculating pay status", e);
+        }
+        document.getElementById("stat-payment-status").textContent = payStatusText;
+
+        // Additional profile tags
+        document.getElementById("profile-instructor").textContent = matchedCourses.length > 0 ? matchedCourses[0].instructor : "Engr. Kayode";
+        document.getElementById("profile-reg-status").textContent = statusLower === "pending" ? "Pending Review" : statusLower === "rejected" ? "Admission Rejected" : "Fully Approved";
+        document.getElementById("profile-reg-status").className = statusLower === "pending" ? "text-warning" : statusLower === "rejected" ? "text-danger" : "text-primary";
+        document.getElementById("profile-payment-status").textContent = verifiedPaid ? "Fully Verified" : "Under Audit";
+        document.getElementById("profile-payment-status").className = verifiedPaid ? "text-success" : "text-warning";
+
         // Level & Financial Balance displays computed
-        const calculatedBalance = data.centreId === "ibadan" ? "₦0.00" : "₦15,000.00";
+        const calculatedBalance = verifiedPaid ? "₦0.00" : "₦15,000.00";
         document.getElementById("student-balance-display").textContent = calculatedBalance;
         document.getElementById("pay-balance-due").textContent = calculatedBalance;
 
@@ -1599,7 +1708,7 @@
           document.getElementById("last-submission-badge").innerHTML = "";
         }
 
-        // Load courses, instructors, timetable, payments, results, attendance, resources, messages
+        // Load courses, instructors, timetable, payments, results, attendance, resources, messages, certificates
         await loadCoursesList(courseVal);
         await loadInstructorsList(courseVal);
         await loadTimetableList(courseVal);
@@ -1608,6 +1717,7 @@
         await loadAttendanceList(courseVal);
         await loadLearningMaterials(courseVal);
         await loadMessagesList();
+        await loadCertificatesList();
 
         // Subscribe to real-time notifications
         if (!notificationsUnsubscribe) {
@@ -2286,6 +2396,108 @@
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-save-fill me-2"></i> Save Profile Details';
         alert("Failed to modify database record rows: " + err.message);
+      }
+    });
+
+    /**
+     * Load certificates dynamically based on student course completion status
+     */
+    async function loadCertificatesList() {
+      const container = document.getElementById("certificate-status-container");
+      if (!container) return;
+      
+      const statusLower = (currentStudentData && currentStudentData.status || "approved").toLowerCase();
+      
+      if (statusLower === "completed") {
+        container.innerHTML = `
+          <div class="card border-success bg-success-subtle p-4 rounded-4 mb-4">
+            <div class="d-flex align-items-center gap-3">
+              <div class="p-3 bg-success text-white rounded-circle fs-2"><i class="bi bi-award-fill"></i></div>
+              <div class="text-start">
+                <h5 class="fw-bold text-success mb-1">Congratulations! Your Academic Certificate is Available</h5>
+                <p class="text-muted small mb-0">The central academic desk has fully approved and issued your completion credentials for the <strong>${currentStudentData.course || "Software Engineering"}</strong> programme.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="border rounded-4 p-4 text-center bg-white shadow-sm position-relative overflow-hidden" style="max-width: 700px; margin: 0 auto;">
+            <!-- Decorative Border overlay -->
+            <div style="position: absolute; border: 15px solid rgba(25, 135, 84, 0.05); top: 10px; bottom: 10px; left: 10px; right: 10px; pointer-events: none; border-radius: 8px;"></div>
+            
+            <div class="py-4 position-relative z-1">
+              <img src="/assets/images/logo-512.png" alt="EJaytech Logo" class="mb-3" style="width: 80px; height: 80px; object-fit: contain;">
+              <h2 class="fw-bold font-display text-dark mb-0">EJaytech Concepts</h2>
+              <p class="text-muted small mb-4 font-mono">Vocational Software & Technical Training Academy</p>
+              
+              <p class="mb-1 text-uppercase text-secondary tracking-widest small">This completion credential is proudly awarded to</p>
+              <h1 class="fw-bold font-display text-primary my-3" style="font-size: 2rem; border-bottom: 2px solid #2563eb; display: inline-block; padding-bottom: 5px;">${currentStudentData.fullname || currentStudentData.fullName}</h1>
+              
+              <p class="lead text-secondary my-3" style="font-size: 1rem;">for having successfully satisfied all prescribed registry curriculum pathways, exams, and projects for graduation in the vocational pathway of:</p>
+              <h4 class="fw-bold text-dark font-display my-2">${currentStudentData.course || "Software Engineering"}</h4>
+              
+              <div class="row mt-5 pt-3 align-items-end">
+                <div class="col-4">
+                  <span class="font-mono text-dark fw-bold" style="font-size: 0.85rem;">${new Date(currentStudentData.createdAt || Date.now()).toLocaleDateString()}</span>
+                  <div class="border-top pt-1 mt-2 text-muted small">Date of Admission</div>
+                </div>
+                <div class="col-4">
+                  <div class="p-3 bg-light d-inline-block border rounded-circle text-success mb-2" style="width: 60px; height: 60px; line-height: 25px;"><i class="bi bi-patch-check-fill fs-3"></i></div>
+                  <div class="text-muted small">Registry Clear</div>
+                </div>
+                <div class="col-4">
+                  <span class="font-mono text-dark fw-bold" style="font-size: 0.85rem;">EJ-CERT-${currentStudentData.studentId || "XXXX"}</span>
+                  <div class="border-top pt-1 mt-2 text-muted small">Certificate ID</div>
+                </div>
+              </div>
+              
+              <div class="mt-5 no-print">
+                <button class="btn btn-success px-4 py-3 fw-bold" onclick="window.print()"><i class="bi bi-download me-2"></i> Download Digital PDF / Print Certificate</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="card p-5 text-center border-0 bg-light rounded-4">
+            <div class="p-4 bg-warning-subtle text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+              <i class="bi bi-lock-fill" style="font-size: 2.5rem;"></i>
+            </div>
+            <h4 class="fw-bold font-display text-dark mb-2">Graduation Certificate Locked</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 550px;">
+              Your completion certificate is currently locked. Once your vocational track duration is complete, all project grading logs are reviewed, and your account is updated to <strong>"Completed"</strong>, your verified digital credential will unlock here for immediate download and print.
+            </p>
+            <div class="border-top pt-4">
+              <span class="badge bg-primary-subtle text-primary py-2 px-3 fw-semibold"><i class="bi bi-info-circle-fill me-1"></i> Current Application Progress: Active Learning Stage</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    /**
+     * Change password form handler
+     */
+    document.getElementById("change-password-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const currentPwd = document.getElementById("change-current-password").value;
+      const newPwd = document.getElementById("change-new-password").value;
+      const btn = document.getElementById("change-pwd-sub-btn");
+      
+      const studentUid = sessionStorage.getItem("student_uid") || "mock_student_uid";
+
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving new keys...';
+        
+        await changeStudentPassword(studentUid, currentPwd, newPwd);
+        
+        alert("Success! Security credentials updated successfully.");
+        document.getElementById("change-password-form").reset();
+      } catch (err) {
+        alert("Failed to change credentials: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-key-fill me-1"></i> Update Security Password';
       }
     });
   </script>
