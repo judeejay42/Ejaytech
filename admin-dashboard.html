@@ -278,6 +278,47 @@
         margin-left: 0 !important;
       }
     }
+
+    /* Audit Row Highlight Animation & Clickable styles */
+    .cursor-pointer {
+      cursor: pointer !important;
+    }
+    .hover-bg-light-accent {
+      transition: all 0.2s ease;
+    }
+    .hover-bg-light-accent:hover {
+      background-color: rgba(37, 99, 235, 0.08) !important;
+      transform: translateX(4px);
+    }
+    @keyframes highlight-flash {
+      0% {
+        background-color: rgba(234, 179, 8, 0.4) !important;
+        outline: 2px solid #eab308;
+      }
+      50% {
+        background-color: rgba(234, 179, 8, 0.2) !important;
+        outline: 2px solid #eab308;
+      }
+      100% {
+        background-color: transparent;
+        outline: none;
+      }
+    }
+    .highlight-audit-row {
+      animation: highlight-flash 3s ease-out forwards;
+    }
+    
+    /* Breadcrumb styles */
+    .breadcrumb-item + .breadcrumb-item::before {
+      content: var(--bs-breadcrumb-divider, "›") !important;
+      color: #64748b !important;
+    }
+    body.dark-mode .breadcrumb-item a {
+      color: #3b82f6 !important;
+    }
+    body.dark-mode .breadcrumb-item.active {
+      color: #94a3b8 !important;
+    }
   </style>
 </head>
 <body>
@@ -529,6 +570,16 @@
 
         <!-- VIEW 3: CENTRE ACCESS VIEW (DETAILED SUB-OPERATIONS) -->
         <div id="centres-subview-access" class="centres-subview d-none">
+          <!-- Breadcrumb Navigation Path -->
+          <nav aria-label="breadcrumb" class="mb-3 no-print">
+            <ol class="breadcrumb bg-white p-2.5 rounded-3 border shadow-xs mb-0 small font-display">
+              <li class="breadcrumb-item"><a href="#" onclick="event.preventDefault(); window.exitCentreProxy();" class="text-primary fw-medium"><i class="bi bi-house-door-fill me-1"></i> Super Admin Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="#" onclick="event.preventDefault();" class="text-secondary fw-semibold" id="breadcrumb-centre-name">Centre Name</a></li>
+              <li class="breadcrumb-item d-none" id="breadcrumb-student-name">Student Name</li>
+              <li class="breadcrumb-item d-none active text-muted fw-semibold" id="breadcrumb-audit-details">Audit Details</li>
+            </ol>
+          </nav>
+
           <!-- Back block & Active centre indicators -->
           <div class="alert alert-info border-0 shadow-sm d-flex justify-content-between align-items-center mb-4 py-3">
             <div class="d-flex align-items-center gap-3">
@@ -536,11 +587,14 @@
                 <i class="bi bi-shield-check-fill fs-5 text-white"></i>
               </div>
               <div>
-                <h6 class="fw-bold mb-0 text-dark">Super Admin Proxy Active</h6>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                  <h6 class="fw-bold mb-0 text-dark">Super Admin Proxy Active</h6>
+                  <span class="badge bg-primary text-white text-uppercase font-mono" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 3px 6px;">Viewing as Super Admin</span>
+                </div>
                 <span class="small text-muted">You are viewing and editing files for: <strong class="text-primary" id="proxy-active-centre-name">ABK Centre</strong>.</span>
               </div>
             </div>
-            <button onclick="exitCentreProxy()" class="btn btn-outline-dark btn-sm fw-semibold px-3 py-1.5"><i class="bi bi-box-arrow-left"></i> Exit Proxy Session</button>
+            <button onclick="exitCentreProxy()" class="btn btn-dark btn-sm fw-semibold shadow-xs px-3 py-1.5"><i class="bi bi-arrow-left-circle-fill me-1"></i> Return to Super Admin Dashboard</button>
           </div>
 
           <!-- Sub-Navbar for proxied Centre Tab Options -->
@@ -1113,6 +1167,39 @@
             <p class="text-muted small">Real-time certified ledger of operator logins, credential reviews, database edits, document approvals, and billing validation trails.</p>
           </div>
           <button onclick="clearSystemAuditLogs()" class="btn btn-outline-danger btn-sm" id="purge-audit-btn"><i class="bi bi-trash"></i> Purge Security Ledger</button>
+        </div>
+
+        <!-- Audit Logs Filter and Search Bar -->
+        <div class="card p-3 mb-4 shadow-sm">
+          <div class="row g-3 align-items-center">
+            <div class="col-lg-3 col-md-6 col-12">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0" id="audit-search-input" placeholder="Search staff, student, message..." oninput="renderAuditLogsLedger()">
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+              <select class="form-select" id="audit-centre-filter" onchange="renderAuditLogsLedger()">
+                <option value="">All Locations / Centres</option>
+                <option value="central">Central / Head Office</option>
+                <option value="abk">ABK Centre</option>
+                <option value="ibadan">Ibadan Centre</option>
+                <option value="abuja">Abuja Centre</option>
+              </select>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+              <select class="form-select" id="audit-action-filter" onchange="renderAuditLogsLedger()">
+                <option value="">All Action Types</option>
+                <option value="payment">Payments &amp; Billing</option>
+                <option value="registration">Registrations &amp; Review</option>
+                <option value="approval">Approvals &amp; Verification</option>
+                <option value="rejection">Rejections &amp; Suspensions</option>
+              </select>
+            </div>
+            <div class="col-lg-3 col-md-6 col-12">
+              <input type="date" class="form-control" id="audit-date-filter" placeholder="Filter by date" onchange="renderAuditLogsLedger()">
+            </div>
+          </div>
         </div>
 
         <div class="card shadow-sm overflow-hidden">
@@ -1764,6 +1851,7 @@
       window.saveGlobalSettings = saveGlobalSettings;
       window.saveProfileCoordinates = saveProfileCoordinates;
       window.handleProfilePhotoUpload = handleProfilePhotoUpload;
+      window.renderAuditLogsLedger = renderAuditLogsLedger;
       
       window.drilldownStudent = drilldownStudent;
       window.handleAuditDocument = handleAuditDocument;
@@ -1976,7 +2064,7 @@
       activitiesDiv.innerHTML = "";
       logs.slice(0, 5).forEach(l => {
         activitiesDiv.innerHTML += `
-          <div class="d-flex align-items-start gap-3 border-bottom pb-2 mb-2 small">
+          <div onclick="handleAuditLogClick('${l.id}')" class="d-flex align-items-start gap-3 border-bottom pb-2 mb-2 p-2 rounded cursor-pointer hover-bg-light-accent small" style="transition: all 0.2s ease;">
             <span class="badge bg-secondary font-mono">${l.time}</span>
             <div style="min-width: 0;">
               <span class="fw-bold text-dark d-block">${l.action}</span>
@@ -2356,19 +2444,83 @@
       });
     }
 
-    // 8. SECURITY SYSTEM AUDIT LOGS LEDGER
+    // 8. SECURITY SYSTEM AUDIT LOGS LEDGER WITH COMPREHENSIVE FILTERING & DRILLDOWN
     function renderAuditLogsLedger() {
       const tbody = document.getElementById("audit-tbody");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
-      if (logs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Audit trail ledger is empty.</td></tr>`;
+      // Safe retrieval of filter element values
+      const searchInput = document.getElementById("audit-search-input");
+      const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : "";
+      
+      const centreFilter = document.getElementById("audit-centre-filter");
+      const centreVal = centreFilter ? centreFilter.value : "";
+      
+      const actionFilter = document.getElementById("audit-action-filter");
+      const actionVal = actionFilter ? actionFilter.value : "";
+      
+      const dateFilter = document.getElementById("audit-date-filter");
+      const dateVal = dateFilter ? dateFilter.value : "";
+
+      // Apply dynamic multi-tier filtering
+      const filteredLogs = logs.filter(l => {
+        // Search matches operator staff details, action types, or message terms
+        const matchesSearch = !searchVal || 
+                              (l.adminName && l.adminName.toLowerCase().includes(searchVal)) ||
+                              (l.adminEmail && l.adminEmail.toLowerCase().includes(searchVal)) ||
+                              (l.action && l.action.toLowerCase().includes(searchVal)) ||
+                              (l.message && l.message.toLowerCase().includes(searchVal));
+
+        // Location/Centre filtering matches log centreId or student's home centre
+        let matchesCentre = true;
+        if (centreVal) {
+          if (centreVal === "central") {
+            matchesCentre = !l.centreId || l.centreId === "central";
+          } else {
+            if (l.centreId === centreVal) {
+              matchesCentre = true;
+            } else {
+              // Locate if student mentioned belongs to this centre
+              const stud = students.find(s => 
+                (s.fullname && l.message.includes(s.fullname)) || 
+                (s.studentId && l.message.includes(s.studentId))
+              );
+              matchesCentre = stud && stud.centreId === centreVal;
+            }
+          }
+        }
+
+        // Action categorization filters
+        let matchesAction = true;
+        if (actionVal) {
+          const actionLower = (l.action || "").toLowerCase();
+          const messageLower = (l.message || "").toLowerCase();
+          if (actionVal === "payment") {
+            matchesAction = actionLower.includes("payment") || actionLower.includes("billing") || actionLower.includes("tuition") || messageLower.includes("payment") || messageLower.includes("receipt") || messageLower.includes("offline payment");
+          } else if (actionVal === "registration") {
+            matchesAction = actionLower.includes("student") || actionLower.includes("dossier") || actionLower.includes("review") || actionLower.includes("registered") || messageLower.includes("dossier") || messageLower.includes("register");
+          } else if (actionVal === "approval") {
+            matchesAction = actionLower.includes("approved") || actionLower.includes("activated") || actionLower.includes("verify") || messageLower.includes("approved") || messageLower.includes("activated");
+          } else if (actionVal === "rejection") {
+            matchesAction = actionLower.includes("rejected") || actionLower.includes("suspended") || actionLower.includes("failed") || messageLower.includes("rejected") || messageLower.includes("suspended") || messageLower.includes("failed");
+          }
+        }
+
+        // Date filter
+        const matchesDate = !dateVal || l.date === dateVal;
+
+        return matchesSearch && matchesCentre && matchesAction && matchesDate;
+      });
+
+      if (filteredLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No audit trail logs match your query criteria.</td></tr>`;
         return;
       }
 
-      logs.forEach(l => {
+      filteredLogs.forEach(l => {
         tbody.innerHTML += `
-          <tr>
+          <tr id="audit-row-${l.id}" onclick="handleAuditLogClick('${l.id}')" class="cursor-pointer hover-bg-light-accent" style="transition: all 0.2s ease;">
             <td class="fw-bold">${l.adminName}</td>
             <td class="font-mono text-muted" style="font-size:0.75rem;">${l.adminEmail}</td>
             <td><span class="badge bg-dark">${l.action}</span></td>
@@ -3585,6 +3737,11 @@
       
       document.getElementById("btn-centres-overview-tab").classList.add("active");
       document.getElementById("btn-centres-management-tab").classList.remove("active");
+      
+      // Reset Breadcrumbs to default
+      document.getElementById("breadcrumb-student-name").classList.add("d-none");
+      document.getElementById("breadcrumb-audit-details").classList.add("d-none");
+      
       renderCentresOverview();
     };
 
@@ -3596,7 +3753,133 @@
       document.querySelectorAll(".proxy-tab-pane").forEach(pane => pane.classList.add("d-none"));
       document.getElementById(`proxy-pane-${tabId}`).classList.remove("d-none");
 
+      // Dynamically update sub-section breadcrumb trail
+      const tabName = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+      const bAudit = document.getElementById("breadcrumb-audit-details");
+      bAudit.textContent = tabName;
+      bAudit.classList.remove("d-none");
+
+      // Hide student detail if switching away from students tab
+      if (tabId !== 'students') {
+        document.getElementById("breadcrumb-student-name").classList.add("d-none");
+      }
+
       renderProxyCentreContents();
+    };
+
+    // Deep Link Audit Log Click Handler
+    window.handleAuditLogClick = function(logId) {
+      const l = logs.find(log => log.id === logId);
+      if (!l) {
+        console.warn(`[Audit Click] Log with ID ${logId} not found in current cache.`);
+        return;
+      }
+
+      console.log("[Audit Click] Audited Event triggered:", l);
+
+      // Check if a student is referenced in the message or student list
+      const stud = students.find(s => 
+        (s.fullname && l.message.includes(s.fullname)) || 
+        (s.studentId && l.message.includes(s.studentId)) ||
+        (s.email && l.message.includes(s.email))
+      );
+
+      // Identify corresponding centre
+      let centreId = l.centreId;
+      if ((!centreId || centreId === "central") && stud) {
+        centreId = stud.centreId;
+      }
+
+      // Automatically hide active bootstrap modals (e.g. dossier) to clean screen transitions
+      const activeModalEl = document.getElementById("drilldownStudentModal");
+      if (activeModalEl) {
+        const modalInst = bootstrap.Modal.getInstance(activeModalEl);
+        if (modalInst) modalInst.hide();
+      }
+
+      // Check if it's a proxyable Centre location
+      if (centreId && centreId !== "central") {
+        // Show Centres Pane first
+        showPane('centres');
+        
+        // Proxy access the centre
+        proxyAccessCentre(centreId);
+
+        // Fetch centre details for breadcrumbs
+        const centres = JSON.parse(localStorage.getItem("mock_centres") || "[]");
+        const c = centres.find(cen => cen.id === centreId);
+        const centreDisplayName = c ? c.name : centreId.toUpperCase();
+        document.getElementById("breadcrumb-centre-name").textContent = centreDisplayName;
+
+        if (stud) {
+          // Switch proxy view to students subsection
+          switchProxySubSection('students');
+
+          // Deep-link Student dossier
+          drilldownStudent(stud.uid);
+
+          // Update detailed breadcrumbs
+          const bStudent = document.getElementById("breadcrumb-student-name");
+          bStudent.textContent = `Student: ${stud.fullname}`;
+          bStudent.classList.remove("d-none");
+
+          const bAudit = document.getElementById("breadcrumb-audit-details");
+          bAudit.textContent = `Audit: ${l.action}`;
+          bAudit.classList.remove("d-none");
+        } else {
+          // No student, open Centre's Log/Audit tab
+          switchProxySubSection('audit');
+
+          // Highlight the row in the proxied campus audit logs
+          highlightAuditRow(logId);
+
+          // Update breadcrumbs
+          document.getElementById("breadcrumb-student-name").classList.add("d-none");
+          
+          const bAudit = document.getElementById("breadcrumb-audit-details");
+          bAudit.textContent = `Audit: ${l.action}`;
+          bAudit.classList.remove("d-none");
+        }
+      } else {
+        // Central command audit action, navigate to central security ledger
+        showPane('audit');
+
+        // Set search filter to match this log's reference for immediate visibility
+        const searchInput = document.getElementById("audit-search-input");
+        if (searchInput) {
+          searchInput.value = l.action;
+          renderAuditLogsLedger();
+        }
+
+        // Highlight row in main central audit ledger
+        highlightAuditRow(logId);
+
+        // Update central breadcrumbs in case we ever show them, or let user know
+        console.log(`[Audit Click] Central action highlighted: ${l.action}`);
+      }
+    };
+
+    // Glow highlight helper for specific log rows
+    window.highlightAuditRow = function(logId) {
+      // Allow DOM to settle and render rows
+      setTimeout(() => {
+        // Try global table first
+        let row = document.getElementById(`audit-row-${logId}`);
+        if (!row) {
+          // Try proxy table next
+          row = document.getElementById(`proxy-audit-row-${logId}`);
+        }
+
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.remove("highlight-audit-row");
+          // Force reflow
+          void row.offsetWidth;
+          row.classList.add("highlight-audit-row");
+        } else {
+          console.warn(`[Highlight] Could not find row element for log id: ${logId}`);
+        }
+      }, 150);
     };
 
     window.renderProxyCentreContents = function() {
@@ -3778,6 +4061,8 @@
         } else {
           cLogs.forEach(l => {
             const tr = document.createElement("tr");
+            tr.id = `proxy-audit-row-${l.id}`;
+            tr.className = "hover-bg-light-accent";
             tr.innerHTML = `
               <td><strong>${l.adminName}</strong><br><small class="text-muted">${l.adminEmail}</small></td>
               <td><span class="badge bg-secondary-subtle text-secondary border font-mono">${l.action}</span></td>
