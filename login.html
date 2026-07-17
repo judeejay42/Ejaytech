@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Login - EJaytech Concepts</title>
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo-512.png">
+  <!-- Custom CSS -->
+  <link href="css/style.css" rel="stylesheet">
+  <style>
+    .portal-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .portal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      transition: background-color 0.3s ease;
+    }
+    .portal-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.08), 0 10px 20px -8px rgba(37, 99, 235, 0.05);
+      border-color: var(--color-primary);
+    }
+    .portal-card.student-card:hover::before {
+      background-color: var(--color-primary);
+    }
+    .portal-card.admin-card:hover::before {
+      background-color: #0f172a;
+    }
+    .portal-card-icon-wrapper {
+      width: 68px;
+      height: 68px;
+      background-color: var(--color-accent-light);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .portal-card:hover .portal-card-icon-wrapper {
+      transform: scale(1.1) rotate(2deg);
+    }
+    .portal-card.admin-card .portal-card-icon-wrapper {
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+    .portal-card.admin-card:hover {
+      border-color: #475569;
+    }
+    .btn-portal-action {
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Sticky Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" id="main-nav">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html" id="nav-logo">
+        <img src="assets/images/logo-512.png"
+             alt="EJaytech Concepts Logo"
+             class="navbar-logo-img"
+             referrerPolicy="no-referrer">
+        <div>
+          <span class="brand-logo fs-4 text-dark fw-bold">EJaytech Concepts</span>
+          <span class="brand-tagline text-muted font-monospace" style="font-size: 0.68rem; display: block; letter-spacing: 0.05em; text-transform: uppercase;">Innovate &bull; Create &bull; Elevate</span>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
+          <li class="nav-item"><a class="nav-link" href="index.html" id="link-home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html" id="link-about">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" href="services.html" id="link-services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="courses.html" id="link-courses">Courses</a></li>
+          <li class="nav-item"><a class="nav-link active" href="login.html" id="link-login">Portal Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 2. Main Gateway Section -->
+  <section class="py-5 bg-light d-flex align-items-center" style="min-height: calc(100vh - 84px - 340px);" id="login-gateway">
+    <div class="container py-4 fade-in-section">
+      
+      <!-- Welcome Section Header -->
+      <div class="text-center mb-5">
+        <div class="d-flex align-items-center justify-content-center mb-3">
+          <img src="assets/images/logo-512.png" alt="EJaytech Concepts Logo" style="width: 80px; height: 80px; object-fit: contain;" referrerPolicy="no-referrer">
+        </div>
+        <h1 class="display-5 fw-bold text-dark font-display mb-2">Welcome to EJaytech Concepts</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 580px; font-size: 1.05rem;">
+          Select the portal you want to access.
+        </p>
+      </div>
+
+      <!-- Selection Cards Grid -->
+      <div class="row g-4 justify-content-center">
+        <!-- 1. Student Portal Card -->
+        <div class="col-lg-5 col-md-6">
+          <div class="portal-card student-card">
+            <div>
+              <div class="portal-card-icon-wrapper">
+                <i class="bi bi-mortarboard-fill"></i>
+              </div>
+              <h3 class="fw-bold text-dark font-display mb-3">Student Portal</h3>
+              <p class="text-muted" style="font-size: 0.95rem; line-height: 1.7;">
+                Access your courses, learning materials, assignments, results, payments, and student dashboard.
+              </p>
+            </div>
+            <div>
+              <a href="student.html" class="btn btn-primary-custom btn-portal-action py-2.5">
+                Continue as Student <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Administrative Portal Card -->
+        <div class="col-lg-5 col-md-6">
+          <div class="portal-card admin-card">
+            <div>
+              <div class="portal-card-icon-wrapper">
+                <i class="bi bi-shield-lock-fill"></i>
+              </div>
+              <h3 class="fw-bold text-dark font-display mb-3">Administrative Portal</h3>
+              <p class="text-muted" style="font-size: 0.95rem; line-height: 1.7;">
+                Access the Super Admin, Centre Administration, and Instructor management portals.
+              </p>
+            </div>
+            <div>
+              <a href="admin.html" class="btn btn-dark btn-portal-action py-2.5" style="border-radius: 8px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.15);">
+                Continue as Administrator <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3. Footer -->
+  <footer class="footer-custom" id="main-footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-12 text-start">
+          <div class="d-flex align-items-center mb-4" style="gap: 12px;">
+            <img src="assets/images/logo-512.png"
+                 alt="EJaytech Concepts Logo"
+                 class="footer-logo-img"
+                 referrerPolicy="no-referrer">
+            <div>
+              <h5 class="mb-0 fw-bold text-white">EJaytech Concepts</h5>
+              <span class="small font-monospace text-secondary-footer" style="font-size: 0.68rem; display: block; letter-spacing: 0.05em; text-transform: uppercase;">Innovate &bull; Create &bull; Elevate</span>
+            </div>
+          </div>
+          <p class="mb-4" style="font-size: 0.95rem; line-height: 1.8;">
+            We fuse professional technology software configurations, premium graphics branding schemes, and government-approved vocational course workflows to launch the next digital creators.
+          </p>
+          <div class="d-flex gap-3" id="social-handles">
+            <a href="https://facebook.com/ejaytechconcepts" target="_blank" class="social-circle-icon" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="https://x.com/ejaytech_c" target="_blank" class="social-circle-icon" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://linkedin.com/company/ejaytech-concepts" target="_blank" class="social-circle-icon" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="https://instagram.com/ejaytechconcepts" target="_blank" class="social-circle-icon" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+        
+        <div class="col-lg-2 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4">Quick Links</h5>
+          <ul class="list-unstyled d-grid gap-3 p-0">
+            <li><a href="index.html" class="footer-link"><i class="bi bi-chevron-right small me-1"></i> Home</a></li>
+            <li><a href="about.html" class="footer-link"><i class="bi bi-chevron-right small me-1"></i> About Us</a></li>
+            <li><a href="services.html" class="footer-link"><i class="bi bi-chevron-right small me-1"></i> Services</a></li>
+            <li><a href="courses.html" class="footer-link"><i class="bi bi-chevron-right small me-1"></i> Courses</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6 text-start">
+          <h5 class="fw-bold text-white mb-4">Services</h5>
+          <ul class="list-unstyled d-grid gap-3 p-0">
+            <li><a href="services.html" class="footer-link">Software Development</a></li>
+            <li><a href="services.html" class="footer-link">Web Development</a></li>
+            <li><a href="services.html" class="footer-link">Cybersecurity Setups</a></li>
+            <li><a href="services.html" class="footer-link">Network Engineering</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-12 text-start">
+          <h5 class="fw-bold text-white mb-4">Contact Info</h5>
+          <div class="d-grid gap-3">
+            <div class="footer-contact-card d-flex align-items-center gap-3">
+              <div class="contact-card-icon-wrapper">
+                <i class="bi bi-geo-alt-fill"></i>
+              </div>
+              <div>
+                <span class="d-block text-secondary-footer" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Address</span>
+                <span style="font-size: 0.88rem; font-weight: 500;">EJaytech Concepts, Abuja, Nigeria.</span>
+              </div>
+            </div>
+            <div class="footer-contact-card d-flex align-items-center gap-3">
+              <div class="contact-card-icon-wrapper">
+                <i class="bi bi-telephone-fill"></i>
+              </div>
+              <div>
+                <span class="d-block text-secondary-footer" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Phone</span>
+                <a href="tel:+2347033719342" style="font-size: 0.88rem; font-weight: 500;">+2347033719342</a>
+              </div>
+            </div>
+            <div class="footer-contact-card d-flex align-items-center gap-3">
+              <div class="contact-card-icon-wrapper">
+                <i class="bi bi-envelope-fill"></i>
+              </div>
+              <div>
+                <span class="d-block text-secondary-footer" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Email</span>
+                <a href="mailto:ejaytechconcepts@gmail.com" style="font-size: 0.88rem; font-weight: 500;">ejaytechconcepts@gmail.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-copyright-bar">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6 text-center text-md-start">
+            <p class="mb-0">&copy; <span id="current-year">2026</span> EJaytech Concepts. All Rights Reserved.</p>
+          </div>
+          <div class="col-md-6 text-center text-md-end">
+            <div class="footer-legal-links">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Cookie Policy</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back-to-top button -->
+  <button type="button" class="btn-back-to-top" id="btn-back-to-top" aria-label="Back to top">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="js/main.js"></script>
+</body>
+</html>
