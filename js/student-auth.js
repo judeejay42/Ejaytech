@@ -4,6 +4,7 @@
  */
 
 import { db, auth } from "./firebase-config.js";
+import { sendEmailNotification } from "./email-notifier.js";
 
 // Seed the student database with defaults if it doesn't exist
 export function seedStudentDatabase() {
@@ -231,6 +232,36 @@ export async function registerStudentAccount(data) {
 
   // Save to the main students list in Firestore (CollectionWrapper handles syncing)
   await db.collection("students").add(studentRecord);
+
+  // Dispatch automatic email notifications
+  try {
+    await sendEmailNotification("registration_confirmation", email.toLowerCase().trim(), {
+      studentName: fullname,
+      studentId: studentId,
+      centre: centre || "EJaytech Centre",
+      course: course,
+      email: email.toLowerCase().trim(),
+      registrationDate: new Date().toLocaleDateString()
+    });
+
+    const adminEmails = {
+      abk: "ejaytechabkadmin@gmail.com",
+      ibadan: "ejaytechibadmin@gmail.com",
+      abuja: "ejaytechabjadmin@gmail.com"
+    };
+    const centreAdminEmail = adminEmails[centreId] || "ejaytechadmin@gmail.com";
+
+    await sendEmailNotification("admin_notification", centreAdminEmail, {
+      studentName: fullname,
+      studentId: studentId,
+      centre: centre || "EJaytech Centre",
+      course: course,
+      registrationDate: new Date().toLocaleDateString(),
+      reviewLink: `${window.location.origin}/admin-dashboard.html`
+    });
+  } catch (emailErr) {
+    console.warn("registerStudentAccount email notification error:", emailErr);
+  }
 
   return studentRecord;
 }

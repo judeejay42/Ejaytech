@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { sendEmail, getEmailLogs } from './server/email-service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,31 @@ const staticPath = fs.existsSync(path.join(__dirname, 'index.html')) ? __dirname
 console.log(`[Static Server] Serving content from ${staticPath}`);
 
 app.use(express.static(staticPath));
+
+// Automatic Gmail/SMTP Email Dispatch Endpoint
+app.post('/api/send-email', async (req, res) => {
+  const { type, to, data } = req.body;
+  if (!to || !type) {
+    return res.status(400).json({ success: false, message: 'Recipient email ("to") and email "type" are required.' });
+  }
+
+  try {
+    const result = await sendEmail({ type, to, data: data || {} });
+    return res.json(result);
+  } catch (err: any) {
+    console.error('API /api/send-email error:', err);
+    return res.status(500).json({
+      success: false,
+      delivered: false,
+      error: err.message || 'Internal server error while sending email.'
+    });
+  }
+});
+
+// Email Audit Logs Endpoint
+app.get('/api/email-logs', (req, res) => {
+  return res.json({ success: true, logs: getEmailLogs() });
+});
 
 // Secure Admin Authentication Endpoint
 app.post('/api/admin/authenticate', (req, res) => {

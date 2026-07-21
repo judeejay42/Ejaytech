@@ -1723,6 +1723,7 @@
       updateAdminProfile,
       logAdminActivity
     } from "./admin.js";
+    import { sendEmailNotification } from "./js/email-notifier.js";
 
     // Global application cache state
     let activePane = "dashboard";
@@ -2949,6 +2950,29 @@
         } else {
           await createCourseAdmin(title, fee, duration, desc, deadline, instructor);
           alert("New course syllabus created!");
+        }
+
+        // Dispatch Instructor Assignment Email to Enrolled Students
+        if (instructor) {
+          try {
+            const studentList = JSON.parse(localStorage.getItem("mock_students_list") || "[]");
+            const enrolledStudents = studentList.filter(s => s.course === title);
+            for (const stud of enrolledStudents) {
+              if (stud.email) {
+                await sendEmailNotification("instructor_assignment", stud.email, {
+                  studentName: stud.fullname || stud.fullName,
+                  instructorName: instructor,
+                  course: title,
+                  centre: stud.centre || "EJaytech Centre",
+                  instructorEmail: `${instructor.toLowerCase().replace(/[^a-z]/g, "")}@ejaytech.com`,
+                  startDate: "Upcoming Session",
+                  portalLink: `${window.location.origin}/student-dashboard.html`
+                });
+              }
+            }
+          } catch (emailErr) {
+            console.warn("Instructor email dispatch error:", emailErr);
+          }
         }
 
         bootstrap.Modal.getInstance(document.getElementById("courseModal")).hide();

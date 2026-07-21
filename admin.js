@@ -16,6 +16,7 @@
  */
 
 import { db, auth } from "./js/firebase-config.js";
+import { sendEmailNotification } from "./js/email-notifier.js";
 
 // --- SEED COMPREHENSIVE LOCAL DATABASE ---
 export function seedAdminMockDatabase() {
@@ -626,6 +627,18 @@ export async function updateWorkflowStage(uid, stage, status) {
       student.status = "approved";
       student.approvalStatus = "approved";
 
+      // Dispatch automatic Approval Email
+      try {
+        await sendEmailNotification("approval", student.email, {
+          studentName: student.fullname || student.fullName,
+          course: student.course,
+          studentId: student.studentId,
+          centre: student.centre || "EJaytech Centre"
+        });
+      } catch (emailErr) {
+        console.warn("Approval email dispatch warning:", emailErr);
+      }
+
       // Dispatch alert
       await sendSystemAlertNotification(
         student.fullname,
@@ -639,6 +652,21 @@ export async function updateWorkflowStage(uid, stage, status) {
       student.status = "rejected";
       student.approvalStatus = "rejected";
       student.workflow.studentActivated = false;
+
+      // Dispatch automatic Rejection Email
+      try {
+        await sendEmailNotification("rejection", student.email, {
+          studentName: student.fullname || student.fullName,
+          course: student.course,
+          studentId: student.studentId,
+          centre: student.centre || "EJaytech Centre",
+          reason: student.rejectionReason || "Application details or uploaded credentials require correction.",
+          instructions: "Please review your details and contact your training centre administration.",
+          resubmitLink: `${window.location.origin}/student.html`
+        });
+      } catch (emailErr) {
+        console.warn("Rejection email dispatch warning:", emailErr);
+      }
 
       await sendSystemAlertNotification(
         student.fullname,
@@ -697,6 +725,33 @@ export async function verifyPayment(paymentId, status, rejectionReason = "") {
       }
       students[studIndex] = student;
       localStorage.setItem("mock_students_list", JSON.stringify(students));
+
+      // Dispatch automatic email
+      if (status === "Verified") {
+        try {
+          await sendEmailNotification("payment_verified", student.email, {
+            studentName: student.fullname || student.fullName,
+            amount: payment.amount ? payment.amount.toLocaleString() : "0",
+            referenceNumber: payment.referenceNumber,
+            course: payment.course || student.course
+          });
+        } catch (emailErr) {
+          console.warn("Payment verified email dispatch error:", emailErr);
+        }
+      } else if (status === "Failed") {
+        try {
+          await sendEmailNotification("rejection", student.email, {
+            studentName: student.fullname || student.fullName,
+            course: payment.course || student.course,
+            studentId: student.studentId,
+            reason: `Payment verification failed for reference ${payment.referenceNumber}. Reason: ${rejectionReason}`,
+            instructions: "Please sign in to your student dashboard and upload valid payment proof.",
+            resubmitLink: `${window.location.origin}/student-dashboard.html`
+          });
+        } catch (emailErr) {
+          console.warn("Payment failed email dispatch error:", emailErr);
+        }
+      }
 
       // Dispatch alert
       const mailTitle = status === "Verified" ? "Payment Verification Succeeded" : "Payment Verification Failed";

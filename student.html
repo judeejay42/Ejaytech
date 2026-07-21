@@ -457,6 +457,7 @@
   <script type="module">
     import { db } from "./js/firebase-config.js";
     import { loginStudentAccount, resetStudentPassword } from "./js/student-auth.js";
+    import { sendEmailNotification } from "./js/email-notifier.js";
 
     let selectedCentre = "";   // "ABK", "IBADAN", or "ABUJA"
     let selectedCentreId = ""; // "abk", "ibadan", or "abuja"
@@ -723,10 +724,47 @@
         // Write directly to the Firestore collection 'students'
         await db.collection("students").add(studentRecord);
 
+        // Dispatch automatic email notifications
+        let emailResult = { success: false, delivered: false };
+        try {
+          // 1. Student Registration Confirmation Email
+          emailResult = await sendEmailNotification("registration_confirmation", email.toLowerCase().trim(), {
+            studentName: name,
+            studentId: studentId,
+            centre: selectedCentre + " Centre",
+            course: course,
+            email: email.toLowerCase().trim(),
+            registrationDate: new Date().toLocaleDateString()
+          });
+
+          // 2. Centre Administrator Notification Email
+          const adminEmails = {
+            abk: "ejaytechabkadmin@gmail.com",
+            ibadan: "ejaytechibadmin@gmail.com",
+            abuja: "ejaytechabjadmin@gmail.com"
+          };
+          const centreAdminEmail = adminEmails[selectedCentreId] || "ejaytechadmin@gmail.com";
+
+          await sendEmailNotification("admin_notification", centreAdminEmail, {
+            studentName: name,
+            studentId: studentId,
+            centre: selectedCentre + " Centre",
+            course: course,
+            registrationDate: new Date().toLocaleDateString(),
+            reviewLink: `${window.location.origin}/admin-dashboard.html`
+          });
+        } catch (emailErr) {
+          console.warn("[Email Notification Error] Logged for debugging:", emailErr);
+        }
+
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-person-plus me-2"></i> Register Account';
 
-        displayNotification(true, "Registration Successful", `Welcome ${name}! Your registration for "${course}" was successfully recorded on Firestore. Assigned ID: ${studentId}`);
+        if (emailResult && emailResult.delivered) {
+          displayNotification(true, "Registration Completed", "Registration completed successfully. A confirmation email has been sent to your email address.");
+        } else {
+          displayNotification(true, "Registration Completed", "Registration completed successfully, but we could not send the confirmation email at this time.");
+        }
         
         // Return back to selection step for subsequent users
         document.getElementById("student-register-form").reset();

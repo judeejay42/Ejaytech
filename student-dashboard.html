@@ -1309,6 +1309,7 @@
     import { db, auth } from "./js/firebase-config.js";
     import { protectStudentPage as protectPageAccess, logoutStudentSession, changeStudentPassword } from "./js/student-auth.js";
     import { getStudentProfile, updateStudentProfile, getStudentNotifications, markNotificationAsRead, getCourseMaterials, uploadAssignmentFile } from "./student.js";
+    import { sendEmailNotification } from "./js/email-notifier.js";
 
     // Enforce student session protection
     protectPageAccess();
@@ -1994,6 +1995,20 @@
 
         allPayments.unshift(newPay);
         localStorage.setItem("mock_payments", JSON.stringify(allPayments));
+
+        // Dispatch Payment Submission Received Email
+        try {
+          if (currentStudentData && currentStudentData.email) {
+            await sendEmailNotification("payment_submission", currentStudentData.email, {
+              studentName: currentStudentData.fullname || currentStudentData.fullName,
+              amount: Number(amount).toLocaleString(),
+              referenceNumber: ref,
+              course: currentStudentData.course
+            });
+          }
+        } catch (emailErr) {
+          console.warn("Payment submission email notification error:", emailErr);
+        }
         
         alert("Success! Receipt proof submitted. Academic finance desk will verify soon.");
         document.getElementById("payment-receipt-form").reset();
