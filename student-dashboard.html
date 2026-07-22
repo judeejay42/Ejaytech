@@ -305,17 +305,20 @@
           <nav class="nav flex-column font-display" id="nav-hub-links">
             <a href="#" class="nav-link active" data-target="sec-dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
             <a href="#" class="nav-link" data-target="sec-profile"><i class="bi bi-person-badge-fill"></i> My Profile</a>
+            <a href="#" class="nav-link" data-target="sec-academic"><i class="bi bi-mortarboard-fill"></i> Academic Info</a>
             <a href="#" class="nav-link" data-target="sec-courses"><i class="bi bi-journal-bookmark-fill"></i> My Courses</a>
+            <a href="#" class="nav-link" data-target="sec-documents"><i class="bi bi-file-earmark-text-fill"></i> Documents</a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-payments"><i class="bi bi-wallet2"></i> Payments & Finance</a>
+            <a href="#" class="nav-link" data-target="sec-announcements"><i class="bi bi-megaphone-fill"></i> Announcements</a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-resources"><i class="bi bi-folder-symlink-fill"></i> Learning Materials <span class="badge bg-secondary ms-auto locked-nav-badge d-none"><i class="bi bi-lock-fill"></i></span></a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-results"><i class="bi bi-award-fill"></i> Results & Grades <span class="badge bg-secondary ms-auto locked-nav-badge d-none"><i class="bi bi-lock-fill"></i></span></a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-certificates"><i class="bi bi-patch-check-fill"></i> Certificates <span class="badge bg-secondary ms-auto locked-nav-badge d-none"><i class="bi bi-lock-fill"></i></span></a>
+            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-attendance"><i class="bi bi-calendar-check-fill"></i> Attendance <span class="badge bg-secondary ms-auto locked-nav-badge d-none"><i class="bi bi-lock-fill"></i></span></a>
             <a href="#" class="nav-link" data-target="sec-instructors"><i class="bi bi-people-fill"></i> Instructors</a>
             <a href="#" class="nav-link" data-target="sec-timetable"><i class="bi bi-calendar3"></i> Timetable</a>
-            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-payments"><i class="bi bi-wallet2"></i> Payments</a>
-            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-results"><i class="bi bi-award-fill"></i> Results</a>
-            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-certificates"><i class="bi bi-patch-check-fill"></i> Certificates</a>
-            <a href="#" class="nav-link text-white text-opacity-75" data-target="sec-attendance"><i class="bi bi-calendar-check-fill"></i> Attendance</a>
-            <a href="#" class="nav-link" data-target="sec-resources"><i class="bi bi-folder-symlink-fill"></i> Learning Resources</a>
             <a href="#" class="nav-link" data-target="sec-messages"><i class="bi bi-chat-dots-fill"></i> Messages <span class="badge bg-danger rounded-pill float-end" id="messages-unseen-badge" style="display: none;">0</span></a>
             <a href="#" class="nav-link" data-target="sec-notifications"><i class="bi bi-bell-fill"></i> Notifications <span class="badge bg-primary ms-auto" id="notif-badge-pill">0</span></a>
-            <a href="#" class="nav-link" data-target="sec-support"><i class="bi bi-question-circle-fill"></i> Support</a>
+            <a href="#" class="nav-link" data-target="sec-support"><i class="bi bi-question-circle-fill"></i> Support Desk</a>
             <a href="#" class="nav-link" data-target="sec-settings"><i class="bi bi-gear-wide-connected"></i> Settings</a>
           </nav>
         </div>
@@ -419,6 +422,34 @@
                 </div>
                 <div class="col-md-4 text-md-end">
                   <span class="small font-mono bg-white bg-opacity-20 py-2 px-3 rounded-3 d-inline-block text-white" id="live-portal-clock">10:49 AM | Garki Center</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROMINENT REGISTRATION STATUS CARD -->
+            <div class="card shadow-sm border-0 rounded-4 p-4 mb-4" id="registration-status-card" style="background: #ffffff;">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fs-4 text-primary"><i class="bi bi-shield-check"></i></span>
+                  <h5 class="fw-bold font-display text-dark mb-0">Registration Status</h5>
+                </div>
+                <span class="badge py-2 px-3 fs-6 font-display rounded-pill" id="main-reg-status-badge">
+                  🟡 Pending Centre Approval
+                </span>
+              </div>
+
+              <div class="p-3 rounded-3 border" id="reg-status-body-container" style="background-color: #f8fafc;">
+                <p class="mb-2 text-dark fw-semibold fs-6" id="reg-status-title">
+                  Your registration has been submitted successfully.
+                </p>
+                <p class="mb-2 text-secondary small" id="reg-status-desc">
+                  The Centre Administrator will review your application shortly. You can already access your profile, payment information and registration details while waiting.
+                </p>
+                <div id="reg-rejection-reason-box" class="alert alert-danger mb-2 d-none">
+                  <strong>Reason for Rejection:</strong> <span id="reg-rejection-reason-text">...</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-3" id="reg-status-actions">
+                  <!-- Dynamic action buttons e.g. Edit Registration, Upload Documents, Resubmit for Approval -->
                 </div>
               </div>
             </div>
@@ -624,6 +655,185 @@
                   <button type="submit" class="btn btn-primary-custom px-4" id="edit-profile-sub-btn"><i class="bi bi-save-fill me-2"></i> Save Profile Details</button>
                 </div>
               </form>
+            </div>
+          </div>
+
+          <!-- VIEW: ACADEMIC INFORMATION -->
+          <div id="sec-academic" class="dashboard-view-module d-none">
+            <div class="card shadow-sm border p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                  <h4 class="fw-bold font-display text-dark mb-1"><i class="bi bi-mortarboard-fill text-primary me-2"></i> Academic Information & Program Setup</h4>
+                  <p class="text-muted small mb-0">Official enrollment details, study centre workstation, and academic timeline.</p>
+                </div>
+                <span class="badge bg-primary-subtle text-primary border px-3 py-2 fw-bold" id="academic-status-pill">Active Track</span>
+              </div>
+
+              <div class="row g-4 mt-1">
+                <div class="col-md-6">
+                  <div class="p-3 bg-light border rounded-3 h-100">
+                    <span class="text-muted small d-block">Selected Study Centre</span>
+                    <h5 class="fw-bold text-dark mt-1 mb-1" id="acad-centre-name">Abuja Garki Hub</h5>
+                    <p class="text-muted small mb-0" id="acad-centre-address">Suite B18 Capital Plaza Garki, Abuja</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="p-3 bg-light border rounded-3 h-100">
+                    <span class="text-muted small d-block">Selected Enrolled Programme</span>
+                    <h5 class="fw-bold text-dark mt-1 mb-1" id="acad-prog-name">Software Engineering</h5>
+                    <p class="text-muted small mb-0">Full-Stack Vocational & Professional Diploma Track</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 border rounded-3">
+                    <span class="text-muted small d-block">Course Duration</span>
+                    <strong class="text-dark fs-6" id="acad-duration">12 Weeks (3 Months)</strong>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 border rounded-3">
+                    <span class="text-muted small d-block">Mode of Study</span>
+                    <strong class="text-dark fs-6" id="acad-mode">Physical Workstation & Practical Lab</strong>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 border rounded-3">
+                    <span class="text-muted small d-block">Registration Date</span>
+                    <strong class="text-dark fs-6" id="acad-reg-date">2026-06-18</strong>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="p-3 border rounded-3 bg-primary-subtle text-primary">
+                    <span class="text-muted small d-block">Expected Completion Date</span>
+                    <strong class="fs-6" id="acad-comp-date">2026-09-18</strong>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="p-3 border rounded-3 bg-success-subtle text-success">
+                    <span class="text-muted small d-block">Certification Clearance</span>
+                    <strong class="fs-6" id="acad-cert-clearance">Pending Course Completion & Centre Signoff</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW: DOCUMENTS & VERIFICATION -->
+          <div id="sec-documents" class="dashboard-view-module d-none">
+            <div class="card shadow-sm border p-4">
+              <h4 class="fw-bold font-display text-dark mb-1"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i> Documents & Identity Verification</h4>
+              <p class="text-muted small mb-4">View and upload replacement documents for Centre Admin review and registration verification.</p>
+
+              <div class="row g-4" id="documents-grid-container">
+                <!-- Passport Photo Document Card -->
+                <div class="col-md-6">
+                  <div class="card border p-3 shadow-sm h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="fw-bold text-dark mb-0"><i class="bi bi-person-bounding-box text-primary me-1"></i> Passport Photograph</h6>
+                      <span class="badge bg-warning-subtle text-warning border" id="doc-status-passport">Pending Verification</span>
+                    </div>
+                    <p class="text-muted small mb-3">Official headshot photo for your student ID card and transcripts.</p>
+                    <div class="mb-3 text-center bg-light p-2 rounded">
+                      <img id="doc-preview-passport" src="assets/images/placeholder_profile.png" alt="Passport Preview" style="max-height: 120px; object-fit: contain;">
+                    </div>
+                    <div class="mt-auto">
+                      <input type="file" class="form-control form-control-sm mb-2" id="input-doc-passport" accept="image/*" onchange="uploadStudentDocument('passportPhoto', this)">
+                      <span class="text-muted extra-small"><i class="bi bi-info-circle"></i> JPEG or PNG under 3MB.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ID Card Document Card -->
+                <div class="col-md-6">
+                  <div class="card border p-3 shadow-sm h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="fw-bold text-dark mb-0"><i class="bi bi-card-heading text-primary me-1"></i> National ID / Voter's Card / NIN</h6>
+                      <span class="badge bg-warning-subtle text-warning border" id="doc-status-idcard">Pending Verification</span>
+                    </div>
+                    <p class="text-muted small mb-3">Official state-issued identification for registry records.</p>
+                    <div class="mb-3 text-center bg-light p-2 rounded">
+                      <span class="small text-muted" id="doc-preview-idcard">No ID document file attached yet.</span>
+                    </div>
+                    <div class="mt-auto">
+                      <input type="file" class="form-control form-control-sm mb-2" id="input-doc-idcard" accept="image/*,application/pdf" onchange="uploadStudentDocument('idCard', this)">
+                      <span class="text-muted extra-small"><i class="bi bi-info-circle"></i> PDF or image copy.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Academic Certificates Card -->
+                <div class="col-md-6">
+                  <div class="card border p-3 shadow-sm h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="fw-bold text-dark mb-0"><i class="bi bi-award text-primary me-1"></i> Academic Certificates (O'Level / Degree)</h6>
+                      <span class="badge bg-warning-subtle text-warning border" id="doc-status-certs">Pending Verification</span>
+                    </div>
+                    <p class="text-muted small mb-3">Previous educational qualifications or certifications.</p>
+                    <div class="mb-3 text-center bg-light p-2 rounded">
+                      <span class="small text-muted" id="doc-preview-certs">No certificate file attached yet.</span>
+                    </div>
+                    <div class="mt-auto">
+                      <input type="file" class="form-control form-control-sm mb-2" id="input-doc-certs" accept="image/*,application/pdf" onchange="uploadStudentDocument('certificates', this)">
+                      <span class="text-muted extra-small"><i class="bi bi-info-circle"></i> Scanned copy in PDF or JPEG format.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Admission Documents Card -->
+                <div class="col-md-6">
+                  <div class="card border p-3 shadow-sm h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="fw-bold text-dark mb-0"><i class="bi bi-file-earmark-check text-primary me-1"></i> Admission & Clearance Forms</h6>
+                      <span class="badge bg-warning-subtle text-warning border" id="doc-status-supp">Pending Verification</span>
+                    </div>
+                    <p class="text-muted small mb-3">Signed acceptance letter, code of conduct, or centre clearance form.</p>
+                    <div class="mb-3 text-center bg-light p-2 rounded">
+                      <span class="small text-muted" id="doc-preview-supp">No admission form attached yet.</span>
+                    </div>
+                    <div class="mt-auto">
+                      <input type="file" class="form-control form-control-sm mb-2" id="input-doc-supp" accept="image/*,application/pdf" onchange="uploadStudentDocument('supportingDocuments', this)">
+                      <span class="text-muted extra-small"><i class="bi bi-info-circle"></i> PDF or image format.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW: ANNOUNCEMENTS & NEWS -->
+          <div id="sec-announcements" class="dashboard-view-module d-none">
+            <div class="card shadow-sm border p-4">
+              <h4 class="fw-bold font-display text-dark mb-1"><i class="bi bi-megaphone-fill text-primary me-2"></i> Centre Announcements & News Feed</h4>
+              <p class="text-muted small mb-4">Stay informed on academic schedules, workstation hub updates, and upcoming tech workshops.</p>
+
+              <div class="d-grid gap-3" id="announcements-container">
+                <div class="card border p-3 shadow-sm">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary">Centre News</span>
+                    <small class="text-muted">Today</small>
+                  </div>
+                  <h6 class="fw-bold text-dark mb-1">EJaytech Concepts Workstation Hours Extended</h6>
+                  <p class="text-secondary small mb-0">Practical lab and workstation ranges at Garki Hub, Abeokuta, and Ibadan are now open Monday - Saturday from 8:00 AM to 6:00 PM for project builds.</p>
+                </div>
+
+                <div class="card border p-3 shadow-sm">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-success">Academic Calendar</span>
+                    <small class="text-muted">This Week</small>
+                  </div>
+                  <h6 class="fw-bold text-dark mb-1">Semester Capstone Project Defense Dates Announced</h6>
+                  <p class="text-secondary small mb-0">Practical capstone project reviews for all active software, design, and cybersecurity cohorts will take place from September 1st to 5th, 2026.</p>
+                </div>
+
+                <div class="card border p-3 shadow-sm">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-info text-dark">Upcoming Event</span>
+                    <small class="text-muted">August 20, 2026</small>
+                  </div>
+                  <h6 class="fw-bold text-dark mb-1">Industry Guest Workshop: Building Scalable Full-Stack Apps</h6>
+                  <p class="text-secondary small mb-0">Join Senior Engineers for a live masterclass on modern frontend architecture and cloud integrations. Virtual classroom links will be dispatched via inbox.</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1435,10 +1645,13 @@
       const titles = {
         "sec-dashboard": "Academic Command Center",
         "sec-profile": "Manage Student Profile",
+        "sec-academic": "Academic Information & Program Setup",
         "sec-courses": "My Academic Courses",
+        "sec-documents": "Documents & Identity Verification",
+        "sec-payments": "Financial Payments Portal",
+        "sec-announcements": "Announcements & News Feed",
         "sec-instructors": "Assigned Instructors",
         "sec-timetable": "Course Timetables",
-        "sec-payments": "Financial Payments Portal",
         "sec-results": "Semester Results & Grades",
         "sec-certificates": "Academic Certificates & Clearances",
         "sec-attendance": "Attendance Register Logs",
@@ -1662,10 +1875,117 @@
         document.getElementById("edit-emergency-phone").value = data.emergencyPhone || "";
         document.getElementById("edit-email").value = emailVal;
 
-        // Handle Admission Stepper state
-        const statusVal = data.status || "approved";
+        // Populate Academic Information View
+        const centreAddresses = {
+          "abk": "Suite 12 Abeokuta Central Hub, Ogun State",
+          "ibadan": "Block 4 Ring Road Tech Hub, Ibadan",
+          "abuja": "Suite B18 Capital Plaza Garki, Abuja"
+        };
+        const centreAddr = centreAddresses[data.centreId] || "Suite B18 Capital Plaza Garki, Abuja";
+        if (document.getElementById("acad-centre-name")) document.getElementById("acad-centre-name").textContent = centreVal;
+        if (document.getElementById("acad-centre-address")) document.getElementById("acad-centre-address").textContent = centreAddr;
+        if (document.getElementById("acad-prog-name")) document.getElementById("acad-prog-name").textContent = courseVal;
+        if (document.getElementById("acad-reg-date")) document.getElementById("acad-reg-date").textContent = enrollDate;
+        
+        // Populate Documents View
+        if (data.passportPhoto && document.getElementById("doc-preview-passport")) {
+          document.getElementById("doc-preview-passport").src = data.passportPhoto;
+        }
+        if (data.documents) {
+          if (data.documents.idCard && document.getElementById("doc-preview-idcard")) {
+            document.getElementById("doc-preview-idcard").textContent = "ID Card Document Attached";
+            if (document.getElementById("doc-status-idcard")) {
+              document.getElementById("doc-status-idcard").textContent = "Uploaded / In Review";
+              document.getElementById("doc-status-idcard").className = "badge bg-info-subtle text-info border";
+            }
+          }
+          if (data.documents.certificates && document.getElementById("doc-preview-certs")) {
+            document.getElementById("doc-preview-certs").textContent = "Certificates Document Attached";
+            if (document.getElementById("doc-status-certs")) {
+              document.getElementById("doc-status-certs").textContent = "Uploaded / In Review";
+              document.getElementById("doc-status-certs").className = "badge bg-info-subtle text-info border";
+            }
+          }
+          if (data.documents.supportingDocuments && document.getElementById("doc-preview-supp")) {
+            document.getElementById("doc-preview-supp").textContent = "Admission Form Attached";
+            if (document.getElementById("doc-status-supp")) {
+              document.getElementById("doc-status-supp").textContent = "Uploaded / In Review";
+              document.getElementById("doc-status-supp").className = "badge bg-info-subtle text-info border";
+            }
+          }
+        }
+
+        // Handle Admission Stepper and Registration Status Card
+        const statusVal = data.status || "pending";
         const statusLower = statusVal.toLowerCase();
         
+        // Update Prominent Registration Status Card
+        const regStatusBadge = document.getElementById("main-reg-status-badge");
+        const regStatusTitle = document.getElementById("reg-status-title");
+        const regStatusDesc = document.getElementById("reg-status-desc");
+        const regRejectionBox = document.getElementById("reg-rejection-reason-box");
+        const regRejectionText = document.getElementById("reg-rejection-reason-text");
+        const regStatusActions = document.getElementById("reg-status-actions");
+
+        if (regStatusBadge && regStatusTitle && regStatusDesc && regStatusActions) {
+          regStatusActions.innerHTML = "";
+          if (regRejectionBox) regRejectionBox.classList.add("d-none");
+
+          if (statusLower === "pending") {
+            regStatusBadge.textContent = "🟡 Pending Centre Approval";
+            regStatusBadge.className = "badge bg-warning-subtle text-warning-emphasis border border-warning py-2 px-3 fs-6 font-display rounded-pill";
+            regStatusTitle.textContent = "Your registration has been submitted successfully.";
+            regStatusDesc.textContent = "The Centre Administrator will review your application shortly. You can already access your profile, payment information and registration details while waiting.";
+            regStatusActions.innerHTML = `
+              <button class="btn btn-outline-primary btn-sm" onclick="switchView('sec-profile')"><i class="bi bi-person-gear me-1"></i> View Profile</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="switchView('sec-payments')"><i class="bi bi-wallet2 me-1"></i> Payment Info</button>
+              <button class="btn btn-outline-info btn-sm" onclick="switchView('sec-documents')"><i class="bi bi-file-earmark-text me-1"></i> Upload/Review Documents</button>
+            `;
+          } else if (statusLower === "rejected") {
+            regStatusBadge.textContent = "🔴 Registration Rejected";
+            regStatusBadge.className = "badge bg-danger-subtle text-danger border border-danger py-2 px-3 fs-6 font-display rounded-pill";
+            regStatusTitle.textContent = "Your admission application was rejected during centre review.";
+            regStatusDesc.textContent = "Application details or uploaded credentials require correction. Please review the reason below, update your details or upload replacement documents, then click Resubmit for Approval.";
+            if (regRejectionBox && regRejectionText) {
+              regRejectionBox.classList.remove("d-none");
+              regRejectionText.textContent = data.rejectionReason || "Credentials or details require verification. Please re-upload documents.";
+            }
+            regStatusActions.innerHTML = `
+              <button class="btn btn-primary btn-sm" onclick="switchView('sec-profile')"><i class="bi bi-pencil-square me-1"></i> Edit Registration</button>
+              <button class="btn btn-outline-primary btn-sm" onclick="switchView('sec-documents')"><i class="bi bi-file-earmark-arrow-up me-1"></i> Upload Correct Documents</button>
+              <button class="btn btn-success btn-sm" onclick="resubmitRegistrationForApproval()"><i class="bi bi-send-check me-1"></i> Resubmit for Approval</button>
+            `;
+          } else if (statusLower === "approved" || statusLower === "completed" || statusLower === "active") {
+            regStatusBadge.textContent = "🟢 Approved";
+            regStatusBadge.className = "badge bg-success-subtle text-success border border-success py-2 px-3 fs-6 font-display rounded-pill";
+            regStatusTitle.textContent = "Congratulations! Your registration is approved.";
+            regStatusDesc.textContent = "Your registration has been reviewed and approved by the Centre Administrator. You have full access to all academic courses, learning materials, live classes, assignments, and certificates.";
+            regStatusActions.innerHTML = `
+              <button class="btn btn-success btn-sm" onclick="switchView('sec-courses')"><i class="bi bi-journal-check me-1"></i> Go to Courses</button>
+              <button class="btn btn-outline-primary btn-sm" onclick="switchView('sec-resources')"><i class="bi bi-folder-symlink me-1"></i> Learning Materials</button>
+            `;
+          } else {
+            regStatusBadge.textContent = "🟣 Payment Pending";
+            regStatusBadge.className = "badge bg-purple-subtle text-purple border py-2 px-3 fs-6 font-display rounded-pill";
+            regStatusTitle.textContent = "Tuition Payment Review Pending.";
+            regStatusDesc.textContent = "Please upload your payment evidence to complete verification.";
+            regStatusActions.innerHTML = `
+              <button class="btn btn-primary btn-sm" onclick="switchView('sec-payments')"><i class="bi bi-wallet2 me-1"></i> Upload Payment Evidence</button>
+            `;
+          }
+        }
+
+        // Toggle Academic Feature Locks
+        const isApprovedState = (statusLower === "approved" || statusLower === "completed" || statusLower === "active");
+        const lockBadges = document.querySelectorAll(".locked-nav-badge");
+        lockBadges.forEach(badge => {
+          if (isApprovedState) {
+            badge.classList.add("d-none");
+          } else {
+            badge.classList.remove("d-none");
+          }
+        });
+
         // Timeline stages selection
         const stepSub = document.getElementById("step-submitted");
         const stepRev = document.getElementById("step-review");
@@ -2517,6 +2837,154 @@
         btn.innerHTML = '<i class="bi bi-key-fill me-1"></i> Update Security Password';
       }
     });
+
+    /**
+     * Resubmit Registration for Centre Admin Review
+     */
+    window.resubmitRegistrationForApproval = async function() {
+      if (!currentStudentData || !currentStudentData.uid) {
+        alert("Unable to find student account record.");
+        return;
+      }
+      
+      if (!confirm("Are you sure you want to resubmit your registration for Centre Admin review?")) {
+        return;
+      }
+
+      try {
+        const studentUid = currentStudentData.uid;
+        currentStudentData.status = "pending";
+        currentStudentData.approvalStatus = "pending";
+        currentStudentData.rejectionReason = "";
+        if (currentStudentData.workflow) {
+          currentStudentData.workflow.adminApproval = "pending";
+          currentStudentData.workflow.pendingReview = "pending";
+        }
+
+        // Save in localStorage
+        localStorage.setItem("mock_student_profile", JSON.stringify(currentStudentData));
+        
+        // Sync in master list
+        try {
+          const listStr = localStorage.getItem("mock_students_list");
+          if (listStr) {
+            const list = JSON.parse(listStr);
+            const idx = list.findIndex(s => s.uid === studentUid || s.studentId === currentStudentData.studentId);
+            if (idx !== -1) {
+              list[idx].status = "pending";
+              list[idx].approvalStatus = "pending";
+              list[idx].rejectionReason = "";
+              if (list[idx].workflow) list[idx].workflow.adminApproval = "pending";
+              localStorage.setItem("mock_students_list", JSON.stringify(list));
+            }
+          }
+        } catch (e) {
+          console.warn("Failed syncing in mock_students_list:", e);
+        }
+
+        // Save in Firestore if available
+        try {
+          if (db) {
+            const snap = await db.collection("students").get();
+            snap.forEach(async (doc) => {
+              const d = doc.data();
+              if (d.uid === studentUid || d.studentId === currentStudentData.studentId) {
+                await db.collection("students").doc(doc.id).update({
+                  status: "pending",
+                  approvalStatus: "pending",
+                  rejectionReason: "",
+                  "workflow.adminApproval": "pending"
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn("Firestore update notice:", e);
+        }
+
+        // Dispatch email notification to Centre Admin
+        try {
+          const adminEmails = {
+            abk: "ejaytechabkadmin@gmail.com",
+            ibadan: "ejaytechibadmin@gmail.com",
+            abuja: "ejaytechabjadmin@gmail.com"
+          };
+          const adminEmail = adminEmails[currentStudentData.centreId] || "ejaytechadmin@gmail.com";
+          await sendEmailNotification("admin_notification", adminEmail, {
+            studentName: currentStudentData.fullname || currentStudentData.fullName,
+            studentId: currentStudentData.studentId,
+            centre: currentStudentData.centre,
+            course: currentStudentData.course,
+            registrationDate: new Date().toLocaleDateString(),
+            reviewLink: `${window.location.origin}/admin-dashboard.html`
+          });
+        } catch (e) {
+          console.warn("Notification error:", e);
+        }
+
+        alert("Registration resubmitted successfully for Centre Admin review!");
+        await renderStudentDashboardWithData(currentStudentData, studentUid);
+
+      } catch (err) {
+        console.error("Resubmit error:", err);
+        alert("Failed to resubmit: " + err.message);
+      }
+    };
+
+    /**
+     * Upload Document Helper
+     */
+    window.uploadStudentDocument = function(docType, input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64Url = e.target.result;
+        if (!currentStudentData) currentStudentData = {};
+        if (!currentStudentData.documents) currentStudentData.documents = {};
+        
+        currentStudentData.documents[docType] = base64Url;
+        
+        if (docType === 'passportPhoto') {
+          currentStudentData.passportPhoto = base64Url;
+          const passImg = document.getElementById("student-passport-photo");
+          if (passImg) passImg.src = base64Url;
+          const prevImg = document.getElementById("doc-preview-passport");
+          if (prevImg) prevImg.src = base64Url;
+        } else {
+          const prevEl = document.getElementById(`doc-preview-${docType === 'idCard' ? 'idcard' : docType === 'certificates' ? 'certs' : 'supp'}`);
+          if (prevEl) prevEl.textContent = `Attached: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        }
+
+        localStorage.setItem("mock_student_profile", JSON.stringify(currentStudentData));
+        
+        try {
+          const listStr = localStorage.getItem("mock_students_list");
+          if (listStr) {
+            const list = JSON.parse(listStr);
+            const idx = list.findIndex(s => s.uid === currentStudentData.uid || s.studentId === currentStudentData.studentId);
+            if (idx !== -1) {
+              list[idx].documents = currentStudentData.documents;
+              if (docType === 'passportPhoto') list[idx].passportPhoto = base64Url;
+              localStorage.setItem("mock_students_list", JSON.stringify(list));
+            }
+          }
+        } catch (err) {
+          console.warn("Doc sync error:", err);
+        }
+
+        const statusBadgeId = `doc-status-${docType === 'passportPhoto' ? 'passport' : docType === 'idCard' ? 'idcard' : docType === 'certificates' ? 'certs' : 'supp'}`;
+        const badgeEl = document.getElementById(statusBadgeId);
+        if (badgeEl) {
+          badgeEl.textContent = "Uploaded / Under Review";
+          badgeEl.className = "badge bg-info-subtle text-info border";
+        }
+
+        alert(`Document (${file.name}) uploaded successfully! Centre Admin will review it.`);
+      };
+      reader.readAsDataURL(file);
+    };
   </script>
 </body>
 </html>

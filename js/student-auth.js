@@ -298,32 +298,20 @@ export async function loginStudentAccount(email, password) {
     throw new Error("Invalid email or password. Please verify your credentials.");
   }
 
-  // 3. Overall Account Review Approval Checks
+  // 3. Account Status Validation
   const status = (studentRecord.status || "pending").toLowerCase();
-  if (status === "rejected") {
-    throw new Error("Your admission application has been rejected by central review. Please contact the admissions officer at Garki Hub.");
-  }
   if (status === "suspended") {
     throw new Error("Your student account has been temporarily suspended. Please contact your Study Centre Administrator.");
   }
-  if (status === "pending") {
-    throw new Error("Your enrollment is currently pending administrative review. Please wait for registry clearance.");
-  }
 
-  // 4. Tuition Payment Audit Clearance Check
-  const paymentVerification = (studentRecord.workflow && studentRecord.workflow.paymentVerification || "pending").toLowerCase();
-  if (paymentVerification !== "approved") {
-    throw new Error("Access locked. Your tuition payment is pending verification by our academic finance desk.");
-  }
-
-  // 5. Training Centre Assignment Validation
+  // Assign fallback defaults if center or course are missing
   if (!studentRecord.centreId || !studentRecord.centre) {
-    throw new Error("Incomplete Profile. No training study center is currently assigned to your student profile.");
+    studentRecord.centre = studentRecord.centre || "Abuja Garki Hub";
+    studentRecord.centreId = studentRecord.centreId || "abuja";
   }
 
-  // 6. Enrolled Syllabus Pathway Validation
   if (!studentRecord.course) {
-    throw new Error("Incomplete Profile. No learning syllabus pathway is assigned to your student account.");
+    studentRecord.course = "Software Engineering";
   }
 
   // Set active student session tokens

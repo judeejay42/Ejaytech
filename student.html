@@ -757,18 +757,19 @@
           console.warn("[Email Notification Error] Logged for debugging:", emailErr);
         }
 
+        // Auto-login registered student immediately
+        sessionStorage.setItem("student_logged_in", "true");
+        sessionStorage.setItem("student_uid", studentRecord.uid);
+        localStorage.setItem("mock_student_profile", JSON.stringify(studentRecord));
+
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-person-plus me-2"></i> Register Account';
 
-        if (emailResult && emailResult.delivered) {
-          displayNotification(true, "Registration Completed", "Registration completed successfully. A confirmation email has been sent to your email address.");
-        } else {
-          displayNotification(true, "Registration Completed", "Registration completed successfully, but we could not send the confirmation email at this time.");
-        }
+        displayNotification(true, "Registration Successful", "Welcome! Redirecting you to your Student Dashboard...");
         
-        // Return back to selection step for subsequent users
-        document.getElementById("student-register-form").reset();
-        showCentreSelection();
+        setTimeout(() => {
+          window.location.href = "student-dashboard.html";
+        }, 1200);
       } catch (err) {
         console.error("[Firestore Student Registration Failure] Error logged to console for debugging:", err);
         btn.disabled = false;
