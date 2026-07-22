@@ -250,18 +250,68 @@ function seedMockStudentPortalData() {
 seedMockStudentPortalData();
 
 /**
- * Fetch and load student profile data
+ * Fetch and load student profile data from Firestore or local storage
  */
-export async function getStudentProfile(uid) {
-  console.log(`[Mock DB] Loading student profile for UID: ${uid}`);
-  
-  // 1. Try to fetch from the master students list
+export async function getStudentProfile(uid, email) {
+  console.log(`[Student Profile Read] Loading student profile for UID: ${uid}, Email: ${email}`);
+
+  // 1. Query Firestore 'students' collection
+  try {
+    if (typeof db !== "undefined" && db && typeof db.collection === "function") {
+      if (uid) {
+        try {
+          const docRef = db.collection("students").doc(uid);
+          const docSnap = await docRef.get();
+          if (docSnap && (docSnap.exists || (typeof docSnap.data === "function" && docSnap.data()))) {
+            const data = typeof docSnap.data === "function" ? docSnap.data() : docSnap.data;
+            if (data && (data.uid || data.email || data.studentId)) {
+              console.log("[Firestore Read] Student profile found by direct document ID:", data);
+              localStorage.setItem("mock_student_profile", JSON.stringify(data));
+              return data;
+            }
+          }
+        } catch (docErr) {
+          console.warn("[Firestore Read] Direct doc read by ID notice:", docErr);
+        }
+      }
+
+      const snap = await db.collection("students").get();
+      let matchedStudent = null;
+      if (snap && snap.forEach) {
+        snap.forEach(doc => {
+          const d = typeof doc.data === "function" ? doc.data() : doc.data;
+          if (d) {
+            const matchUid = uid && (d.uid === uid || d.id === uid || doc.id === uid || d.studentId === uid);
+            const matchEmail = email && d.email && d.email.toLowerCase().trim() === email.toLowerCase().trim();
+            if (matchUid || matchEmail) {
+              matchedStudent = d;
+            }
+          }
+        });
+      }
+
+      if (matchedStudent) {
+        console.log("[Firestore Read] Student profile found in students collection:", matchedStudent);
+        localStorage.setItem("mock_student_profile", JSON.stringify(matchedStudent));
+        return matchedStudent;
+      }
+    }
+  } catch (err) {
+    console.error("[Firestore Read Error] Error querying students collection:", err);
+    throw err;
+  }
+
+  // 2. Query master students list in local storage
   try {
     const listStr = localStorage.getItem("mock_students_list");
     if (listStr) {
       const list = JSON.parse(listStr);
-      const found = list.find(s => s.uid === uid || s.id === uid || s.studentId === uid);
+      const found = list.find(s => 
+        (uid && (s.uid === uid || s.id === uid || s.studentId === uid)) ||
+        (email && s.email && s.email.toLowerCase().trim() === email.toLowerCase().trim())
+      );
       if (found) {
+        console.log("[Local Storage Read] Student profile found in mock_students_list:", found);
         localStorage.setItem("mock_student_profile", JSON.stringify(found));
         return found;
       }
@@ -270,56 +320,24 @@ export async function getStudentProfile(uid) {
     console.warn("Error looking up profile in mock_students_list:", e);
   }
 
-  // 2. Fallback to cached profile if matching
+  // 3. Fallback to cached profile if matching
   const cached = localStorage.getItem("mock_student_profile");
   if (cached) {
     try {
       const parsed = JSON.parse(cached);
-      if (parsed.uid === uid || parsed.id === uid || parsed.studentId === uid) {
+      if (
+        (uid && (parsed.uid === uid || parsed.id === uid || parsed.studentId === uid)) ||
+        (email && parsed.email && parsed.email.toLowerCase().trim() === email.toLowerCase().trim())
+      ) {
+        console.log("[Local Storage Read] Student profile found in cached mock_student_profile:", parsed);
         return parsed;
       }
     } catch (e) {}
   }
 
-  // Return a beautiful default profile if none exists
-  const defaultProfile = {
-    uid: uid || "mock_student_uid",
-    studentId: "EJ-2026-9999",
-    fullName: "EJaytech Student",
-    fullname: "EJaytech Student",
-    email: "student@example.com",
-    phone: "07033719342",
-    gender: "Male",
-    dob: "2000-01-01",
-    state: "Lagos",
-    address: "04 Akande Oke Street, Abeokuta",
-    course: "Software Engineering",
-    role: "student",
-    status: "approved",
-    approvalStatus: "approved",
-    createdAt: new Date().toISOString(),
-    bio: "Enthusiastic EJaytech Concepts student.",
-    centre: "Abuja Garki Hub",
-    centreId: "abuja",
-    lastDocumentSubmitted: "",
-    workflow: {
-      submitted: true,
-      pendingReview: "approved",
-      documentVerification: "approved",
-      paymentVerification: "approved",
-      adminApproval: "approved",
-      studentActivated: true
-    },
-    documents: {
-      passportPhoto: { status: "approved", fileUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80", feedback: "" },
-      idCard: { status: "approved", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" },
-      certificates: { status: "approved", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" },
-      supportingDocuments: { status: "approved", fileUrl: "assets/images/placeholder_document.pdf", feedback: "" }
-    },
-    paymentHistory: []
-  };
-  localStorage.setItem("mock_student_profile", JSON.stringify(defaultProfile));
-  return defaultProfile;
+  // Student profile document does not exist
+  console.warn("[Student Profile Read] No student profile document found matching UID:", uid, "or Email:", email);
+  return null;
 }
 
 /**

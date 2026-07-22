@@ -1565,33 +1565,105 @@
     document.addEventListener("DOMContentLoaded", async () => {
       console.log("[Portal Initialization] Student workspace online.");
       
-      const studentUid = sessionStorage.getItem("student_uid") || "mock_student_uid";
       const loadingTextEl = document.getElementById("dash-loading-text");
       
       // Initialize clock
       updateLivePortalClock();
       setInterval(updateLivePortalClock, 1000);
 
+      let isDashboardLoaded = false;
+
+      // Requirement 7: Ensure loading spinner stops after max 10 seconds
+      const maxLoadingTimeout = setTimeout(() => {
+        if (!isDashboardLoaded) {
+          console.error("[Timeout Error] Dashboard initialization exceeded 10 seconds.");
+          const loadingScreen = document.getElementById("dash-loading-screen");
+          if (loadingScreen) loadingScreen.classList.add("d-none");
+          showErrorState("Unable to Connect", "Unable to connect to the server. Please try again.", true);
+        }
+      }, 10000);
+
+      // Requirement 1 & 10: Wait for onAuthStateChanged() before requesting Firestore data
       try {
         if (loadingTextEl) loadingTextEl.textContent = "Authenticating...";
-        const data = await getStudentProfile(studentUid);
-        
-        // Stagger progressive checks with high fidelity animations
-        setTimeout(() => {
-          if (loadingTextEl) loadingTextEl.textContent = "Verifying student records...";
-          
-          setTimeout(() => {
-            if (loadingTextEl) loadingTextEl.textContent = "Loading dashboard...";
-            
-            setTimeout(async () => {
-              await renderStudentDashboardWithData(data, studentUid);
-            }, 600);
-          }, 600);
-        }, 600);
 
-      } catch (err) {
-        console.error("[Portal Initialization Error]", err);
-        showErrorState("Renderer Setup Error", "Could not assemble student dashboard layouts: " + err.message, true);
+        const processAuthenticatedUser = async (authUser) => {
+          try {
+            console.log("[Auth State Verified] Authentication state change completed. Auth user:", authUser);
+
+            const sessionUid = sessionStorage.getItem("student_uid");
+            const uidToFetch = (authUser && authUser.uid) ? authUser.uid : sessionUid;
+            const emailToFetch = authUser ? authUser.email : null;
+
+            if (!uidToFetch && !emailToFetch) {
+              console.warn("[Auth State Check] No authenticated user or valid student session found.");
+              clearTimeout(maxLoadingTimeout);
+              document.getElementById("dash-loading-screen").classList.add("d-none");
+              showErrorState("Profile Not Found", "Student profile not found. Please contact your Centre Administrator.", true);
+              return;
+            }
+
+            if (loadingTextEl) loadingTextEl.textContent = "Fetching student records...";
+
+            // Requirement 2 & 6: Immediately fetch student document from Firestore with try/catch
+            let studentDoc = null;
+            let firestoreError = null;
+
+            try {
+              studentDoc = await getStudentProfile(uidToFetch, emailToFetch);
+            } catch (err) {
+              firestoreError = err;
+              console.error("[Firestore Read Error] Error fetching student profile document from Firestore:", err);
+            }
+
+            clearTimeout(maxLoadingTimeout);
+
+            if (firestoreError) {
+              // Requirement 5 & 6: If Firestore cannot be reached or network/permission error occurs
+              console.error("[Firestore Connection Error]", firestoreError);
+              document.getElementById("dash-loading-screen").classList.add("d-none");
+              showErrorState("Unable to Connect", "Unable to connect to the server. Please try again.", true);
+              return;
+            }
+
+            if (!studentDoc) {
+              // Requirement 4: If student document does not exist
+              console.warn("[Firestore Read] Student profile document does not exist for UID:", uidToFetch);
+              document.getElementById("dash-loading-screen").classList.add("d-none");
+              showErrorState("Profile Not Found", "Student profile not found. Please contact your Centre Administrator.", true);
+              return;
+            }
+
+            // Requirement 3: If student document exists -> hide loading spinner and render complete dashboard
+            isDashboardLoaded = true;
+            document.getElementById("dash-loading-screen").classList.add("d-none");
+            await renderStudentDashboardWithData(studentDoc, uidToFetch);
+
+          } catch (innerErr) {
+            console.error("[Dashboard Initialization Error]", innerErr);
+            clearTimeout(maxLoadingTimeout);
+            document.getElementById("dash-loading-screen").classList.add("d-none");
+            showErrorState("Unable to Connect", "Unable to connect to the server. Please try again.", true);
+          }
+        };
+
+        if (auth && typeof auth.onAuthStateChanged === "function") {
+          let unsubscribe = auth.onAuthStateChanged((authUser) => {
+            if (typeof unsubscribe === "function") {
+              try { unsubscribe(); } catch(e) {}
+            }
+            processAuthenticatedUser(authUser);
+          });
+        } else {
+          const currentUser = (auth && auth.currentUser) ? auth.currentUser : null;
+          processAuthenticatedUser(currentUser);
+        }
+
+      } catch (authErr) {
+        console.error("[Authentication Error]", authErr);
+        clearTimeout(maxLoadingTimeout);
+        document.getElementById("dash-loading-screen").classList.add("d-none");
+        showErrorState("Unable to Connect", "Unable to connect to the server. Please try again.", true);
       }
 
       // Sidebar view switcher link binding
