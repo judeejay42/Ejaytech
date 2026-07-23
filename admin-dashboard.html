@@ -16,6 +16,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
   <!-- D3 / Chart.js for High Fidelity Reports -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- EmailJS Super Admin Engine -->
+  <script type="module" src="js/admin-emailjs.js"></script>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Custom CSS variables -->
@@ -346,6 +348,7 @@
       <button class="menu-item" onclick="showPane('audit')"><i class="bi bi-shield-lock-fill"></i> Audit Logs</button>
       <button class="menu-item" onclick="showPane('admins')"><i class="bi bi-person-workspace"></i> Admins (RBAC)</button>
       <button class="menu-item" onclick="showPane('settings')"><i class="bi bi-sliders"></i> Settings</button>
+      <button class="menu-item" onclick="showPane('emailjs')" id="menu-btn-emailjs"><i class="bi bi-envelope-at-fill text-warning"></i> 📧 EmailJS Settings</button>
       <button class="menu-item" onclick="showPane('profile')"><i class="bi bi-person-fill-gear"></i> Personal Profile</button>
     </div>
     <div class="p-3 border-top border-secondary mt-auto">
@@ -1375,6 +1378,258 @@
         </div>
       </div>
 
+      <!-- PANE 12: EMAILJS CONFIGURATION (SUPER ADMIN EXCLUSIVE) -->
+      <div class="workspace-pane d-none" id="pane-emailjs">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <div>
+            <h4 class="fw-bold mb-1"><i class="bi bi-envelope-at-fill text-primary"></i> 📧 EmailJS Settings</h4>
+            <p class="text-muted small mb-0">Configure EmailJS parameters, monitor delivery activity logs, test dispatch, customize email templates, and manage configuration backups.</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 fw-semibold">
+              <i class="bi bi-shield-lock-fill me-1"></i> Super Admin Clearance Only
+            </span>
+          </div>
+        </div>
+
+        <!-- Connection Status Card -->
+        <div class="card p-4 shadow-sm mb-4 border-0" id="emailjs-status-card" style="border-left: 5px solid #dc3545 !important;">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="fs-1" id="emailjs-status-icon">🔴</div>
+              <div>
+                <h5 class="fw-bold mb-1" id="emailjs-status-title">EmailJS Not Configured</h5>
+                <p class="text-muted small mb-0" id="emailjs-status-desc">Enter your EmailJS Public Key, Service ID, and Template ID below to activate automated email notifications across all portals.</p>
+              </div>
+            </div>
+            <div class="text-end font-mono small text-muted">
+              <div><strong class="text-dark">Notification Email:</strong> <span id="emailjs-status-notify-email">ejaytechadmin@gmail.com</span></div>
+              <div><strong class="text-dark">Connection Engine:</strong> EmailJS REST API</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Controls inside EmailJS Pane -->
+        <ul class="nav nav-tabs mb-4 fw-semibold" id="emailjsTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="ejs-config-tab" data-bs-toggle="tab" data-bs-target="#ejs-config-pane" type="button" role="tab"><i class="bi bi-sliders me-1"></i> API Credentials &amp; Keys</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ejs-templates-tab" data-bs-toggle="tab" data-bs-target="#ejs-templates-pane" type="button" role="tab"><i class="bi bi-file-earmark-code me-1"></i> Notification Templates</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ejs-logs-tab" data-bs-toggle="tab" data-bs-target="#ejs-logs-pane" type="button" role="tab" onclick="renderEmailActivityLogsTable()"><i class="bi bi-journal-text me-1"></i> Email Activity Logs</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ejs-backup-tab" data-bs-toggle="tab" data-bs-target="#ejs-backup-pane" type="button" role="tab"><i class="bi bi-cloud-arrow-down me-1"></i> Backup &amp; Restore</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="emailjsTabContent">
+          <!-- SUB-TAB 1: API CREDENTIALS FORM -->
+          <div class="tab-pane fade show active" id="ejs-config-pane" role="tabpanel">
+            <form id="emailjsConfigForm" onsubmit="handleSaveEmailJSForm(event)">
+              <div class="card p-4 shadow-sm mb-4">
+                <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-key-fill text-primary"></i> EmailJS API Credentials</h6>
+                
+                <div id="emailjs-validation-alert" class="alert alert-danger d-none mb-3" role="alert"></div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">EmailJS Public Key <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <input type="password" class="form-control font-mono" id="ejs-public-key" placeholder="e.g. user_XXXXXXXXXXXXXX" required>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('ejs-public-key', this)"><i class="bi bi-eye"></i></button>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">EmailJS Service ID <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <input type="password" class="form-control font-mono" id="ejs-service-id" placeholder="e.g. service_XXXXXXX" required>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('ejs-service-id', this)"><i class="bi bi-eye"></i></button>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">EmailJS Template ID <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <input type="password" class="form-control font-mono" id="ejs-template-id" placeholder="e.g. template_XXXXXXX" required>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('ejs-template-id', this)"><i class="bi bi-eye"></i></button>
+                    </div>
+                  </div>
+                </div>
+
+                <h6 class="fw-bold border-bottom pb-2 mb-3 mt-2"><i class="bi bi-send-check text-success"></i> Sender &amp; Notification Identities</h6>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">Sender Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="ejs-sender-name" placeholder="EJaytech Concepts Operations" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">Reply-To Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="ejs-reply-to" placeholder="ejaytechconcepts@gmail.com" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">Notification Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="ejs-notification-email" value="ejaytechadmin@gmail.com" required>
+                  </div>
+                </div>
+
+                <!-- Test Email Outcome Banner -->
+                <div id="test-email-result-banner" class="mt-3"></div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap gap-2 justify-content-end mt-4 pt-3 border-top">
+                  <button type="button" onclick="handleCancelEmailJSForm()" class="btn btn-outline-secondary px-4"><i class="bi bi-x-circle me-1"></i> Cancel</button>
+                  <button type="button" onclick="handleResetEmailJSForm()" class="btn btn-outline-warning text-dark px-4"><i class="bi bi-arrow-counterclockwise me-1"></i> Reset</button>
+                  <button type="button" onclick="handleTestEmailJSTrigger()" class="btn btn-success px-4" id="btn-test-emailjs"><i class="bi bi-arrow-repeat me-1"></i> Test Email</button>
+                  <button type="submit" class="btn btn-primary px-4 fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Save Settings</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- SUB-TAB 2: NOTIFICATION TEMPLATES EDITOR -->
+          <div class="tab-pane fade" id="ejs-templates-pane" role="tabpanel">
+            <div class="card p-4 shadow-sm mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                  <h6 class="fw-bold mb-0"><i class="bi bi-file-earmark-text text-primary"></i> Notification Templates Editor</h6>
+                  <span class="small text-muted">Customize subject lines and bodies for automatic dispatch emails.</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <label class="small fw-bold text-nowrap">Select Template:</label>
+                  <select class="form-select form-select-sm" id="ejs-template-selector" onchange="switchActiveEmailJSTemplate(this.value)" style="min-width: 250px;">
+                    <option value="student_registration">Student Registration Confirmation</option>
+                    <option value="admission_approved">Admission Approved</option>
+                    <option value="admission_rejected">Admission Rejected</option>
+                    <option value="payment_confirmation">Payment Confirmation</option>
+                    <option value="password_reset">Password Reset</option>
+                    <option value="instructor_assignment">Instructor Assignment</option>
+                    <option value="course_registration">Course Registration Confirmation</option>
+                    <option value="general_announcement">General Announcement</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Available Placeholders Chips -->
+              <div class="p-3 bg-light rounded border mb-3">
+                <span class="small fw-bold d-block mb-1 text-primary"><i class="bi bi-code-slash"></i> Click any placeholder chip to insert into text:</span>
+                <div class="d-flex flex-wrap gap-1">
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{student_name}}')" style="font-size: 0.75rem;">{{student_name}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{email}}')" style="font-size: 0.75rem;">{{email}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{centre}}')" style="font-size: 0.75rem;">{{centre}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{programme}}')" style="font-size: 0.75rem;">{{programme}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{course}}')" style="font-size: 0.75rem;">{{course}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{registration_number}}')" style="font-size: 0.75rem;">{{registration_number}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{amount}}')" style="font-size: 0.75rem;">{{amount}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{payment_status}}')" style="font-size: 0.75rem;">{{payment_status}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{approval_status}}')" style="font-size: 0.75rem;">{{approval_status}}</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-mono" onclick="insertPlaceholderChip('{{portal_link}}')" style="font-size: 0.75rem;">{{portal_link}}</button>
+                </div>
+              </div>
+
+              <form id="emailjsTemplateEditorForm" onsubmit="handleSaveActiveEmailJSTemplate(event)">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Subject Line</label>
+                  <input type="text" class="form-control" id="ejs-template-subject" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Template Body Content</label>
+                  <textarea class="form-control font-mono" id="ejs-template-body" rows="10" required></textarea>
+                </div>
+
+                <div id="ejs-template-saved-alert" class="alert alert-success d-none mb-3 py-2 small">✔ Template saved successfully!</div>
+
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                  <button type="button" onclick="handleResetActiveEmailJSTemplate()" class="btn btn-outline-danger btn-sm"><i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Default Template</button>
+                  <button type="submit" class="btn btn-primary btn-sm px-4"><i class="bi bi-save me-1"></i> Save Template</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 3: EMAIL ACTIVITY LOG -->
+          <div class="tab-pane fade" id="ejs-logs-pane" role="tabpanel">
+            <div class="card p-3 mb-4 shadow-sm">
+              <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="ejs-log-search" placeholder="Search recipient or type..." oninput="renderEmailActivityLogsTable()">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" id="ejs-log-time-filter" onchange="renderEmailActivityLogsTable()">
+                    <option value="all">All Dates &amp; Times</option>
+                    <option value="today">Today</option>
+                    <option value="last_7">Last 7 Days</option>
+                    <option value="last_30">Last 30 Days</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" id="ejs-log-status-filter" onchange="renderEmailActivityLogsTable()">
+                    <option value="all">All Statuses</option>
+                    <option value="successful">Successful Emails</option>
+                    <option value="failed">Failed Emails</option>
+                  </select>
+                </div>
+                <div class="col-md-2 text-end">
+                  <button onclick="handlePurgeEmailLogs()" class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-trash"></i> Purge Logs</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card shadow-sm overflow-hidden">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Recipient</th>
+                      <th>Email Type</th>
+                      <th>Status</th>
+                      <th>Error Message (if any)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="emailjs-logs-tbody">
+                    <!-- Logs injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 4: BACKUP & RESTORE -->
+          <div class="tab-pane fade" id="ejs-backup-pane" role="tabpanel">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="card p-4 shadow-sm h-100">
+                  <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-download text-primary"></i> Export Email Settings</h6>
+                  <p class="text-muted small">Download a secure JSON file containing all EmailJS API configuration keys, identities, and customized notification templates.</p>
+                  <div class="mt-auto pt-3">
+                    <button onclick="handleExportEmailSettings()" class="btn btn-primary w-100 py-2"><i class="bi bi-file-earmark-arrow-down me-2"></i> Export Email Settings</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card p-4 shadow-sm h-100">
+                  <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-upload text-success"></i> Import Email Settings</h6>
+                  <p class="text-muted small">Restore EmailJS settings and templates from a previously exported JSON backup file.</p>
+                  <div class="mb-3">
+                    <input type="file" class="form-control form-control-sm" id="ejs-import-file-input" accept=".json">
+                  </div>
+                  <div id="ejs-import-alert" class="alert d-none mb-3 py-2 small"></div>
+                  <div class="mt-auto pt-2">
+                    <button onclick="handleImportEmailSettings()" class="btn btn-success text-white w-100 py-2"><i class="bi bi-file-earmark-arrow-up me-2"></i> Import Email Settings</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1920,8 +2175,8 @@
       if (activeRole === "Super Admin") return true;
 
       if (activeRole === "Administrator") {
-        if (actionType === "settings" || actionType === "centres" || actionType === "monitoring") {
-          alert("Access Denied: Super-Administrator authorization is required.");
+        if (actionType === "settings" || actionType === "centres" || actionType === "monitoring" || actionType === "emailjs") {
+          alert("Access Denied: Super-Administrator authorization is required to access EmailJS Settings.");
           return false;
         }
         return true;
@@ -2006,6 +2261,8 @@
         renderCentresOverview();
       } else if (paneId === "monitoring") {
         renderMonitoringDashboard();
+      } else if (paneId === "emailjs") {
+        if (typeof window.renderEmailJSSettingsPane === "function") window.renderEmailJSSettingsPane();
       }
 
       // Close mobile sidebar if open

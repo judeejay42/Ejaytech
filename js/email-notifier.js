@@ -7,6 +7,21 @@
 export async function sendEmailNotification(type, to, data = {}) {
   let result = { success: false, delivered: false, error: "Network error" };
 
+  // 1. Check if EmailJS is configured and connected
+  if (typeof window.sendEmailViaEmailJS === "function" && typeof window.isEmailJSConnected === "function" && window.isEmailJSConnected()) {
+    try {
+      const emailjsResult = await window.sendEmailViaEmailJS(type, to, data);
+      if (emailjsResult.success) {
+        return emailjsResult;
+      } else {
+        console.warn("EmailJS dispatch returned error, attempting backend fallback:", emailjsResult.error);
+      }
+    } catch (ejsErr) {
+      console.warn("EmailJS error during sendEmailNotification:", ejsErr);
+    }
+  }
+
+  // 2. Fallback to /api/send-email service
   try {
     const response = await fetch("/api/send-email", {
       method: "POST",
